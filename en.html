@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Last Launcher — English overview</title>
+  <meta name="description" content="The Last is a French Minecraft: Java Edition server with custom NeoForge content. This page describes The Last Launcher: how it signs players in with Microsoft, what it downloads and what data it handles.">
+  <link rel="canonical" href="https://thelastmc.fr/en.html">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="./" lang="fr">Accueil (FR)</a>
+        <a href="en.html" aria-current="page">English</a>
+        <a href="confidentialite.html" lang="fr">Privacy (FR)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="doc">
+    <div class="wrap">
+      <h1>The Last Launcher</h1>
+      <p class="updated">English overview — last updated October 5, 2026</p>
+
+      <p><strong>The Last</strong> is an independent French Minecraft: Java Edition server with custom
+        content built on NeoForge, currently in development. <strong>The Last Launcher</strong> is its
+        desktop launcher (Windows first; macOS and Linux planned). It installs and updates everything
+        needed to play on the server and starts the game straight into it.</p>
+
+      <h2>How players sign in</h2>
+      <ul>
+        <li>Players sign in with <strong>their own Microsoft account</strong> in the <strong>system
+          browser</strong>, on Microsoft's own sign-in page (OAuth 2.0 authorization code flow with PKCE,
+          <code>consumers</code> tenant, scope <code>XboxLive.signin offline_access</code>, loopback
+          redirect to <code>http://localhost</code>). The launcher never sees or stores the password and
+          uses no client secret.</li>
+        <li>It then follows the documented chain: Xbox Live user token → XSTS token
+          (<code>rp://api.minecraftservices.com/</code>) → <code>login_with_xbox</code> → game ownership
+          check (<code>/entitlements/mcstore</code>) → Minecraft profile.</li>
+        <li><strong>There is no offline or "cracked" mode.</strong> Accounts that do not own Minecraft:
+          Java Edition cannot play. The launcher never bypasses authentication, license or safety checks.</li>
+        <li>Our game server runs with <code>online-mode=true</code>, so only genuine accounts can join.</li>
+      </ul>
+
+      <h2>What it downloads</h2>
+      <ul>
+        <li>Minecraft, its libraries, assets and Java runtime come <strong>only from Mojang's official
+          servers</strong>, verified against Mojang's published hashes. No modified Minecraft jar is ever
+          distributed.</li>
+        <li>NeoForge is installed from its official Maven repository; mods come from Modrinth or from our
+          own file server.</li>
+        <li>Our pack manifest and news are <strong>digitally signed (Ed25519)</strong>; every file is
+          checked against the signed manifest before each launch. Launcher updates are signed as well.</li>
+      </ul>
+
+      <h2>Data and privacy</h2>
+      <ul>
+        <li>Only the refresh token issued by Microsoft is kept, <strong>encrypted on the player's
+          computer</strong> (operating-system credential store). Minecraft access tokens stay in memory
+          and are only passed to the game process. Tokens are never logged.</li>
+        <li>No telemetry, no analytics, no advertising, no hardware fingerprinting. The launcher sends no
+          personal data to The Last.</li>
+        <li>Full privacy policy (French): <a href="confidentialite.html">thelastmc.fr/confidentialite</a>.</li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p><a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="cols">
+        <div>© 2026 The Last — <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
+        <nav aria-label="Legal links">
+          <a href="confidentialite.html" lang="fr">Confidentialité</a>
+          <a href="cgu.html" lang="fr">Conditions d'utilisation</a>
+          <a href="mentions-legales.html" lang="fr">Mentions légales</a>
+        </nav>
+      </div>
+      <div class="disclaimer">
+        <p>Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+        <p lang="fr">Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

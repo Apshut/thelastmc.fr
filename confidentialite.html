@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Politique de confidentialité — The Last</title>
+  <meta name="description" content="Quelles données le launcher, le serveur et le site The Last traitent, pourquoi, combien de temps, et comment exercer tes droits.">
+  <link rel="canonical" href="https://thelastmc.fr/confidentialite.html">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a href="./">Accueil</a>
+        <a href="./#launcher">Le launcher</a>
+        <a href="confidentialite.html" aria-current="page">Confidentialité</a>
+        <a href="en.html" lang="en">English</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="doc">
+    <div class="wrap">
+      <h1>Politique de confidentialité</h1>
+      <p class="updated">Dernière mise à jour : 5 octobre 2026</p>
+
+      <p>Cette page explique quelles données personnelles sont traitées quand tu utilises
+        <strong>The Last Launcher</strong>, le <strong>serveur Minecraft The Last</strong> et ce
+        <strong>site</strong>, pourquoi, combien de temps, et comment exercer tes droits. Nous en
+        collectons le moins possible : le launcher n'envoie aucune donnée personnelle à The Last.</p>
+
+      <h2>1. Qui est responsable ?</h2>
+      <p>The Last est un projet indépendant mené par un particulier en France. Le responsable du
+        traitement est le responsable du projet The Last, joignable à
+        <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>.</p>
+
+      <h2>2. Le launcher</h2>
+      <h3>Connexion avec ton compte Microsoft</h3>
+      <p>Tu te connectes dans ton navigateur, sur la page officielle de Microsoft. <strong>Le launcher
+        ne voit jamais ton mot de passe.</strong> Microsoft lui renvoie une autorisation, qu'il échange
+        auprès de Microsoft, Xbox Live et Minecraft pour vérifier que tu possèdes Minecraft: Java
+        Edition et récupérer ton profil (pseudo, identifiant unique et skin).</p>
+
+      <h3>Ce qui est gardé, et où</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Donnée</th><th>Où</th><th>Pourquoi</th><th>Combien de temps</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pseudo, identifiant unique (UUID) et skin Minecraft</td>
+              <td>Sur ton ordinateur uniquement</td>
+              <td>Afficher tes comptes et lancer le jeu</td>
+              <td>Jusqu'à ce que tu retires le compte ou désinstalles le launcher</td>
+            </tr>
+            <tr>
+              <td>Jeton de renouvellement Microsoft (pour rester connecté)</td>
+              <td>Sur ton ordinateur, <strong>chiffré</strong> ; la clé est protégée par le coffre-fort de
+                ton système (Gestionnaire d'identifiants Windows, Trousseau macOS, Secret Service sous Linux)</td>
+              <td>Te reconnecter sans retaper ton mot de passe</td>
+              <td>Jusqu'au retrait du compte, ou jusqu'à son expiration chez Microsoft</td>
+            </tr>
+            <tr>
+              <td>Jetons d'accès Xbox et Minecraft</td>
+              <td>Dans la mémoire du launcher, puis transmis au jeu ; jamais écrits dans un fichier ni dans
+                un journal</td>
+              <td>Lancer le jeu avec ton compte</td>
+              <td>Le temps de la session</td>
+            </tr>
+            <tr>
+              <td>Réglages (mémoire, langue, canal…)</td>
+              <td>Sur ton ordinateur</td>
+              <td>Retrouver tes préférences</td>
+              <td>Jusqu'à la désinstallation</td>
+            </tr>
+            <tr>
+              <td>Journaux du launcher et du jeu</td>
+              <td>Sur ton ordinateur ; les jetons y sont masqués</td>
+              <td>Diagnostiquer un problème</td>
+              <td>7 jours pour le launcher ; les journaux du jeu sont gérés par Minecraft</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Le launcher n'a <strong>ni télémétrie, ni statistiques d'utilisation, ni publicité, ni
+        empreinte de ton matériel</strong>. Il ne transmet tes journaux à personne : la fonction
+        « Exporter les journaux » crée un fichier sur ton ordinateur, que tu restes libre de partager
+        (par exemple avec le support).</p>
+
+      <h3>Les services que le launcher contacte</h3>
+      <p>Comme toute connexion à Internet, chacun de ces services reçoit ton adresse IP.</p>
+      <ul>
+        <li><strong>Microsoft, Xbox Live et Mojang</strong> : connexion, vérification de la possession du
+          jeu, profil et skin, téléchargement de Minecraft et de Java. Leur traitement relève de la
+          <a href="https://privacy.microsoft.com/fr-fr/privacystatement" rel="noopener">déclaration de
+          confidentialité de Microsoft</a>.</li>
+        <li><strong>Notre serveur de fichiers</strong> : contenu du serveur (mods, configuration),
+          actualités et mises à jour du launcher. L'hébergeur conserve des journaux techniques (adresse IP,
+          date, fichier demandé) pour la sécurité. Son nom sera indiqué ici avant l'ouverture.</li>
+        <li><strong>Modrinth</strong> et le dépôt officiel de <strong>NeoForge</strong> : téléchargement
+          de certains mods et du chargeur de mods.</li>
+        <li><strong>Le serveur de jeu The Last</strong> : le launcher l'interroge pour afficher son statut
+          (joueurs en ligne).</li>
+        <li><strong>Discord (facultatif)</strong> : si l'option est activée et que l'application Discord
+          est ouverte sur ton ordinateur, le launcher lui indique que tu joues sur The Last, pour
+          l'afficher sur ton profil Discord. Désactivable dans les paramètres.</li>
+      </ul>
+
+      <h2>3. Le serveur de jeu</h2>
+      <p>Quand tu joues, le serveur reçoit, comme tout serveur Minecraft, ton <strong>pseudo</strong>,
+        ton <strong>identifiant unique</strong>, ton <strong>adresse IP</strong>, ainsi que tes messages
+        et tes actions en jeu. Ces informations servent à faire fonctionner le jeu, à le sécuriser et à
+        modérer (lutte contre la triche et les abus). Les journaux du serveur sont conservés au plus
+        <strong>12 mois</strong>. Ta progression en jeu est conservée tant que le serveur existe, sauf si
+        tu demandes sa suppression.</p>
+
+      <h2>4. Ce site</h2>
+      <p>Ce site n'utilise <strong>aucun cookie</strong>, aucun outil de mesure d'audience et aucun
+        service tiers : même les polices de caractères sont hébergées ici. Il est hébergé par GitHub Pages ;
+        GitHub reçoit l'adresse IP des visiteurs et la conserve dans ses journaux de sécurité (voir la
+        <a href="https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">déclaration
+        de confidentialité de GitHub</a>).</p>
+      <p>Si tu nous écris, nous gardons l'échange le temps de traiter ta demande, puis au plus un an.</p>
+
+      <h2>5. Sur quelle base ?</h2>
+      <ul>
+        <li><strong>Fournir le service que tu demandes</strong> (installer et lancer le jeu, te connecter,
+          te permettre de jouer) : exécution des conditions d'utilisation (article 6.1.b du RGPD).</li>
+        <li><strong>Sécurité et modération</strong> (journaux techniques et journaux du serveur) : notre
+          intérêt légitime à protéger le service et ses joueurs (article 6.1.f du RGPD).</li>
+      </ul>
+      <p>Nous ne vendons, ne louons et ne partageons tes données avec personne à des fins commerciales.</p>
+
+      <h2>6. Transferts hors de l'Union européenne</h2>
+      <p>Microsoft et GitHub sont des entreprises américaines. Leurs transferts de données vers les
+        États-Unis s'appuient sur le cadre de protection des données UE–États-Unis (Data Privacy
+        Framework) et sur leurs propres garanties.</p>
+
+      <h2>7. Tes droits</h2>
+      <p>Tu peux demander l'accès à tes données, leur rectification, leur effacement, la limitation du
+        traitement, t'y opposer, et demander leur portabilité, en écrivant à
+        <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>. Nous répondons dans un délai
+        d'un mois. Si tu estimes que tes droits ne sont pas respectés, tu peux saisir la
+        <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>.</p>
+      <p>Pour effacer ce que le launcher garde sur ton ordinateur :</p>
+      <ul>
+        <li>retire le compte dans le launcher (<em>Comptes → Retirer</em>) : son jeton est supprimé ;</li>
+        <li>désinstalle le launcher, puis supprime son dossier de données
+          (<code>%LOCALAPPDATA%\fr.thelast.launcher</code> sous Windows) ;</li>
+        <li>tu peux aussi retirer l'accès de « The Last Launcher » depuis ton compte Microsoft :
+          <a href="https://account.live.com/consent/Manage" rel="noopener">account.live.com/consent/Manage</a>.</li>
+      </ul>
+
+      <h2>8. Mineurs</h2>
+      <p>Minecraft est joué par beaucoup de jeunes. Les comptes Microsoft des enfants sont gérés par leurs
+        parents (famille Microsoft). Un parent peut nous écrire pour toute question ou pour faire supprimer
+        les données liées au compte de son enfant.</p>
+
+      <h2>9. Modifications</h2>
+      <p>Nous mettrons cette page à jour si nos pratiques changent ; la date en haut de page l'indique.
+        En cas de changement important, nous le signalerons dans les actualités du launcher.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="cols">
+        <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
+        <nav aria-label="Liens légaux">
+          <a href="confidentialite.html">Confidentialité</a>
+          <a href="cgu.html">Conditions d'utilisation</a>
+          <a href="mentions-legales.html">Mentions légales</a>
+          <a href="en.html" lang="en">English</a>
+        </nav>
+      </div>
+      <div class="disclaimer">
+        <p>Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+        <p lang="en">Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

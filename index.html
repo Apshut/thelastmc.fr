@@ -9,168 +9,233 @@
   <meta property="og:description" content="Un serveur moddé au contenu fait maison, avec son launcher sécurisé. Ouverture prochaine.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://thelastmc.fr/">
-  <meta property="og:image" content="https://thelastmc.fr/assets/captures/accueil.png">
+  <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Une forteresse-bête du Nether gravée THE LAST en blocs d'or, au milieu d'un lac de lave">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0a0608">
   <link rel="canonical" href="https://thelastmc.fr/">
   <link rel="alternate" hreflang="en" href="https://thelastmc.fr/en.html">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="stylesheet" href="assets/style.css">
+  <script>document.documentElement.className = "js";</script>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/nether.css">
+  <script src="assets/config.js" defer></script>
+  <script src="assets/mc/mc.js" defer></script>
+  <script src="assets/castle.js" defer></script>
+  <script src="assets/world.js" defer></script>
+  <script src="assets/nether.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
-      <nav class="nav" aria-label="Navigation principale">
-        <a href="./" aria-current="page">Accueil</a>
-        <a href="#launcher">Le launcher</a>
-        <a href="confidentialite.html">Confidentialité</a>
-        <a href="en.html" lang="en">English</a>
-      </nav>
-    </div>
+  <a class="skip" href="#launcher">Aller au téléchargement</a>
+
+  <header class="top" id="top">
+    <a class="brand" href="#lac"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <nav aria-label="Navigation principale">
+      <a class="tbtn tbtn-main" href="#launcher">Télécharger</a>
+      <a class="tbtn" href="#boutique">Boutique</a>
+      <a class="tbtn" href="en.html" lang="en" hreflang="en">EN</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="wrap">
-        <span class="eyebrow">Serveur Minecraft: Java Edition</span>
-        <h1>THE LAST</h1>
-        <p class="tagline">Le dernier monde vous attend.</p>
-        <p class="lead">Un serveur moddé (NeoForge) au contenu fait maison, pensé pour l'aventure et la
-          progression plutôt que pour le PvP faction. Il se rejoint avec son propre launcher, simple et sécurisé.</p>
-        <span class="pill">En préparation — ouverture prochaine</span>
-        <div class="actions">
-          <a class="btn btn-primary" href="#launcher">Découvrir le launcher</a>
-          <a class="btn btn-ghost" href="#securite">Sécurité et vie privée</a>
+  <nav class="depth" aria-label="Profondeur">
+    <ol>
+      <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span>Le lac de lave</span></a></li>
+      <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span>Sous la lave · le launcher</span></a></li>
+      <li><a href="#magma" data-sec="#magma" data-tex="magma"><span>Magma · aperçu</span></a></li>
+      <li><a href="#boutique" data-sec="#boutique" data-tex="netherrack"><span>Netherrack · la boutique</span></a></li>
+      <li><a href="#ames" data-sec="#ames" data-tex="soul_sand"><span>Sable des âmes · questions</span></a></li>
+      <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span>Bedrock · le fond</span></a></li>
+    </ol>
+    <p class="depth-y" aria-hidden="true">Y <b>48</b></p>
+  </nav>
+
+  <canvas id="scene" role="img" aria-label="Une forteresse de pierre noire à cornes et aux yeux de feu, gravée des mots THE LAST en blocs d'or, sur une île au milieu d'un lac de lave. Au premier plan, un piglin assis sur un arpenteur pêche dans la lave."></canvas>
+
+  <main id="monde">
+    <!-- ============ Le lac ============ -->
+    <section class="hero" id="lac" aria-label="Le lac de lave">
+      <h1 class="sr">The Last — serveur Minecraft: Java Edition</h1>
+      <div class="hero-ui">
+        <p class="loader" aria-hidden="true"><span class="px" data-fs="3">Ouverture du Nether...</span></p>
+        <div class="hero-cap">
+          <p class="cap-k"><i aria-hidden="true"></i><span class="px" data-fs="2">Serveur Minecraft moddé · ouverture prochaine</span></p>
+          <p class="cap-l">Contenu fait maison, aventure, construction et progression. Pas un énième PvP faction.</p>
         </div>
+        <a class="hero-hint" id="hint" href="#launcher"><span class="px" data-fs="2">Suis la ligne ↓</span></a>
       </div>
     </section>
 
-    <section id="serveur">
-      <div class="wrap">
-        <h2 class="section-title">Le serveur</h2>
-        <p class="section-sub">The Last est un projet indépendant, développé en France, qui ouvrira ses portes
-          quand il sera prêt.</p>
-        <div class="grid">
-          <article class="card">
-            <div class="icon" aria-hidden="true">✦</div>
-            <h3>Contenu sur mesure</h3>
-            <p>Des mods et des systèmes créés pour le serveur, installés automatiquement par le launcher.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">⚑</div>
-            <h3>Pas un énième PvP faction</h3>
-            <p>Un univers tourné vers l'exploration, la construction et la progression.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">✔</div>
-            <h3>Comptes authentiques uniquement</h3>
-            <p>Il faut posséder Minecraft: Java Edition. Le serveur vérifie chaque compte auprès de Mojang
-              (mode « online »).</p>
-          </article>
+    <!-- ============ Sous la lave : le launcher ============ -->
+    <section class="stratum s-lava" id="abysse" aria-label="Sous la lave">
+      <article class="catch" id="launcher" aria-labelledby="t-launcher">
+        <i class="ring" aria-hidden="true"></i>
+        <div class="panel">
+          <h2 class="px" id="t-launcher" data-fs="4">The Last Launcher</h2>
+          <p class="lead">Minecraft, Java, NeoForge, les mods et les réglages du serveur&nbsp;: il installe tout
+            et garde tout à jour. Toi, tu cliques sur «&nbsp;Jouer&nbsp;».</p>
+          <div class="dl">
+            <button class="btn btn-big btn-locked" id="dl" type="button" disabled>Bientôt disponible</button>
+            <p class="dl-meta" id="dl-meta">Windows 10 / 11 · gratuit · compte Microsoft avec Minecraft: Java Edition</p>
+          </div>
+          <ul class="tips" id="tips">
+            <li data-icon="trial_key"><strong>Connexion Microsoft officielle</strong>
+              <span>Tu te connectes dans ton navigateur, sur la page de Microsoft. Le launcher ne voit jamais ton mot de passe.</span></li>
+            <li data-icon="written_book"><strong>Fichiers officiels et signés</strong>
+              <span>Minecraft vient des serveurs de Mojang. Les fichiers du serveur sont signés et vérifiés avant chaque lancement.</span></li>
+            <li data-icon="totem_of_undying"><strong>Réparation en un clic</strong>
+              <span>Un fichier abîmé ou modifié&nbsp;? Le launcher le repère et le ressuscite dans sa bonne version.</span></li>
+            <li data-icon="ender_eye+barrier"><strong>Zéro pistage</strong>
+              <span>Pas de télémétrie, pas de publicité, pas d'empreinte de ton matériel. Ce site n'utilise aucun cookie.</span></li>
+            <li data-icon="name_tag"><strong>Aucun mode «&nbsp;crack&nbsp;»</strong>
+              <span>Pas de connexion hors ligne&nbsp;: il faut un compte Microsoft qui possède Minecraft: Java Edition.</span></li>
+          </ul>
+          <p class="only">Le launcher sera proposé ici, et uniquement ici. Ne télécharge jamais
+            «&nbsp;The Last Launcher&nbsp;» depuis un autre site.</p>
         </div>
-      </div>
+      </article>
+      <div class="bones" aria-hidden="true"></div>
     </section>
 
-    <section id="launcher">
+    <!-- ============ Magma : aperçu ============ -->
+    <section class="stratum s-magma" id="magma" aria-labelledby="t-apercu">
+      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
       <div class="wrap">
-        <h2 class="section-title">The Last Launcher</h2>
-        <p class="section-sub">Le launcher installe et met à jour tout ce qu'il faut pour jouer sur The Last :
-          Minecraft, Java, NeoForge, les mods et la configuration du serveur. Un clic sur « Jouer » et c'est parti.</p>
-        <div class="grid">
-          <article class="card">
-            <div class="icon" aria-hidden="true">🔑</div>
-            <h3>Connexion Microsoft officielle</h3>
-            <p>Tu te connectes dans ton navigateur, sur la page de Microsoft. Le launcher ne voit jamais ton
-              mot de passe.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">⬇</div>
-            <h3>Fichiers officiels et vérifiés</h3>
-            <p>Minecraft est téléchargé depuis les serveurs officiels de Mojang. Les fichiers du serveur sont
-              signés numériquement et vérifiés avant chaque lancement.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">⛔</div>
-            <h3>Aucun mode « crack »</h3>
-            <p>Pas de connexion hors ligne : il faut un compte Microsoft qui possède Minecraft: Java Edition.</p>
-          </article>
-          <article class="card">
-            <div class="icon" aria-hidden="true">🛠</div>
-            <h3>Réparation en un clic</h3>
-            <p>Un fichier abîmé ou modifié ? Le launcher le détecte et le remplace par la bonne version.</p>
-          </article>
-        </div>
-
-        <div class="gallery" style="margin-top: 32px">
-          <figure>
+        <h2 class="px" id="t-apercu" data-fs="4">Vu de l'intérieur</h2>
+        <p class="sub">Quatre tableaux accrochés dans la roche. Clique pour les voir en grand.</p>
+        <div class="paintings">
+          <button class="painting" type="button" data-full="assets/captures/connexion.png">
             <img src="assets/captures/connexion.png" alt="Écran de connexion du launcher avec le bouton Se connecter avec Microsoft" width="1280" height="760" loading="lazy">
-            <figcaption>Connexion avec un compte Microsoft</figcaption>
-          </figure>
-          <figure>
+            <span>Connexion avec un compte Microsoft</span>
+          </button>
+          <button class="painting" type="button" data-full="assets/captures/accueil.png">
             <img src="assets/captures/accueil.png" alt="Accueil du launcher : statut du serveur, actualités et bouton Jouer" width="1280" height="760" loading="lazy">
-            <figcaption>Accueil : statut du serveur, actualités, bouton Jouer</figcaption>
-          </figure>
-          <figure>
+            <span>Accueil : statut, actualités, bouton Jouer</span>
+          </button>
+          <button class="painting" type="button" data-full="assets/captures/preparation.png">
             <img src="assets/captures/preparation.png" alt="Préparation du jeu avec la progression du téléchargement" width="1280" height="760" loading="lazy">
-            <figcaption>Préparation et vérification des fichiers</figcaption>
-          </figure>
-          <figure>
-            <img src="assets/captures/jeu.png" alt="Minecraft lancé avec NeoForge depuis le launcher" width="870" height="519" loading="lazy">
-            <figcaption>Le jeu lancé avec NeoForge</figcaption>
-          </figure>
+            <span>Préparation et vérification des fichiers</span>
+          </button>
+          <button class="painting" type="button" data-full="assets/captures/jeu-cadre.png">
+            <img src="assets/captures/jeu-cadre.png" alt="Minecraft lancé avec NeoForge depuis le launcher" width="870" height="487" loading="lazy">
+            <span>Le jeu lancé avec NeoForge</span>
+          </button>
         </div>
-        <p class="note">Captures de la version en développement, avec des données de démonstration (joueurs en
-          ligne, actualités, pseudo).</p>
-
-        <div class="callout" style="margin-top: 28px">
-          <p><strong>Téléchargement :</strong> le launcher sera proposé ici, et uniquement ici, à l'ouverture du
-            serveur (Windows d'abord). Ne télécharge jamais « The Last Launcher » depuis un autre site.</p>
-        </div>
+        <p class="note">Captures de la version en développement, avec des données de démonstration
+          (joueurs en ligne, actualités, pseudo).</p>
       </div>
     </section>
 
-    <section id="securite">
+    <!-- ============ Netherrack : la boutique ============ -->
+    <section class="stratum s-rack" id="boutique" aria-labelledby="t-troc">
+      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
       <div class="wrap">
-        <h2 class="section-title">Sécurité et vie privée</h2>
-        <p class="section-sub">Ce que le launcher fait, et surtout ce qu'il ne fait pas.</p>
-        <div class="grid">
-          <article class="card">
-            <h3>Ton compte reste chez toi</h3>
-            <p>Seule la clé de connexion renouvelable fournie par Microsoft est gardée, chiffrée, sur ton
-              ordinateur. Rien n'est envoyé à The Last.</p>
-          </article>
-          <article class="card">
-            <h3>Zéro pistage</h3>
-            <p>Pas de télémétrie, pas de publicité, pas d'empreinte de ton matériel. Ce site n'utilise aucun
-              cookie.</p>
-          </article>
-          <article class="card">
-            <h3>Mises à jour signées</h3>
-            <p>Le launcher refuse toute mise à jour ou tout fichier qui ne porte pas notre signature.</p>
-          </article>
+        <div class="shop-head">
+          <div>
+            <h2 class="px" id="t-troc" data-fs="4">Le troc</h2>
+            <p class="sub">La boutique des piglins. 100&nbsp;% cosmétique&nbsp;: rien ici ne donne d'avantage en jeu.</p>
+            <p class="pill"><i aria-hidden="true"></i><span id="shop-state">Aperçu : la boutique ouvrira avec le serveur.</span></p>
+          </div>
+          <div class="keeper" aria-hidden="true">
+            <p class="bubble" id="bubble">De l'or&nbsp;? Montre voir.</p>
+            <i class="keeper-pig"></i>
+          </div>
         </div>
-        <p class="note">Détails complets : <a href="confidentialite.html">politique de confidentialité</a>.</p>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Rayons de la boutique"></div>
+        <div class="shop-grid" id="shop">
+          <p class="note">La boutique a besoin de JavaScript pour s'afficher.</p>
+        </div>
+        <p class="note" id="shop-note">Articles et prix indicatifs. Aucun paiement n'est possible pour l'instant, et le coffre se vide si tu quittes la page.</p>
       </div>
     </section>
+
+    <!-- ============ Sable des âmes : questions ============ -->
+    <section class="stratum s-soul" id="ames" aria-labelledby="t-ames">
+      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
+      <div class="wrap">
+        <h2 class="px" id="t-ames" data-fs="4">Les âmes répondent</h2>
+        <p class="sub">Tout en bas, on sait tout. Choisis une lanterne.</p>
+        <div class="faq">
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>C'est quoi, The Last&nbsp;?</summary>
+            <p>Un serveur Minecraft: Java Edition moddé (NeoForge), au contenu fait maison. De l'aventure,
+              de la construction et de la progression, pas un énième PvP faction. C'est un projet indépendant,
+              développé en France.</p>
+          </details>
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
+            <p>Oui. Le launcher et l'accès au serveur sont gratuits. La boutique ne vend que du cosmétique.</p>
+          </details>
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
+            <p>Un PC sous Windows et un compte Microsoft qui possède Minecraft: Java Edition. Le serveur
+              vérifie chaque compte auprès de Mojang&nbsp;: il n'y a pas de mode hors ligne.</p>
+          </details>
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
+            <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
+              Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
+              Le détail est dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+          </details>
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
+            <p>Quand ce sera prêt. Le launcher sera proposé sur cette page, et nulle part ailleurs.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Bedrock : le fond ============ -->
+    <footer class="stratum s-bedrock" id="fond">
+      <i class="blend" aria-hidden="true"></i>
+      <div class="wrap">
+        <div class="cols">
+          <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
+          <nav aria-label="Liens légaux">
+            <a href="confidentialite.html">Confidentialité</a>
+            <a href="cgu.html">Conditions d'utilisation</a>
+            <a href="mentions-legales.html">Mentions légales</a>
+            <a href="en.html" lang="en">English</a>
+          </nav>
+        </div>
+        <div class="disclaimer">
+          <p>Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+          <p lang="en">Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+          <p>Minecraft, ses textures et ses créatures appartiennent à Mojang AB.</p>
+        </div>
+        <a class="tbtn up" href="#lac">Remonter à la surface ↑</a>
+      </div>
+    </footer>
+
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="cols">
-        <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
-        <nav aria-label="Liens légaux">
-          <a href="confidentialite.html">Confidentialité</a>
-          <a href="cgu.html">Conditions d'utilisation</a>
-          <a href="mentions-legales.html">Mentions légales</a>
-          <a href="en.html" lang="en">English</a>
-        </nav>
-      </div>
-      <div class="disclaimer">
-        <p>Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
-        <p lang="en">Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+  <!-- La canne à pêche : ligne, flotteur, hameçon -->
+  <div id="rig" aria-hidden="true"><i class="rig-line"></i><i class="rig-bob"></i></div>
+
+  <!-- Barre du coffre (panier) -->
+  <div class="cartbar" id="cartbar" aria-live="polite">
+    <div class="cart-slots"></div>
+    <b class="cart-total">0,00 €</b>
+    <button class="btn btn-main btn-sm" id="cart-open" type="button">Ouvrir le coffre</button>
+  </div>
+
+  <dialog id="chest" aria-labelledby="t-chest">
+    <div class="panel chest">
+      <h2 id="t-chest">Ton coffre</h2>
+      <div class="chest-lines"></div>
+      <p class="chest-sum">Total <b class="chest-total">0,00 €</b></p>
+      <div class="chest-pay">
+        <button class="btn btn-locked" id="pay" type="button" disabled>Paiement à l'ouverture</button>
+        <button class="btn" id="chest-close" type="button">Fermer</button>
       </div>
     </div>
-  </footer>
+  </dialog>
+
+  <dialog id="lightbox" aria-label="Capture en grand">
+    <img alt="">
+  </dialog>
 </body>
 </html>

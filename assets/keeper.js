@@ -429,15 +429,19 @@ const PARTS = [
               { o: [-.8, 1.7, -10.25], s: [1.6, .3, .3], col: GOLD }],
             c: [HORNS(1), HORNS(-1),
               /* pupilles fendues, comme celles des chèvres : elles suivent le regard ; en colère, elles pivotent
-                 d'un quart de tour à l'intérieur de l'œil, qui brille alors tout entier */
+                 d'un quart de tour à l'intérieur de l'œil, qui brille alors tout entier.
+                 Chaque pupille tourne autour de son propre globe (pivot 6 px derrière l'œil), et non autour du
+                 centre de la tête : sinon, quand il regarde de côté, une pupille s'enfonçait dans l'œil et
+                 disparaissait. Elle est posée 0,05 à 0,1 px devant l'œil, marge que le regard n'entame pas. */
               { n: 'pupils', p: [0, -3.3, 0], c: [
-                { n: 'pupilR', p: [-3, 0, -6.3], b: [{ o: [-.55, -.16, -.36], s: [1.1, .32, .05], col: PUP }] },
-                { n: 'pupilL', p: [3, 0, -6.3], b: [{ o: [-.55, -.16, -.36], s: [1.1, .32, .05], col: PUP }] }] },
+                { n: 'gazeR', p: [-3, 0, -.3], c: [{ n: 'pupilR', p: [0, 0, -6], b: [{ o: [-.55, -.16, -.4], s: [1.1, .32, .05], col: PUP }] }] },
+                { n: 'gazeL', p: [3, 0, -.3], c: [{ n: 'pupilL', p: [0, 0, -6], b: [{ o: [-.55, -.16, -.4], s: [1.1, .32, .05], col: PUP }] }] }] },
               /* paupières : ouvertes, elles sont rangées dans l'œil et la tête (rx = 1,5) ; à 0, elles le couvrent */
               { n: 'lidR', p: [-2.95, -3.95, -6.25], r: [1.5, 0, 0], b: [{ o: [-1.05, 0, -.45], s: [2.1, 1.3, .08], col: LID }] },
               { n: 'lidL', p: [2.95, -3.95, -6.25], r: [1.5, 0, 0], b: [{ o: [-1.05, 0, -.45], s: [2.1, 1.3, .08], col: LID }] },
-              { n: 'browL', p: [4.5, -4.5, -6], r: [0, 0, -.18], b: [B('brow', [-4, -1.5, -.6], [4, 2, 2])] },
-              { n: 'browR', p: [-4.5, -4.5, -6], r: [0, 0, .18], b: [B('brow', [0, -1.5, -.6], [4, 2, 2], { mir: 1 })] },
+              /* sourcils : 0,15 px devant les yeux (leurs faces étaient dans le même plan et scintillaient) */
+              { n: 'browL', p: [4.5, -4.5, -6], r: [0, 0, -.18], b: [B('brow', [-4, -1.5, -.75], [4, 2, 2])] },
+              { n: 'browR', p: [-4.5, -4.5, -6], r: [0, 0, .18], b: [B('brow', [0, -1.5, -.75], [4, 2, 2], { mir: 1 })] },
               { n: 'earL', p: [4, -5, -2.5], r: [0, 0, .4], b: [B('ear', [0, -1, -1], [4, 2, 2])] },
               { n: 'earR', p: [-4, -5, -2.5], r: [0, 0, -.4], b: [B('earN', [-4, -1, -1], [4, 2, 2], { mir: 1 })] },
               { n: 'braid', p: [0, 4, -7.5], b: [B('braid', [-1, -1, -1], [2, 4, 2])], c: [
@@ -621,7 +625,7 @@ function pose(t, st) {
   P.tail = tail; P.tail2 = tail2;
   // les yeux : pupilles qui suivent le regard ; paupières rangées (1,5) ou fermées (0)
   if (REDUCE) blink = 0;
-  P.pupils = [ly * .05, -lx * .08 * (1 - pupil), 0]; P.pupilL = P.pupilR = [pupil * PI / 2, 0, 0];
+  P.gazeL = P.gazeR = [ly * .05, -lx * .08 * (1 - pupil), 0]; P.pupilL = P.pupilR = [pupil * PI / 2, 0, 0];
   P.lidL = P.lidR = [1.5 * (1 - clamp(blink * 1.6, 0, 1)), 0, 0];
   // pattes arrière : quand l'avant se lève, la cuisse se plie pour que le sabot reste posé, le canon reste d'aplomb
   ['HL', 'HR'].forEach(k => { const a = legs['leg' + k][0] - bx; legs['leg' + k] = [a, 0, 0]; legs['hock' + k] = [legs['hock' + k][0] - bx - a, 0, 0]; });

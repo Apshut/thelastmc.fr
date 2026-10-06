@@ -176,7 +176,10 @@ function drawScene(t) {
   if (!world) return false;
   const pin = pinLen(), sy = SY();
   if (aby.getBoundingClientRect().bottom < -40) return false;          // tout est recouvert par les strates : inutile de dessiner
-  world.frame(REDUCE ? 20 : t, { p: pin ? clamp(sy / pin, 0, 1) : 0, after: Math.max(0, sy - pin), vh: innerHeight, mx, my, texel: innerWidth < 700 ? 2 : 3, scroll: sy, origin: pin, depth: aby.offsetHeight, calm: REDUCE });
+  // Plongée finie, on descend vers la coupe sombre : le décor cesse de suivre la souris (sinon il se décale
+  // par rapport à la coupe et à l'encart, et la ligne de pêche se désaxe). Il se recentre en douceur.
+  const after = Math.max(0, sy - pin), s = clamp(after / 80, 0, 1), follow = 1 - s * s * (3 - 2 * s);
+  world.frame(REDUCE ? 20 : t, { p: pin ? clamp(sy / pin, 0, 1) : 0, after, vh: innerHeight, mx: mx * follow, my: my * follow, texel: innerWidth < 700 ? 2 : 3, scroll: sy, origin: pin, depth: aby.offsetHeight, calm: REDUCE });
   return true;
 }
 

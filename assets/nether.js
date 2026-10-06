@@ -1,5 +1,6 @@
-/* The Last — page d'accueil : textures et police du jeu, strates, ligne de pêche, boutique.
-   La scène 3D (lac, château, pêcheur) est dans world.js ; le château dans castle.js. Aucun stockage, aucun appel externe. */
+/* The Last — page d'accueil : textures et police du jeu, strates, ligne de pêche.
+   La scène 3D (lac, château, pêcheur) est dans world.js ; le château dans castle.js. La boutique a sa propre page
+   (boutique.html, tavern.js). Aucun stockage, aucun appel externe. */
 (() => {
 'use strict';
 
@@ -108,19 +109,15 @@ function seep(mat, seed, tint) {
   return c;
 }
 function strata() {
-  const rk = r => r < .04 ? 'nether_gold_ore' : r < .07 ? 'nether_quartz_ore' : r < .078 ? 'ancient_debris_side' : 'netherrack';
   const sl = r => r < .2 ? 'soul_soil' : 'soul_sand', mg = () => 'magma', bd = () => 'bedrock';
   setVar('--t-magma', tile(16, 16, 30, mg, true));
-  setVar('--t-rack', tile(40, 24, 31, rk, true));
   setVar('--t-soul', tile(40, 24, 32, sl, false));
   setVar('--t-bedrock', tile(8, 8, 33, bd, true));
   setVar('--b-magma', band(mg, 41, true));
-  setVar('--b-rack', band(rk, 42, true));
   setVar('--b-soul', band(sl, 43, false));
   setVar('--b-bedrock', band(bd, 44, true));
   setVar('--s-magma', seep('lava_still', 51, 'rgb(128,61,38)'));
-  setVar('--s-rack', seep('magma', 52));
-  setVar('--s-soul', seep('netherrack', 53));
+  setVar('--s-soul', seep('magma', 53, 'rgb(150,104,92)'));
   setVar('--lava', T('lava_still'));
   { const S = 64, c = mk(S, S), g = c.getContext('2d'), R = rng(77), n = 8, lat = [];
     for (let k = 0; k < n * n; k++) lat.push(R());
@@ -147,9 +144,6 @@ function icon(name) {
   if (ICONS[name]) return ICONS[name];
   let c;
   if (name.indexOf('+') > 0) { c = mk(16, 16); name.split('+').forEach(n => c.getContext('2d').drawImage(icon(n), 0, 0, 16, 16)); }
-  else if (name === 'cape') c = art(['................', '...kkkkkkkkkk...', '..kDddddddddDk..', '..kdDddddddDdk..', '..kddDddddDddk..', '..kddDddddDddk..',
-    '..kdddDddDdddk..', '..kdddDddDdddk..', '..kddDddddDddk..', '..kddDddddDddk..', '..kdDddddddDdk..', '..kdDddddddDdk..', '..kddddddddddk..',
-    '..koroorooorok..', '...kk.kk.kk.k...', '................'], { k: '#120c10', d: '#2b2430', D: '#3d3546', o: '#ff8a3c', r: '#c2410c' });
   else if (name.indexOf('block:') === 0 && MC.blocks[name.slice(6)]) c = iso(T(name.slice(6)));
   else if (MC.items[name] !== undefined && IM.items) { c = mk(16, 16); c.getContext('2d').drawImage(IM.items, 0, MC.items[name] * 16, 16, 16, 0, 0, 16, 16); }
   else c = iso(T('gold_block'));
@@ -289,7 +283,6 @@ function Download() {
   if (Cm.url) {
     const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, rel: 'noopener' }), Cm.label || 'Rejoindre la communauté');
     if (meta) meta.after(mkLink());
-    const pay = $('.chest-pay'); if (pay) pay.prepend(mkLink());
   }
 }
 
@@ -298,102 +291,6 @@ function Gallery() {
   const im = $('img', dlg);
   $$('.painting').forEach(b => b.addEventListener('click', () => { im.src = b.dataset.full; im.alt = $('img', b).alt; dlg.showModal(); }));
   dlg.addEventListener('click', () => dlg.close());
-}
-
-/* Le marchand : un vrai buste de piglin en 3D, qui suit le curseur et hoche la tête quand on troque. */
-function Keeper() {
-  const box = $('.keeper-pig'), none = { nod() {}, frame() {} }; if (!box) return none;
-  const cv = mk(320, 372); box.appendChild(cv);
-  let bust = null;
-  try { bust = window.NetherWorld && window.NetherWorld.bust ? window.NetherWorld.bust(cv, IM.piglin) : null; } catch (e) { bust = null; }
-  if (!bust) { const g = cv.getContext('2d'); if (g) { g.imageSmoothingEnabled = false; g.drawImage(IM.piglin, 8, 8, 10, 8, 20, 60, 200, 160); } return none; }
-  let lx = 0, ly = 0, tx = 0, ty = 0, nodT = -9, vis = false;
-  addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); tx = clamp((e.clientX - r.left - r.width / 2) / 420, -1, 1); ty = clamp((e.clientY - r.top - r.height * .35) / 360, -1, 1); }, { passive: true });
-  if ('IntersectionObserver' in window) new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(cv); else vis = true;
-  return {
-    nod() { nodT = performance.now() / 1000; },
-    frame(t, force) { if (!vis && !force) return; lx += (tx - lx) * .12; ly += (ty - ly) * .12; const n = performance.now() / 1000 - nodT; bust.frame(t, lx, ly, n < .7 ? Math.sin(n / .7 * Math.PI * 2) * (1 - n / .7) : 0); }
-  };
-}
-
-function Shop(keeper) {
-  const S = CFG.shop || {}, list = S.products || [], grid = $('#shop'), tabs = $('#tabs'), bar = $('#cartbar'), dlg = $('#chest');
-  if (!grid || !list.length) return;
-  const eur = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
-  const cart = new Map(), byId = new Map(list.map(p => [p.id, p])), buttons = new Map();
-  const bubble = $('#bubble'), SAY = ["Hmm. De l'or.", 'Marché conclu.', 'Bonne pioche.', 'Hmpf. Ça ira.', 'Tu as du goût.', 'Je garde ça de côté.'];
-  const ic = p => copy(icon(p.icon || 'gold_ingot'));
-  let said = 0;
-  /* Règles : un article « stack » se prend en plusieurs exemplaires ; les autres une seule fois ;
-     les articles d'un même « group » s'excluent (un seul grade à la fois). */
-  function add(p, slot) {
-    if (!p.stack && cart.has(p.id)) return;
-    let swapped = null;
-    if (p.group) cart.forEach((q, id) => { const o = byId.get(id); if (o.group === p.group && o.id !== p.id) { cart.delete(id); swapped = o; } });
-    cart.set(p.id, p.stack ? (cart.get(p.id) || 0) + 1 : 1);
-    bubble.textContent = swapped ? 'Un seul à la fois. Je reprends ' + swapped.name + '.' : SAY[said++ % SAY.length];
-    render(); fly(slot, $('.cart-slots', bar), ic(p)); keeper.nod();
-    toast('troc', p.icon || 'gold_ingot', 'Progrès réalisé !', 'Premier troc');
-  }
-  grid.textContent = '';
-  list.forEach(p => {
-    const slot = h('div', { class: 'slot big' }, ic(p)), btn = h('button', { class: 'btn btn-main btn-sm', type: 'button', 'aria-label': 'Ajouter ' + p.name + ' au coffre' });
-    btn.addEventListener('click', () => add(p, slot));
-    buttons.set(p.id, btn);
-    grid.appendChild(h('article', { class: 'item panel', 'data-cat': p.cat }, slot, h('div', null, h('h3', { text: p.name }), h('p', { text: p.lore })),
-      h('div', { class: 'item-buy' }, h('span', { class: 'price', text: eur.format(p.price) }), btn)));
-  });
-  ['Tout'].concat(Array.from(new Set(list.map(p => p.cat)))).forEach((c, i) => {
-    const b = pxLabel(h('button', { class: 'tbtn tab', type: 'button', role: 'tab', 'aria-selected': i ? 'false' : 'true' }), c);
-    b.addEventListener('click', () => { $$('.tab', tabs).forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false')); $$('.item', grid).forEach(it => { it.hidden = i > 0 && it.dataset.cat !== c; }); });
-    tabs.appendChild(b);
-  });
-  function fly(from, to, c) {
-    if (REDUCE || !c.animate) return;
-    const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
-    c.className = 'fly'; c.style.left = a.left + 'px'; c.style.top = a.top + 'px'; c.style.width = a.width + 'px'; c.style.height = a.height + 'px';
-    D.body.appendChild(c);
-    const dx = b.left + b.width / 2 - a.left - a.width / 2, dy = b.top - a.top;
-    c.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + dx * .5 + 'px,' + (Math.min(dy, 0) - 70) + 'px) scale(1.15)', offset: .4 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.45)' }],
-      { duration: 560, easing: 'cubic-bezier(.3,.1,.3,1)' }).onfinish = () => c.remove();
-  }
-  function render() {
-    let n = 0, sum = 0; cart.forEach((q, id) => { n += q; sum += q * byId.get(id).price; });
-    bar.classList.toggle('on', n > 0); root.classList.toggle('has-cart', n > 0);
-    buttons.forEach((b, id) => { const full = !byId.get(id).stack && cart.has(id); b.disabled = full; b.classList.toggle('btn-main', !full); pxLabel(b, full ? 'Dans le coffre' : 'Troquer'); });
-    const slots = $('.cart-slots', bar), body = $('.chest-lines', dlg);
-    slots.textContent = ''; body.textContent = '';
-    cart.forEach((q, id) => {
-      const p = byId.get(id), s = h('span', { class: 'slot' }, ic(p)); if (q > 1) s.appendChild(h('b', { class: 'n', text: String(q) })); slots.appendChild(s);
-      const ctl = h('span', { class: 'qty' });
-      if (p.stack) {
-        const minus = h('button', { type: 'button', 'aria-label': 'Retirer un exemplaire de ' + p.name, text: '−' }), plus = h('button', { type: 'button', 'aria-label': 'Ajouter un exemplaire de ' + p.name, text: '+' });
-        minus.addEventListener('click', () => { if (q > 1) cart.set(id, q - 1); else cart.delete(id); render(); });
-        plus.addEventListener('click', () => { cart.set(id, q + 1); render(); });
-        ctl.append(minus, h('b', { text: String(q) }), plus);
-      } else {
-        const del = h('button', { type: 'button', 'aria-label': 'Retirer ' + p.name + ' du coffre', text: '×' });
-        del.addEventListener('click', () => { cart.delete(id); render(); });
-        ctl.append(del);
-      }
-      body.appendChild(h('div', { class: 'line' }, h('span', { class: 'slot' }, ic(p)), h('span', { class: 'line-name', text: p.name }), ctl, h('span', { class: 'price', text: eur.format(q * p.price) })));
-    });
-    if (!n) body.appendChild(h('p', { class: 'note', text: 'Ton coffre est vide.' }));
-    $('.cart-total', bar).textContent = eur.format(sum); $('.chest-total', dlg).textContent = eur.format(sum);
-  }
-  if (S.checkoutUrl) {
-    $('#pay').replaceWith(pxLabel(h('a', { class: 'btn btn-main', id: 'pay', href: S.checkoutUrl, rel: 'noopener' }), 'Payer'));
-    $('#shop-state').textContent = 'Boutique ouverte. Paiement sécurisé chez notre partenaire.';
-    $('#shop-note').hidden = true;
-  } else pxLabel($('#pay'), "Paiement à l'ouverture");
-  pxLabel($('#cart-open'), innerWidth < 560 ? 'Coffre' : 'Ouvrir le coffre'); pxLabel($('#chest-close'), 'Fermer');
-  // la barre du coffre ne vit que dans la boutique : elle ne cache ni les questions ni le pied de page
-  if ('IntersectionObserver' in window) new IntersectionObserver(es => bar.classList.toggle('near', es[0].isIntersecting)).observe($('#boutique')); else bar.classList.add('near');
-  $('#cart-open').addEventListener('click', () => { if (dlg.showModal) dlg.showModal(); });
-  $('#chest-close').addEventListener('click', () => dlg.close());
-  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
-  if (QS.has('cart')) { cart.set(list[0].id, 1); list.filter(p => !p.group).slice(0, 2).forEach(p => cart.set(p.id, p.stack ? 3 : 1)); }
-  render();
 }
 
 /* Notifications de progrès, comme en jeu : une seule fois par visite et par progrès. */
@@ -415,7 +312,7 @@ function F3() {
   rows.forEach(r => box.appendChild(r)); D.body.appendChild(box);
   const set = (i, txt) => { if (cache[i] !== txt) { cache[i] = txt; pxLabel(rows[i], txt); } };
   set(0, 'The Last 26.1.2 (thelastmc.fr)');
-  const BIOME = ['nether_wastes', 'nether_wastes', 'basalt_deltas', 'crimson_forest', 'soul_sand_valley', 'soul_sand_valley'];
+  const BIOME = ['nether_wastes', 'nether_wastes', 'basalt_deltas', 'soul_sand_valley', 'soul_sand_valley'];
   return (y, cur, label) => { set(1, 'XYZ: 0.500 / ' + y.toFixed(1) + ' / 46.700'); set(2, 'Biome: minecraft:' + BIOME[cur]); set(3, 'Couche: ' + label); };
 }
 
@@ -439,16 +336,15 @@ function Depth(f3) {
 /* ================= Démarrage ================= */
 $$('.px').forEach(pxText);
 const rig = Rig();
-let keeper = { nod() {}, frame() {} }, depth = () => {}, align = () => {};
+let depth = () => {}, align = () => {};
 
 function start() {
   strata(); sprites();
   Scene();
   toast = Toasts();
   align = Catch();
-  keeper = Keeper();
   $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
-  Tips(); Download(); Gallery(); Shop(keeper);
+  Tips(); Download(); Gallery();
   depth = Depth(F3()); depth();
   if (QS.has('toast')) toast('demo', 'fishing_rod', 'Progrès réalisé !', 'Belle prise');
   root.classList.add('ready');
@@ -457,10 +353,10 @@ function start() {
       $('#monde').style.marginTop = '0px';
       shotY = QS.get('at') ? Math.max(0, Math.round($('#' + QS.get('at')).getBoundingClientRect().top) + (+QS.get('dy') || 0)) : +(QS.get('y') || 0); $('#monde').style.marginTop = -shotY + 'px'; D.body.style.overflow = 'hidden';
       let t = +(QS.get('t') || 20) - 5;
-      for (let i = 0; i < 100; i++) { t += .05; drawScene(t); align(); if (align.frame) align.frame(t, true); rig.frame(t, .05); keeper.frame(t, true); }
+      for (let i = 0; i < 100; i++) { t += .05; drawScene(t); align(); if (align.frame) align.frame(t, true); rig.frame(t, .05); }
       depth();
     };
-    shoot(); addEventListener('resize', shoot); const tops = {}; ['abysse', 'launcher', 'magma', 'boutique', 'ames', 'fond'].forEach(id => { tops[id] = Math.round($('#' + id).getBoundingClientRect().top + shotY); }); tops.end = Math.round($('#monde').offsetHeight);
+    shoot(); addEventListener('resize', shoot); const tops = {}; ['abysse', 'launcher', 'magma', 'ames', 'fond'].forEach(id => { tops[id] = Math.round($('#' + id).getBoundingClientRect().top + shotY); }); tops.end = Math.round($('#monde').offsetHeight);
     D.title = 'ready ' + JSON.stringify(tops);
     return;
   }
@@ -479,7 +375,7 @@ function start() {
     const t = ms / 1000, raw = t - last;
     if (raw < .012 || D.hidden) return;                  // inutile de dépasser ~80 images par seconde sur les écrans rapides
     last = t;
-    drawScene(t); align(); if (align.frame) align.frame(t); rig.frame(t, raw); keeper.frame(t); depth();
+    drawScene(t); align(); if (align.frame) align.frame(t); rig.frame(t, raw); depth();
   };
   requestAnimationFrame(loop);
 }

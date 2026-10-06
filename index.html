@@ -36,7 +36,7 @@
     <a class="brand" href="#lac"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
     <nav aria-label="Navigation principale">
       <a class="tbtn tbtn-main" href="#launcher">Télécharger</a>
-      <a class="tbtn" href="#boutique">Boutique</a>
+      <a class="tbtn" href="boutique.html">Boutique</a>
       <a class="tbtn" href="en.html" lang="en" hreflang="en">EN</a>
     </nav>
   </header>
@@ -46,7 +46,6 @@
       <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span>Le lac de lave</span></a></li>
       <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span>Sous la lave · le launcher</span></a></li>
       <li><a href="#magma" data-sec="#magma" data-tex="magma"><span>Magma · aperçu</span></a></li>
-      <li><a href="#boutique" data-sec="#boutique" data-tex="netherrack"><span>Netherrack · la boutique</span></a></li>
       <li><a href="#ames" data-sec="#ames" data-tex="soul_sand"><span>Sable des âmes · questions</span></a></li>
       <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span>Bedrock · le fond</span></a></li>
     </ol>
@@ -129,29 +128,6 @@
       </div>
     </section>
 
-    <!-- ============ Netherrack : la boutique ============ -->
-    <section class="stratum s-rack" id="boutique" aria-labelledby="t-troc">
-      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
-      <div class="wrap">
-        <div class="shop-head">
-          <div>
-            <h2 class="px" id="t-troc" data-fs="4">Le troc</h2>
-            <p class="sub">La boutique des piglins. 100&nbsp;% cosmétique&nbsp;: rien ici ne donne d'avantage en jeu.</p>
-            <p class="pill"><i aria-hidden="true"></i><span id="shop-state">Aperçu : la boutique ouvrira avec le serveur.</span></p>
-          </div>
-          <div class="keeper" aria-hidden="true">
-            <p class="bubble" id="bubble">De l'or&nbsp;? Montre voir.</p>
-            <i class="keeper-pig"></i>
-          </div>
-        </div>
-        <div class="tabs" id="tabs" role="tablist" aria-label="Rayons de la boutique"></div>
-        <div class="shop-grid" id="shop">
-          <p class="note">La boutique a besoin de JavaScript pour s'afficher.</p>
-        </div>
-        <p class="note" id="shop-note">Articles et prix indicatifs. Aucun paiement n'est possible pour l'instant, et le coffre se vide si tu quittes la page.</p>
-      </div>
-    </section>
-
     <!-- ============ Sable des âmes : questions ============ -->
     <section class="stratum s-soul" id="ames" aria-labelledby="t-ames">
       <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
@@ -167,7 +143,15 @@
           </details>
           <details>
             <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
-            <p>Oui. Le launcher et l'accès au serveur sont gratuits. La boutique ne vend que du cosmétique.</p>
+            <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="boutique.html">La taverne</a> vend des Braises,
+              la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
+              d'avantage en jeu, et il n'y a pas de cape.</p>
+          </details>
+          <details>
+            <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
+            <p>La monnaie du serveur. On l'achète dans <a href="boutique.html">la taverne</a>, puis on la dépense en jeu,
+              au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
+              ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
           </details>
           <details>
             <summary><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
@@ -214,25 +198,6 @@
 
   <!-- La canne à pêche : ligne, flotteur, hameçon -->
   <div id="rig" aria-hidden="true"><i class="rig-line"></i><i class="rig-bob"></i></div>
-
-  <!-- Barre du coffre (panier) -->
-  <div class="cartbar" id="cartbar" aria-live="polite">
-    <div class="cart-slots"></div>
-    <b class="cart-total">0,00 €</b>
-    <button class="btn btn-main btn-sm" id="cart-open" type="button">Ouvrir le coffre</button>
-  </div>
-
-  <dialog id="chest" aria-labelledby="t-chest">
-    <div class="panel chest">
-      <h2 id="t-chest">Ton coffre</h2>
-      <div class="chest-lines"></div>
-      <p class="chest-sum">Total <b class="chest-total">0,00 €</b></p>
-      <div class="chest-pay">
-        <button class="btn btn-locked" id="pay" type="button" disabled>Paiement à l'ouverture</button>
-        <button class="btn" id="chest-close" type="button">Fermer</button>
-      </div>
-    </div>
-  </dialog>
 
   <dialog id="lightbox" aria-label="Capture en grand">
     <img alt="">

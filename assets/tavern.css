@@ -1,0 +1,153 @@
+/* The Last — la taverne (boutique.html). S'appuie sur nether.css : couleurs, boutons, panneaux, police pixel, en-tête.
+   Sur ordinateur (au moins 900 x 600), tout tient dans la fenêtre : la scène 3D occupe l'écran, les panneaux sont posés
+   par-dessus, rien ne défile. Sur téléphone, la page défile : la scène, puis l'article, l'ardoise et les mentions. */
+
+.tavern { --side: clamp(250px, 19vw, 380px); background: #0a0507; }
+.tv-main { position: relative; }
+
+/* ---------- La scène ---------- */
+.stage {
+  position: relative; overflow: hidden; height: clamp(400px, 70svh, 700px);
+  background: radial-gradient(ellipse at 50% 62%, #4a1a0c 0, #1a0807 45%, #0a0406 75%);
+}
+#tavern { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity .8s; }
+.ready.gl #tavern { opacity: 1; }
+.shot #tavern, .shot .tag, .shot .say { transition: none; }
+.no-gl #tavern { display: none; }
+.nojs { position: absolute; inset: auto 16px 40% 16px; margin: 0; text-align: center; color: var(--fg-2); }
+
+/* ---------- L'étal : un bouton posé sur chaque objet 3D ---------- */
+.etal { position: absolute; inset: 0; pointer-events: none; }
+.loot {
+  position: absolute; left: 0; top: 0; width: 60px; height: 60px; padding: 0; border: 0; background: none;
+  color: #fff; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent;
+}
+html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
+.loot-ic { display: none; }
+.loot:focus-visible { outline: 2px dashed rgb(255 255 255 / .85); outline-offset: 4px; }
+/* étiquette comme celle d'un objet nommé en jeu */
+.tag {
+  position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 8px 5px;
+  background: rgb(0 0 0 / .52); white-space: nowrap; pointer-events: none; transition: background .15s, transform .15s, box-shadow .15s;
+}
+.tag-n { color: #fff; }
+.tag-p { color: #ffc067; font: 700 12.5px/1.2 "Sora", sans-serif; letter-spacing: .02em; text-shadow: 1px 1px 0 #000; }
+.loot:hover .tag, .loot.on .tag, .loot:focus-visible .tag { background: rgb(0 0 0 / .82); transform: translateX(-50%) translateY(2px); }
+.loot[data-prop="jar"] .tag, .loot[data-row="back"] .tag, .etal.stagger .loot[data-alt] .tag { top: auto; bottom: calc(100% + 6px); }
+@media (max-width: 899px) { .tag-b { display: none; } .tag-p { font-size: 12px; } }
+.etal.compact .tag-p { display: none; }
+.loot[aria-pressed="true"] .tag { box-shadow: 0 0 0 2px var(--ember), 0 0 18px rgb(255 107 44 / .5); }
+
+/* ---------- La bulle du tavernier ---------- */
+.say { position: absolute; left: 0; top: 0; z-index: 3; margin: 0; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .25s; }
+.say.on { opacity: 1; }
+.say .pxl { position: absolute; left: 0; bottom: 12px; transform: translateX(calc(-50% + var(--dx, 0px))); padding: 5px 8px 6px; background: rgb(0 0 0 / .74); color: #fff; white-space: nowrap; flex-wrap: wrap; justify-content: center; row-gap: 4px; width: max-content; max-width: min(420px, calc(100vw - 32px)); }
+.say::after { content: ""; position: absolute; left: -5px; bottom: 6px; width: 10px; height: 6px; background: rgb(0 0 0 / .74); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+[data-mood="angry"] .say .pxl { color: #ff7a52; }
+[data-mood="threat"] .say .pxl { color: #ffd27a; }
+
+/* ---------- Titre ---------- */
+.intro .px { margin: 0; }
+.lede { margin: 10px 0 12px; color: #fbeadb; font-size: 15px; line-height: 1.5; text-shadow: 0 1px 0 #000, 0 0 12px rgb(0 0 0 / .9); }
+.lede strong { color: var(--gold); }
+
+/* ---------- L'article choisi ---------- */
+.deal { padding: 18px 18px 16px; }
+.deal-head { display: flex; align-items: center; gap: 12px; }
+.deal-ic canvas { display: block; width: 32px; height: 32px; image-rendering: pixelated; }
+.deal-t { margin: 0; font: 700 18px/1.2 "Sora", sans-serif; letter-spacing: .02em; }
+.deal-q { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; margin: 12px 0 4px; }
+.deal-q b { color: #ffa25e; font: 700 21px/1.1 "Sora", sans-serif; }
+.deal-p { color: var(--gold); font: 700 19px/1.1 "Sora", sans-serif; white-space: nowrap; }
+.deal-lore { margin: 6px 0 12px; color: var(--fg-2); font-size: 14px; line-height: 1.5; }
+.deal-buy { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.deal-note { color: var(--fg-3); font-size: 12.5px; }
+
+/* ---------- L'ardoise : ce qu'on obtient en jeu ---------- */
+.slate {
+  padding: 22px 22px 18px; color: #e9efe9;
+  background: #1d2221 radial-gradient(ellipse at 28% 18%, rgb(255 255 255 / .06), transparent 62%);
+  box-shadow: inset 0 0 0 3px #1a0709, inset 0 0 0 8px #6e2533, inset 3px 3px 0 8px #8f3646, inset 0 0 0 11px #2c0d12, inset 0 0 0 12px #0b0405, 0 10px 30px rgb(0 0 0 / .55);
+}
+.slate .px { color: #f2f5ef; --k: 1; }
+.slate .px svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 rgb(0 0 0 / .45)); }
+.slate-list { list-style: none; margin: 12px 0 10px; padding: 0; display: grid; gap: 5px; }
+.slate-list li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding-bottom: 5px; border-bottom: 1px dashed rgb(233 239 233 / .18); font: 500 14px/1.3 "Inter", sans-serif; }
+.s-ic canvas { display: block; width: 24px; height: 24px; image-rendering: pixelated; }
+.s-n small { display: block; color: rgb(233 239 233 / .62); font-size: 12px; }
+.s-p { display: inline-flex; align-items: center; gap: 5px; color: #ffc067; font: 700 14px/1 "Sora", sans-serif; white-space: nowrap; }
+.s-p canvas { width: 16px; height: 16px; image-rendering: pixelated; }
+.slate-note { margin: 0; color: rgb(233 239 233 / .72); font-size: 12px; line-height: 1.45; }
+
+/* ---------- Mentions ---------- */
+.fine { color: #dccdc2; font-size: 12px; line-height: 1.5; text-shadow: 0 1px 0 #000, 0 0 10px rgb(0 0 0 / .95); }
+.foot { color: var(--fg-3); font-size: 12px; line-height: 1.5; }
+.foot p { margin: 0; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.foot a { color: var(--fg-2); text-decoration: none; }
+.foot a:hover { color: #fff; }
+.fps { position: fixed; z-index: 99; left: 8px; top: 70px; margin: 0; padding: 8px; background: #000; color: #0f0; font: 14px/1.3 monospace; white-space: pre-wrap; max-width: 60vw; }
+
+/* ---------- Téléphone et petites fenêtres : la page défile ---------- */
+.intro { padding: 74px 16px 14px; }
+.deal, .slate { margin: 14px 12px 0; }
+.fine { margin: 16px 16px 0; }
+.foot { margin-top: 20px; padding: 18px 16px 28px; border-top: 2px solid rgb(255 255 255 / .08); display: grid; gap: 8px; }
+
+/* ---------- Ordinateur : tout tient dans la fenêtre ---------- */
+@media (min-width: 900px) and (min-height: 600px) {
+  html.tv, html.tv body { height: 100%; overflow: hidden; }
+  .stage { position: fixed; inset: 0; height: auto; z-index: 0; }
+  .intro, .deal, .slate, .fine { position: fixed; z-index: 5; width: var(--side); margin: 0; }
+  .intro { left: 24px; top: 70px; padding: 0; }
+  .deal { left: 24px; bottom: 58px; }
+  .slate { right: 24px; top: 70px; }
+  .fine { right: 24px; bottom: 58px; }
+  .foot {
+    position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; margin: 0; padding: 14px 24px 9px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 18px; border: 0; font-size: 11.5px;
+    background: linear-gradient(rgb(6 2 3 / 0), rgb(6 2 3 / .9) 45%);
+  }
+  .foot .disc { flex-basis: 100%; text-align: center; font-size: 11px; }
+}
+/* petites fenêtres d'ordinateur : panneaux plus compacts */
+@media (min-width: 900px) and (max-height: 720px), (min-width: 900px) and (max-width: 1099px) {
+  .intro .px { --k: .75; }
+  .lede { font-size: 13.5px; line-height: 1.45; margin: 6px 0 8px; }
+  .intro .pill { padding: 6px 10px; font-size: 11px; }
+  .deal { padding: 12px 14px; }
+  .deal-q { margin: 8px 0 2px; } .deal-q b { font-size: 18px; } .deal-p { font-size: 17px; }
+  .deal-lore { font-size: 13px; line-height: 1.4; margin: 4px 0 8px; }
+  .deal-note { display: none; }
+  .slate { padding: 16px 16px 12px; }
+  .slate-list { margin: 8px 0 6px; gap: 3px; }
+  .slate-list li { font-size: 13px; padding-bottom: 3px; }
+  .slate-note { font-size: 11.5px; }
+  .fine { font-size: 11px; line-height: 1.4; }
+  .foot { padding: 10px 16px 6px; }
+  .foot .disc { font-size: 10.5px; }
+}
+/* filet de sécurité (posé par tavern.js si des panneaux se chevauchent encore) */
+.tv-tight .lede, .tv-tight .slate-note { display: none; }
+.tv-tight .deal-lore { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+@media (min-width: 900px) and (max-height: 780px), (min-width: 900px) and (max-width: 1399px) { .s-n small { display: none; } }
+@media (min-width: 900px) and (max-height: 780px) { .lede { font-size: 14px; } .deal-lore { font-size: 13.5px; } }
+@media (min-width: 900px) and (max-height: 680px) { .slate-list li { font-size: 13px; } .slate { padding-top: 18px; padding-bottom: 14px; } .lede { margin-bottom: 8px; } }
+
+/* ---------- Sans 3D : les articles en simple grille ---------- */
+.no-gl .stage { height: auto; min-height: 320px; }
+.no-gl .etal { position: relative; inset: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; padding: 16px; pointer-events: auto; }
+.no-gl .loot {
+  position: relative; transform: none !important; width: auto !important; height: auto !important; min-height: 130px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px 8px;
+  background: #191113; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 var(--u) #050304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #4f3a35, inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #0d0808;
+}
+.no-gl .loot-ic { display: block; }
+.no-gl .loot-ic canvas { display: block; width: 48px; height: 48px; image-rendering: pixelated; }
+.no-gl .tag { position: static; transform: none; background: none; }
+.no-gl .say, .no-gl .stage .loader { display: none; }
+@media (min-width: 900px) and (min-height: 600px) {
+  .no-gl .stage { display: grid; align-content: center; padding: 0 calc(var(--side) + 48px); }
+}

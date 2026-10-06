@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr" class="tv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La taverne — The Last</title>
+  <meta name="description" content="La boutique du serveur Minecraft The Last : des Braises, la monnaie du serveur, à dépenser en jeu contre des grades et des cosmétiques. Sans avantage en jeu, sans cape.">
+  <meta property="og:title" content="La taverne — The Last">
+  <meta property="og:description" content="Des Braises à dépenser en jeu, au comptoir d'un tavernier qui n'aime pas qu'on touche à sa marchandise.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thelastmc.fr/boutique.html">
+  <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0a0608">
+  <link rel="canonical" href="https://thelastmc.fr/boutique.html">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/nether.css">
+  <link rel="stylesheet" href="assets/tavern.css">
+  <script src="assets/config.js" defer></script>
+  <script src="assets/mc/mc.js" defer></script>
+  <script src="assets/keeper.js" defer></script>
+  <script src="assets/tavern.js" defer></script>
+</head>
+<body class="tavern">
+  <a class="skip" href="#etal">Aller aux articles</a>
+
+  <header class="top solid" id="top">
+    <a class="brand" href="index.html"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <nav aria-label="Navigation principale">
+      <a class="tbtn" href="index.html">Accueil</a>
+      <a class="tbtn tbtn-main" href="boutique.html" aria-current="page">Boutique</a>
+      <a class="tbtn" href="en.html" lang="en" hreflang="en">EN</a>
+    </nav>
+  </header>
+
+  <main class="tv-main" id="taverne">
+    <div class="intro">
+      <h1 class="px" data-fs="4">La taverne</h1>
+      <p class="lede">Ici, on achète des <strong>Braises</strong>, la monnaie du serveur. On les dépense ensuite
+        en jeu, au comptoir du tavernier.</p>
+      <p class="pill"><i aria-hidden="true"></i><span id="shop-state">Aperçu : la taverne ouvrira avec le serveur.</span></p>
+    </div>
+
+    <div class="stage" id="stage">
+      <canvas id="tavern" role="img" aria-label="Une taverne du Nether en briques sombres, éclairée par des lanternes, un feu de cheminée et une chute de lave derrière des barreaux. Derrière un comptoir de pierre noire, Gromaur, un tavernier centaure : torse et tête de bouc aux longues cornes annelées, sur un corps de bouc à quatre pattes, poings sur les hanches, trois chopes devant lui. Devant le comptoir, sur un tapis rouge : un tas de pièces de braise, une bourse, un sac et un coffre ouvert."></canvas>
+      <div class="etal" id="etal" role="group" aria-label="Articles posés devant le comptoir"></div>
+      <p class="say" id="say" aria-hidden="true"></p>
+      <p class="loader" aria-hidden="true"><span class="px" data-fs="3">Allumage des lanternes...</span></p>
+      <noscript><p class="nojs">La taverne a besoin de JavaScript pour s'afficher. Les Braises se vendront ici, à l'ouverture du serveur.</p></noscript>
+    </div>
+
+    <section class="deal panel" id="deal" aria-live="polite" aria-labelledby="deal-name">
+      <h2 class="deal-t" id="deal-name">Le comptoir</h2>
+    </section>
+
+    <aside class="slate" aria-labelledby="t-slate">
+      <h2 class="px" id="t-slate" data-fs="2">Au comptoir, en jeu</h2>
+      <ul class="slate-list" id="slate"></ul>
+      <p class="slate-note">Exemples de prix, en Braises. Grades et cosmétiques sans aucun avantage en jeu. Pas de cape.</p>
+    </aside>
+
+    <p class="fine">Les Braises n'ont aucune valeur réelle : elles ne sont ni remboursables, ni échangeables contre de
+      l'argent, ni transférables vers un autre compte ou un autre serveur. Tarifs indicatifs. L'historique de tes achats
+      te sera fourni avec le paiement.</p>
+  </main>
+
+  <footer class="foot">
+    <p>© 2026 The Last · <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></p>
+    <nav aria-label="Liens légaux">
+      <a href="confidentialite.html">Confidentialité</a>
+      <a href="cgu.html">Conditions d'utilisation</a>
+      <a href="mentions-legales.html">Mentions légales</a>
+    </nav>
+    <p class="disc">Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.
+      Minecraft, ses textures et ses créatures appartiennent à Mojang AB.</p>
+  </footer>
+</body>
+</html>

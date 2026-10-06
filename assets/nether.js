@@ -190,6 +190,7 @@ function Rig() {
      Texture 8 x 8 : la ligne s'attache en haut de la bouée (4,5 ; 1), l'hameçon se courbe vers (3,5 ; 7,5). */
   const el = $('#rig'), line = $('.rig-line', el), bob = $('.rig-bob', el), card = $('#launcher'), ring = $('.ring', card);
   const hint = $('#hint'); let y = null, hooked = false, struck = false, hw = 0;
+  addEventListener('resize', () => { hw = 0; }, { passive: true });          // la largeur de l'étiquette change avec la taille du texte
   function frame(t, dt) {
     if (!world) { if (!hooked) { hooked = true; card.classList.add('hooked'); } el.style.display = 'none'; return; }
     const tp = world.tip(), bb = world.bob(), rr = ring.getBoundingClientRect(), vh = innerHeight, u = innerWidth < 700 ? 2 : 3;
@@ -215,7 +216,8 @@ function Rig() {
     bob.style.opacity = show ? 1 : 0;
     if (show) bob.style.transform = 'translate(' + ex + 'px,' + ey + 'px)';
     bob.classList.toggle('sunk', !hooked && under > 2 * u);
-    if (hint && bb && surf > -30 && surf < vh + 30) { if (!hw) hw = hint.offsetWidth; hint.style.left = clamp(bx + 22, 8, innerWidth - hw - 8) + 'px'; }
+    // « Suis la ligne » à gauche de la ligne, loin des pattes de l'arpenteur ; à droite seulement s'il n'y a pas la place
+    if (hint && bb && surf > -30 && surf < vh + 30) { if (!hw) hw = hint.offsetWidth; const gap = u === 2 ? 14 : 22, lx = bx - gap - hw; hint.style.left = (lx >= 8 ? lx : clamp(bx + gap, 8, innerWidth - hw - 8)) + 'px'; }
   }
   return { frame };
 }

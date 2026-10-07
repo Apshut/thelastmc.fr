@@ -36,6 +36,7 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 .loot:hover .tag, .loot.on .tag, .loot:focus-visible .tag { background: rgb(0 0 0 / .82); transform: translateX(-50%) translateY(2px); }
 .loot[data-prop="jar"] .tag, .loot[data-row="back"] .tag, .etal.stagger .loot[data-alt] .tag { top: auto; bottom: calc(100% + 6px); }
 @media (max-width: 899px) { .tag-b { display: none; } .tag-p { font-size: 12px; } }
+.etal.short .tag-b { display: none; }
 .etal.compact .tag-p { display: none; }
 .loot[aria-pressed="true"] .tag { box-shadow: 0 0 0 2px var(--ember), 0 0 18px rgb(255 107 44 / .5); }
 

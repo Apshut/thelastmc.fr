@@ -1040,18 +1040,25 @@ function tighten() {
 let restag = true;
 function stagger() {
   restag = false;
-  etal.classList.remove('stagger', 'compact');
-  const clash = () => {
-    const fl = items.filter(it => it.btn && it.prop !== 'jar' && it.btn.dataset.row !== 'back').map(it => {
+  etal.classList.remove('stagger', 'compact', 'short');
+  const front = items.filter(it => it.btn && it.prop !== 'jar' && it.btn.dataset.row !== 'back');
+  // les étiquettes du premier rang se touchent-elles ? En quinconce, une sur deux passe au-dessus de son objet :
+  // seules celles d'une même rangée (une sur deux) peuvent alors se toucher
+  const clash = alt => {
+    const fl = front.map(it => {
       const b = it.btn.getBoundingClientRect(), w = it.btn.querySelector('.tag').offsetWidth, c = (b.left + b.right) / 2;
       return { it, x0: c - w / 2, x1: c + w / 2 };
-    }).sort((a, b) => a.x0 - b.x0);
-    let hit = false;
-    fl.forEach((f, i) => { f.it.btn.toggleAttribute('data-alt', i % 2 === 1); if (i && f.x0 < fl[i - 1].x1 + 4) hit = true; });
-    return hit;
+    }).sort((a, b) => a.x0 - b.x0), k = alt ? 2 : 1;
+    fl.forEach((f, i) => f.it.btn.toggleAttribute('data-alt', alt && i % 2 === 1));
+    return fl.some((f, i) => i >= k && f.x0 < fl[i - k].x1 + 4);
   };
-  // d'abord sans le prix (il reste dans le panneau et dans le nom du bouton), puis en quinconce
-  if (clash()) { etal.classList.add('compact'); if (clash()) etal.classList.add('stagger'); }
+  // le prix reste affiché : d'abord sans le mot « Braises » (comme sur mobile), puis en quinconce ; il ne disparaît
+  // qu'en dernier recours (il reste dans le panneau de l'article et dans le nom du bouton). Il disparaissait dès que
+  // deux étiquettes se touchaient, soit dans toutes les fenêtres de moins de 1100 px de large environ
+  if (!clash(false)) return;
+  etal.classList.add('short'); if (!clash(false)) return;
+  etal.classList.add('stagger'); if (!clash(true)) return;
+  etal.classList.add('compact');
 }
 function relayout() {
   restag = true;

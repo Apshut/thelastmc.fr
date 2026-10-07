@@ -7,6 +7,7 @@
      skin:  { w, h, draw(ctx) },      // peau pixel-art dessinée par code dans un canevas w x h (origine en haut à gauche)
      parts: [ partie, ... ],          // modèle en boîtes, au format du jeu (et de world.js)
      pose(t, st) { return { ... } },  // appelée à chaque image
+     blend(from, to, b) { ... },      // facultatif : fondu de certaines parties entre deux humeurs (voir plus bas)
      lines: { idle: [], threat: [], angry: [], don: [] }   // facultatif : répliques de la bulle (don = au survol du tronc)
    };
 
@@ -41,6 +42,10 @@
      _shake: 0..1        secousse de la caméra (coup sur le comptoir, sabot)
    Le moteur fond les poses pendant 0,3 s à chaque changement d'humeur ; avec « réduire les animations », il fige t
    et coupe les particules et la secousse (since, lui, continue : c'est au tavernier de figer ses poses).
+   Le fondu passe par le plus court chemin de chaque partie, une par une. blend(from, to, b), s'il existe, est appelée
+   à chaque image du fondu : from et to = { [nomDePartie]: [rx, ry, rz] } (la pose affichée au changement d'humeur et
+   la pose demandée), b = avancée du fondu (0..1, déjà adoucie) ; elle renvoie les rotations des parties qu'elle fond
+   elle-même (les autres gardent le fondu du moteur).
    Une erreur dans pose() ou draw() est attrapée : le modèle reste au repos.
 
    Repères de la scène (dans le repère du modèle, sans rotation) : le tavernier se tient derrière le comptoir.
@@ -89,8 +94,12 @@ const app = (A, v) => [A[0] * v[0] + A[1] * v[1] + A[2] * v[2], A[3] * v[0] + A[
 const appT = (A, v) => [A[0] * v[0] + A[3] * v[1] + A[6] * v[2], A[1] * v[0] + A[4] * v[1] + A[7] * v[2], A[2] * v[0] + A[5] * v[1] + A[8] * v[2]];
 const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const scl = (a, k) => [a[0] * k, a[1] * k, a[2] * k], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const norm = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
 const rot = r => mul(mul(M3.z(r[2] || 0), M3.y(r[1] || 0)), M3.x(r[0] || 0));      // Z, puis Y, puis X, comme le jeu
+/* l'inverse : les angles [rx, ry, rz] d'une rotation (blocage de cardan : rz = 0) */
+const euler = R => abs(R[6]) > .99999 ? [Math.atan2(-R[5], R[4]), -Math.sign(R[6]) * PI / 2, 0]
+  : [Math.atan2(R[7], R[8]), Math.asin(-R[6]), Math.atan2(R[3], R[0])];
 const child = (F, p, r) => ({ R: mul(F.R, rot(r)), t: add(F.t, app(F.R, p)) });
 const ID3 = [1, 0, 0, 0, 1, 0, 0, 0, 1], ROOT = { R: ID3, t: [0, 0, 0] };
 /* rotation [rx, ry, 0] qui oriente l'axe +y d'une partie (son « bas ») selon v */
@@ -479,10 +488,19 @@ const PARTS = [
 
 /* ================= Bras : visée et cinématique inverse ================= */
 const UA = 9, FA = 13, COUNTER = 11;                         // épaule -> coude ; coude -> dessous du poing ; dessus du comptoir
-/* bras : coude E et bout du poing T, dans le repère du torse (chest) */
+/* bras : coude E et bout du poing T, dans le repère du torse (chest).
+   Le coude est une charnière : le bras tourne sur lui-même pour que l'avant-bras plie vers sa face avant (-z), et
+   l'avant-bras ne fait que plier autour de l'axe x du bras. Visés chacun de leur côté (aim), le bras prenait la
+   torsion de sa direction et l'avant-bras rattrapait l'écart en tournant sur lui-même, jusqu'à un demi-tour ; au
+   fondu entre deux humeurs, cette torsion changeait d'une centaine de degrés : l'avant-bras vrillait autour de son
+   axe et le coude se tordait de côté. Le poing et l'avant-bras gardent exactement la même orientation qu'avant ;
+   seul le bras tourne sur son axe (deltoïde et bras sont des pavés centrés sur cet axe). */
 function armTo(side, E, T) {
-  const S = [side * 9, -8, 0], ua = aim(sub(E, S)), Rua = rot(ua), Ea = add(S, app(Rua, [0, UA, 0]));
-  return [ua, aim(appT(Rua, sub(T, Ea)))];
+  const S = [side * 9, -8, 0], u = norm(sub(E, S)), f = norm(sub(T, add(S, scl(u, UA)))), c = clamp(dot(u, f), -1, 1);
+  const b = sub(f, scl(u, c));                               // vers où plie le coude
+  if (Math.hypot(b[0], b[1], b[2]) < 1e-6) return [aim(u), [0, 0, 0]];   // bras tendu : pas de pli, pas de plan
+  const Z = scl(norm(b), -1), X = cross(u, Z);               // repère du bras : y = u, et sa face avant (-z) côté pli
+  return [euler([X[0], u[0], Z[0], X[1], u[1], Z[1], X[2], u[2], Z[2]]), [-Math.acos(c), 0, 0]];
 }
 /* cinématique inverse : T = dessous du poing, dans le repère du modèle ; pole = côté où plie le coude (repère du torse).
    Rend [coude, poing] dans le repère du torse. */
@@ -495,6 +513,28 @@ function solve(side, Fc, T, pole) {
   return [add(S, scl(u, UA)), add(S, scl(dn, Dc))];
 }
 const reach = (side, Fc, T, pole) => { const e = solve(side, Fc, T, pole); return armTo(side, e[0], e[1]); };
+/* fondu des bras entre deux humeurs (blend du contrat) : ils passent par les positions du coude et du bout du poing, et
+   non par les angles. Fondus angle par angle, chaque partie par son plus court chemin, le poing quittait la hanche tout
+   droit vers la paume, au travers du tablier et du ventre. Ici coude et poing tournent autour du buste (axe vertical du
+   torse : angle, distance à l'axe et hauteur fondus), écartés en chemin d'autant plus que le trajet est long (4 px au
+   plus pour le poing, 2 pour le coude), et le coude reste une charnière (armTo) */
+function around(P, Q, b, out) {
+  const a0 = Math.atan2(P[0], -P[2]); let da = Math.atan2(Q[0], -Q[2]) - a0;
+  da -= Math.round(da / (2 * PI)) * 2 * PI;                  // par le plus court côté
+  const r = lerp(Math.hypot(P[0], P[2]), Math.hypot(Q[0], Q[2]), b) + out, an = a0 + da * b;
+  return [r * sin(an), lerp(P[1], Q[1], b), -r * cos(an)];
+}
+function blend(from, to, b) {
+  const o = {}, arc = sin(b * PI);
+  [1, -1].forEach(sd => {
+    const n = sd > 0 ? 'L' : 'R', S = [sd * 9, -8, 0];
+    const fk = r => { const Ra = rot(r['arm' + n] || []), E = add(S, app(Ra, [0, UA, 0])); return [E, add(E, app(mul(Ra, rot(r['fore' + n] || [])), [0, FA, 0]))]; };
+    const A = fk(from), B = fk(to), d = Math.hypot(B[1][0] - A[1][0], B[1][1] - A[1][1], B[1][2] - A[1][2]);
+    const a = armTo(sd, around(A[0], B[0], b, arc * Math.min(2, d * .2)), around(A[1], B[1], b, arc * Math.min(4, d * .3)));
+    o['arm' + n] = a[0]; o['fore' + n] = a[1];
+  });
+  return o;
+}
 /* point le plus bas du poing au-dessus du comptoir (z < -10,5), ou null */
 function fistLow(side, Fc, a) {
   const Fa = child(Fc, [side * 9, -8, 0], a[0]), Ff = child(Fa, [0, UA, 0], a[1]);
@@ -604,17 +644,22 @@ function pose(t, st) {
        renversée). En montant, ils passent 6 px devant les épaules : tirés droit vers le haut, ils frôlaient l'épaule,
        le coude se repliait à fond et chaque poing entrait dans son deltoïde */
     const PLANT = [[7.5, COUNTER - 1.3, -16], [-7.5, COUNTER - 1.3, -15.5]], UPF = [[10.5, -29, -6], [-10.5, -29, -6]], STAND = [[11, 3, -6], [-11, 3, -6]];
-    let tgt, pole = [[.5, -.2, 1], [-.5, -.2, 1]];
+    /* côté où plient les coudes (écartés, vers l'arrière) : plus bas pendant l'élan (PW), un peu moins pendant la
+       frappe (PB), relevés une fois appuyé (PH). Changé d'un coup à chaque phase, il faisait tourner bras et avant-bras
+       d'un bloc (28° en haut de l'élan, 17° au coup sur le comptoir) : il glisse désormais de l'un à l'autre quand les
+       bras bougent peu (fin de l'élan, poings posés, retour), et la frappe reste telle quelle */
+    const PW = [.6, .4, .7], PB = [.5, .1, 1], PH = [.5, -.2, 1], mixP = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+    let tgt, pole;
     if (k < .34) {
       w = lerp(.1, -.08, wind); c = lerp(0, -.05, wind); bx = -.14 * wind; hx = lerp(.2, -.22, wind); browL = -.5;
       legs.legFL = [-.5 * wind, 0, 0]; legs.shinFL = [.9 * wind, 0, 0]; legs.legFR = [-.4 * wind, 0, 0]; legs.shinFR = [.8 * wind, 0, 0];
       tgt = [0, 1].map(i => [lerp(STAND[i][0], UPF[i][0], wind), lerp(STAND[i][1], UPF[i][1], wind), lerp(STAND[i][2], UPF[i][2], wind) - sin(wind * PI) * 6]);
-      pole = [[.6, .4, .7], [-.6, .4, .7]];
+      pole = mixP(PW, PB, smooth((k - .1) / .24));
     } else if (k < HIT) {
       w = lerp(-.08, .44, slam); c = lerp(-.05, .2, slam); bx = lerp(-.14, 0, slam); hx = lerp(-.22, .3, slam); browL = -.5;
       legs.legFL = [-.5 * (1 - slam), 0, 0]; legs.shinFL = [.9 * (1 - slam), 0, 0]; legs.legFR = [-.4 * (1 - slam), 0, 0]; legs.shinFR = [.8 * (1 - slam), 0, 0];
       tgt = [0, 1].map(i => { const a = [lerp(UPF[i][0], PLANT[i][0], slam), lerp(UPF[i][1], PLANT[i][1], slam), lerp(UPF[i][2], PLANT[i][2], slam)]; a[2] -= sin(slam * PI) * 9; a[1] = Math.min(a[1], PLANT[i][1]); return a; });
-      pole = [[.5, .1, 1], [-.5, .1, 1]];
+      pole = PB;
     } else {
       // appuyé sur ses poings : le torse pompe, la tête secoue puis se relève pour te fixer
       const settle = Math.exp(-after * 5), hold = 1 - rec;
@@ -623,6 +668,7 @@ function pose(t, st) {
       hx = lerp(.3 - smooth(after / .9) * .3 + ly * .2, .05 + ly * .25, rec); hy = shakeH * hold - lx * .45 * smooth(after / .8);
       browL = -.5;
       tgt = [0, 1].map(i => [lerp(PLANT[i][0], STAND[i][0], rec), lerp(PLANT[i][1], STAND[i][1], rec) - sin(rec * PI) * 3, lerp(PLANT[i][2], STAND[i][2], rec)]);
+      pole = mixP(mixP(PB, PH, smooth(after / .25)), PW, rec);
       if (after < .09) {
         fx.push({ kind: 'spark', part: 'foreL', at: [0, 13, -2], n: 190 }, { kind: 'spark', part: 'foreR', at: [0, 13, -2], n: 190 });
         fx.push({ kind: 'dust', part: 'foreL', at: [0, 13, 0], n: 300 }, { kind: 'dust', part: 'foreR', at: [0, 13, 0], n: 300 });
@@ -642,7 +688,7 @@ function pose(t, st) {
       });
     }
     const Fc = frames(), onIt = k >= HIT && k < 1.35;
-    arms = [plant(1, Fc, tgt[0], pole[0], onIt), plant(-1, Fc, tgt[1], pole[1], onIt)];
+    arms = [plant(1, Fc, tgt[0], pole, onIt), plant(-1, Fc, tgt[1], [-pole[0], pole[1], pole[2]], onIt)];
     P.earL = [0, -1, .25]; P.earR = [0, 1, -.25];
     tail = [-1.3, 0, sin(t * 21) * .14]; tail2 = [-.25, 0, sin(t * 21 - .6) * .22];
     pupil = 1;                                                  // les yeux s'embrasent : plus de pupilles
@@ -701,6 +747,7 @@ window.TAVERN_KEEPER = {
   skin: { w: SW, h: SH, draw },
   parts: PARTS,
   pose,
+  blend,
   lines: {
     idle: ['Grmmh. Tu prends quoi ?', 'Ici, on paie en Braises.', 'Les Braises, ça se dépense au comptoir. En jeu.', 'Pas de cape. Jamais. Demande pas.', 'Je t\'ai à l\'œil.'],
     threat: ['Touche avec les yeux.', 'Repose ça. Doucement.', 'Tu touches, tu paies.', 'Mes cornes te regardent.'],

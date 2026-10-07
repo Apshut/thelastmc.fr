@@ -391,11 +391,21 @@ function Download() {
   }
 }
 
-function Gallery() {
-  const dlg = $('#lightbox'); if (!dlg || !dlg.showModal) return;
-  const im = $('img', dlg);
-  $$('.painting').forEach(b => b.addEventListener('click', () => { im.src = b.dataset.full; im.alt = $('img', b).alt; dlg.showModal(); }));
-  dlg.addEventListener('click', () => dlg.close());
+/* Le chantier : les 5 dernières nouvelles du site, du launcher et du jeu. assets/journal.json est réécrit toutes les heures
+   par une tâche GitHub (.github/journal/build.mjs) à partir des lignes « Journal(…): » des commits des projets. */
+const PROJETS = { site: 'Site', launcher: 'Launcher', jeu: 'Jeu' };
+function Journal() {
+  const ol = $('#journal'); if (!ol) return;
+  const quand = iso => {
+    const d = new Date(iso), j = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 864e5);
+    return j <= 0 ? "aujourd'hui" : j === 1 ? 'hier' : j < 7 ? 'il y a ' + j + ' jours' : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+  };
+  fetch('assets/journal.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error('journal ' + r.status); return r.json(); }).then(j => {
+    const list = (j.entries || []).filter(e => PROJETS[e.p] && e.t && e.d).slice(0, 5); if (!list.length) return;
+    ol.textContent = '';
+    list.forEach(e => ol.appendChild(h('li', { class: 'j-e', 'data-p': e.p },
+      h('span', { class: 'j-p' }, PROJETS[e.p]), h('span', { class: 'j-t', text: e.t }), h('time', { class: 'j-d', datetime: e.d, text: quand(e.d) }))));
+  }).catch(e => { if (window.console) console.warn(e); });
 }
 
 /* Notifications de progrès, comme en jeu : une seule fois par visite et par progrès. */
@@ -449,7 +459,7 @@ function start() {
   toast = Toasts();
   align = Catch();
   $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
-  Tips(); Download(); Gallery();
+  Tips(); Download(); Journal();
   depth = Depth(F3()); depth();
   if (QS.has('toast')) toast('demo', 'fishing_rod', 'Progrès réalisé !', 'Belle prise');
   root.classList.add('ready');
@@ -487,5 +497,5 @@ function start() {
 Promise.all([loadImg('assets/mc/blocks.png'), loadImg('assets/mc/items.png'), loadImg('assets/mc/piglin.png'), loadImg('assets/mc/strider.png'), loadImg('assets/mc/ghast.png').catch(() => null), loadImg('assets/mc/strider_saddle.png').catch(() => null),
     loadImg('assets/mc/skeleton.png').catch(() => null)])
   .then(a => { IM.blocks = a[0]; IM.items = a[1]; IM.piglin = a[2]; IM.strider = a[3]; IM.ghast = a[4]; IM.saddle = a[5]; IM.skeleton = a[6]; start(); })
-  .catch(e => { root.classList.add('no-gl'); if (window.console) console.error(e); Download(); Gallery(); $('#launcher').classList.add('hooked'); });
+  .catch(e => { root.classList.add('no-gl'); if (window.console) console.error(e); Download(); Journal(); $('#launcher').classList.add('hooked'); });
 })();

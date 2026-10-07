@@ -1,0 +1,41 @@
+# Journal du chantier : toutes les heures, relit les lignes « Journal(…): » des commits des projets (dépôts privés,
+# lus avec le jeton JOURNAL_TOKEN, en lecture seule) et republie assets/journal.json s'il a changé.
+# Sans le secret JOURNAL_TOKEN, la tâche ne fait rien (et ne signale pas d'erreur).
+name: Journal du chantier
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+concurrency: journal
+jobs:
+  journal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Lire les journaux des projets
+        run: node .github/journal/build.mjs
+        env:
+          JOURNAL_TOKEN: ${{ secrets.JOURNAL_TOKEN }}
+      - name: Publier si le journal a changé
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- assets/journal.json; then
+            git add assets/journal.json
+            git commit -m "Journal du chantier : mise à jour automatique"
+          elif [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt 4320000 ]; then
+            # GitHub coupe les tâches planifiées d'un dépôt public sans activité depuis 60 jours : un signe de vie tous les 50 jours
+            git commit --allow-empty -m "Journal du chantier : la tâche automatique reste active"
+          else
+            echo "Rien de neuf."; exit 0
+          fi
+          git push
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" > /dev/null || true

@@ -45,7 +45,7 @@
     <ol>
       <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span>Le lac de lave</span></a></li>
       <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span>Sous la lave · le launcher</span></a></li>
-      <li><a href="#magma" data-sec="#magma" data-tex="magma"><span>Magma · aperçu</span></a></li>
+      <li><a href="#magma" data-sec="#magma" data-tex="magma"><span>Magma · chantier</span></a></li>
       <li><a href="#ames" data-sec="#ames" data-tex="soul_sand"><span>Sable des âmes · questions</span></a></li>
       <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span>Bedrock · le fond</span></a></li>
     </ol>
@@ -99,32 +99,15 @@
       <div class="bones" aria-hidden="true"></div>
     </section>
 
-    <!-- ============ Magma : aperçu ============ -->
-    <section class="stratum s-magma" id="magma" aria-labelledby="t-apercu">
+    <!-- ============ Magma : le chantier ============ -->
+    <section class="stratum s-magma" id="magma" aria-labelledby="t-chantier">
       <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
       <div class="wrap">
-        <h2 class="px" id="t-apercu" data-fs="4">Vu de l'intérieur</h2>
-        <p class="sub">Quatre tableaux accrochés dans la roche. Clique pour les voir en grand.</p>
-        <div class="paintings">
-          <button class="painting" type="button" data-full="assets/captures/connexion.png">
-            <img src="assets/captures/connexion.png" alt="Écran de connexion du launcher avec le bouton Se connecter avec Microsoft" width="1280" height="760" loading="lazy">
-            <span>Connexion avec un compte Microsoft</span>
-          </button>
-          <button class="painting" type="button" data-full="assets/captures/accueil.png">
-            <img src="assets/captures/accueil.png" alt="Accueil du launcher : statut du serveur, actualités et bouton Jouer" width="1280" height="760" loading="lazy">
-            <span>Accueil : statut, actualités, bouton Jouer</span>
-          </button>
-          <button class="painting" type="button" data-full="assets/captures/preparation.png">
-            <img src="assets/captures/preparation.png" alt="Préparation du jeu avec la progression du téléchargement" width="1280" height="760" loading="lazy">
-            <span>Préparation et vérification des fichiers</span>
-          </button>
-          <button class="painting" type="button" data-full="assets/captures/jeu-cadre.png">
-            <img src="assets/captures/jeu-cadre.png" alt="Minecraft lancé avec NeoForge depuis le launcher" width="870" height="487" loading="lazy">
-            <span>Le jeu lancé avec NeoForge</span>
-          </button>
-        </div>
-        <p class="note">Captures de la version en développement, avec des données de démonstration
-          (joueurs en ligne, actualités, pseudo).</p>
+        <h2 class="px" id="t-chantier" data-fs="4">Le chantier</h2>
+        <p class="sub">Ce qui avance sur le site, le launcher et le jeu, au fil des corrections. Les cinq dernières nouvelles.</p>
+        <ol class="journal" id="journal">
+          <li class="j-vide">Le journal du chantier s'affiche ici.</li>
+        </ol>
       </div>
     </section>
 
@@ -199,8 +182,5 @@
   <!-- La canne à pêche : ligne, flotteur, hameçon -->
   <div id="rig" aria-hidden="true"><i class="rig-line"></i><i class="rig-bob"></i></div>
 
-  <dialog id="lightbox" aria-label="Capture en grand">
-    <img alt="">
-  </dialog>
 </body>
 </html>

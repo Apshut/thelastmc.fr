@@ -59,6 +59,28 @@ function scale(x, y, z) { const o = ident(); o[0] = x; o[5] = y; o[10] = z; retu
 function tp(m, x, y, z) { return [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13], m[2] * x + m[6] * y + m[10] * z + m[14]]; }
 function tv(m, x, y, z) { return [m[0] * x + m[4] * y + m[8] * z, m[1] * x + m[5] * y + m[9] * z, m[2] * x + m[6] * y + m[10] * z]; }
 const IDENT = ident(), Z3 = [0, 0, 0];
+/* Rotations des parties [rx, ry, rz], appliquées comme le jeu (Z, puis Y, puis X : R = Rz·Ry·Rx), en quaternions [w, x, y, z].
+   Le fondu entre deux humeurs passe par eux : mélanger les angles nombre par nombre faisait parfois faire un tour complet
+   à un avant-bras (+170° et -170° ne sont qu'à 20° l'un de l'autre, mais 340° en chiffres). */
+function e2q(r) {
+  const hx = (r[0] || 0) / 2, hy = (r[1] || 0) / 2, hz = (r[2] || 0) / 2;
+  const cx = Math.cos(hx), sx = Math.sin(hx), cy = Math.cos(hy), sy = Math.sin(hy), cz = Math.cos(hz), sz = Math.sin(hz);
+  return [cz * cy * cx + sz * sy * sx, cz * cy * sx - sz * sy * cx, cz * sy * cx + sz * cy * sx, sz * cy * cx - cz * sy * sx];
+}
+function q2e(q) {
+  const w = q[0], x = q[1], y = q[2], z = q[3], r20 = 2 * (x * z - w * y);
+  if (Math.abs(r20) > .99999) return [Math.atan2(-2 * (y * z - w * x), 1 - 2 * (x * x + z * z)), -Math.sign(r20) * Math.PI / 2, 0];   // blocage de cardan
+  return [Math.atan2(2 * (y * z + w * x), 1 - 2 * (x * x + y * y)), Math.asin(-r20), Math.atan2(2 * (x * y + w * z), 1 - 2 * (y * y + z * z))];
+}
+/* le plus court chemin entre deux orientations */
+function slerpE(a, c, t) {
+  const p = e2q(a); let q = e2q(c), d = p[0] * q[0] + p[1] * q[1] + p[2] * q[2] + p[3] * q[3];
+  if (d < 0) { q = q.map(v => -v); d = -d; }
+  let k0 = 1 - t, k1 = t;
+  if (d < .9995) { const th = Math.acos(d), s = Math.sin(th); k0 = Math.sin((1 - t) * th) / s; k1 = Math.sin(t * th) / s; }
+  const o = [p[0] * k0 + q[0] * k1, p[1] * k0 + q[1] * k1, p[2] * k0 + q[2] * k1, p[3] * k0 + q[3] * k1], l = Math.hypot(o[0], o[1], o[2], o[3]) || 1;
+  return q2e(o.map(v => v / l));
+}
 const C16 = new Float32Array([1 / 16, 0, 0, 0, 0, -1 / 16, 0, 0, 0, 0, -1 / 16, 0, 0, 1.5, 0, 1]);   // repère des créatures du jeu -> monde (sol à y = 24)
 const P16 = scale(1 / 16, -1 / 16, -1 / 16);                                                       // repère des objets : sol à y = 0
 
@@ -718,7 +740,7 @@ function Engine(canvas, imgs, opts) {
     let out = cur;
     if (b < 1) {
       out = { rot: {}, root: {}, glow: lerp(kFrom.glow, cur.glow, b) };
-      for (const n in kRest) { const a = kFrom.rot[n], c = cur.rot[n]; out.rot[n] = [lerp(a[0] || 0, c[0] || 0, b), lerp(a[1] || 0, c[1] || 0, b), lerp(a[2] || 0, c[2] || 0, b)]; }
+      for (const n in kRest) out.rot[n] = slerpE(kFrom.rot[n], cur.rot[n], b);
       for (const k in ROOT0) out.root[k] = lerp(+kFrom.root[k] || 0, +cur.root[k] || 0, b);
     } else kFrom = null;
     kShown = out;

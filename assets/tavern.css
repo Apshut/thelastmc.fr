@@ -40,7 +40,8 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 .loot[aria-pressed="true"] .tag { box-shadow: 0 0 0 2px var(--ember), 0 0 18px rgb(255 107 44 / .5); }
 
 /* ---------- La bulle du tavernier ---------- */
-.say { position: absolute; left: 0; top: 0; z-index: 3; margin: 0; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .25s; }
+/* bulle hors de la scène, au premier plan (voir tavern.js) : sous l'en-tête sur mobile, où la page défile dessous */
+.say { position: absolute; left: 0; top: 0; z-index: 20; margin: 0; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .25s; }
 .say.on { opacity: 1; }
 .say .pxl { position: absolute; left: 0; bottom: 12px; transform: translateX(calc(-50% + var(--dx, 0px))); padding: 5px 8px 6px; background: rgb(0 0 0 / .74); color: #fff; white-space: nowrap; flex-wrap: wrap; justify-content: center; row-gap: 4px; width: max-content; max-width: min(420px, calc(100vw - 32px)); }
 .say::after { content: ""; position: absolute; left: -5px; bottom: 6px; width: 10px; height: 6px; background: rgb(0 0 0 / .74); clip-path: polygon(0 0, 100% 0, 50% 100%); }
@@ -99,6 +100,7 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 @media (min-width: 900px) and (min-height: 600px) {
   html.tv, html.tv body { height: 100%; overflow: hidden; }
   .stage { position: fixed; inset: 0; height: auto; z-index: 0; }
+  .say { z-index: 40; }                                       /* par-dessus l'en-tête (30) et les panneaux */
   .intro, .deal, .slate, .fine { position: fixed; z-index: 5; width: var(--side); margin: 0; }
   .intro { left: 24px; top: 70px; padding: 0; }
   .deal { left: 24px; bottom: 58px; }

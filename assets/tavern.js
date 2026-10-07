@@ -969,7 +969,7 @@ const copy = c => { const o = mk(c.width, c.height); o.getContext('2d').drawImag
 const S = CFG.shop || {}, LIST = (S.products || []).filter(p => p && p.id), INGAME = S.inGame || [];
 const eur = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 const nb = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-const stage = $('#stage'), canvas = $('#tavern'), etal = $('#etal'), dealBox = $('#deal'), say = $('#say');
+const stage = $('#stage'), canvas = $('#tavern'), etal = $('#etal'), dealBox = $('#deal'), say = $('#say'), topBar = $('#top');
 const IMG = {};
 const loadImg = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ko(new Error('image ' + src)); i.src = src; });
 const deskMQ = matchMedia('(min-width: 900px) and (min-height: 600px)');
@@ -1154,9 +1154,21 @@ function step(t, dt, since) {
     it.btn.classList.toggle('on', it.hl > .5);
   });
   if (restag && eng) stagger();
+  /* la bulle vit hors de la scène, au premier plan : dedans, elle passait sous l'en-tête, dont le fondu noir masquait le
+     haut du texte quand la tête du tavernier montait près du bord de la fenêtre (et la scène la coupait). Sur ordinateur,
+     elle reste entière dans la fenêtre et descend sous l'en-tête si elle devait passer sur ses boutons ; sur mobile, la
+     page défile sous l'en-tête : elle suit la scène, sous l'en-tête comme le reste */
   if (say && hd) {
-    const bw = say.firstElementChild ? say.firstElementChild.offsetWidth : 0, x = bw ? clamp(hd.x, bw / 2 + 8, Math.max(bw / 2 + 8, W - bw / 2 - 8)) : hd.x;
-    say.style.transform = 'translate(' + Math.round(hd.x) + 'px,' + Math.round(Math.max(hd.y, 48)) + 'px)'; say.style.setProperty('--dx', Math.round(x - hd.x) + 'px');
+    const box = say.firstElementChild, bw = box ? box.offsetWidth : 0, bh = box ? box.offsetHeight : 0;
+    const x = bw ? clamp(hd.x, bw / 2 + 8, Math.max(bw / 2 + 8, W - bw / 2 - 8)) : hd.x;
+    const sr = stage.getBoundingClientRect(), pr = say.offsetParent ? say.offsetParent.getBoundingClientRect() : sr;
+    let minTop = -Infinity;
+    if (desk) {
+      const l = sr.left + x - bw / 2, r = l + bw;
+      minTop = topBar && Array.from(topBar.children).some(c => { const q = c.getBoundingClientRect(); return l < q.right + 8 && r > q.left - 8; }) ? topBar.getBoundingClientRect().bottom + 6 : 8;
+    }
+    const y = Math.max(hd.y, minTop - sr.top + 12 + bh);      // 12 = de la pointe au bas de la bulle
+    say.style.transform = 'translate(' + Math.round(sr.left - pr.left + hd.x) + 'px,' + Math.round(sr.top - pr.top + y) + 'px)'; say.style.setProperty('--dx', Math.round(x - hd.x) + 'px');
   }
   root.dataset.mood = mood;
 }

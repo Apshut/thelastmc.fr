@@ -52,7 +52,7 @@
      - il se tient sur une estrade (un quart de bloc) ; y = 24 est le dessus de l'estrade ;
      - dessus du comptoir : y = +11 (13 px au-dessus de l'estrade) ; bord arrière du comptoir : z = -12 (le plateau
        déborde jusqu'à z = -11) ; bord avant : z = -28 ; le comptoir va de x = -83 à x = +83 ;
-     - le pot « Soutien » est posé sur le comptoir entre x = -33 et x = -27 : rien ne doit s'y poser ;
+     - le pot « Soutien » est posé sur le comptoir entre x = -47 et x = -37 : rien ne doit s'y poser ;
      - le client (la caméra) est devant, un peu au-dessus de la tête : à la profondeur du tavernier, on voit tout
        ce qui est plus haut que y ≈ 16 ; le comptoir cache le reste (sabots, bas des pattes) ;
      - le cadrage suit la taille du modèle au repos (cornes comprises) : un grand tavernier reste dans l'image.

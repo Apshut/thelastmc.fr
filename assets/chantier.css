@@ -1,0 +1,42 @@
+/* The Last — le chantier (chantier.html). Les entrées reprennent le style du journal de l'accueil (.journal, nether.css). */
+.chantier-page body {
+  min-height: 100vh; display: flex; flex-direction: column;
+  background: linear-gradient(rgb(10 4 5 / .9), rgb(10 4 5 / .8) 40%, rgb(10 4 5 / .92)), #120709 var(--ch-bg, none) 0 0 / 48px auto;
+  image-rendering: pixelated;
+}
+@media (max-width: 700px) { .chantier-page body { background-size: auto, 32px auto; } }
+.ch-main { flex: 1; width: min(880px, calc(100% - 32px)); margin: 0 auto; padding: 110px 0 56px; image-rendering: auto; }
+.ch-main .sub { margin-bottom: 22px; }
+
+/* filtres : un bouton par projet, à sa couleur ; éteint, il reste lisible mais terne */
+.ch-filtres { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 34px; }
+.ch-f {
+  --jc: #ffb547; display: inline-flex; align-items: center; gap: 10px; padding: 10px 14px 10px 12px; border: 0; cursor: pointer;
+  color: var(--jc); background: rgb(14 6 5 / .9); clip-path: var(--notch); --fs: 2px;
+  box-shadow: inset 0 0 0 var(--u) var(--jc), inset 0 0 0 calc(var(--u) * 2) #050304;
+  transition: filter .15s, transform .15s, opacity .15s;
+}
+.ch-f[data-p="launcher"] { --jc: #5fd8ff; }
+.ch-f[data-p="jeu"] { --jc: #62e06a; }
+.ch-f::before { content: ""; width: 12px; height: 12px; background: var(--jc); box-shadow: 0 0 10px var(--jc); }
+.ch-f[aria-pressed="false"] { opacity: .45; filter: saturate(.3); box-shadow: inset 0 0 0 var(--u) rgb(255 255 255 / .18), inset 0 0 0 calc(var(--u) * 2) #050304; }
+.ch-f[aria-pressed="false"]::before { background: transparent; box-shadow: inset 0 0 0 2px var(--jc); }
+.ch-f:hover { transform: translateY(-2px); }
+.ch-f:focus-visible { outline: 2px dashed rgb(255 255 255 / .85); outline-offset: 3px; }
+.ch-n { color: #e9d9cf; font: 600 12px/1 "Sora", sans-serif; opacity: .8; }
+
+/* année, puis mois */
+.ch-annee { margin: 6px 0 14px; color: #ffd27a; }
+.ch-mois { margin: 0 0 30px; }
+.ch-mt {
+  display: flex; align-items: baseline; gap: 12px; margin: 0 0 12px; padding-bottom: 8px;
+  border-bottom: 2px solid rgb(255 181 71 / .22); color: #fff3e6; font: 700 15px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase;
+}
+.ch-mt small { color: #bda89c; font-weight: 500; letter-spacing: .04em; text-transform: none; }
+.ch-vide { color: #cdb9ad; font-size: 15px; }
+
+.ch-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 18px; padding: 16px 20px 18px; color: var(--fg-3, #a89a93); font-size: 12px; background: rgb(6 2 3 / .9); }
+.ch-foot p { margin: 0; }
+.ch-foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.ch-foot a { color: var(--fg-2, #d8cbc4); text-decoration: none; }
+.ch-foot a:hover { color: #fff; }

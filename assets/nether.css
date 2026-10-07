@@ -103,6 +103,9 @@ img { max-width: 100%; }
 .top.solid .brand, html:not(.js) .brand { opacity: 1; transform: none; }
 .top nav { display: flex; gap: 8px; margin-left: auto; }
 .top .tbtn { padding: 10px 13px; font-size: 12px; }
+/* téléphones : quatre boutons tiennent sur la ligne (police du jeu à 1,5 px par pixel, marges serrées) */
+@media (max-width: 480px) { .top { padding: 0 10px; } .top nav { gap: 5px; } .top .tbtn { padding-left: 8px; padding-right: 8px; } .top .tbtn .pxl { --fs: 1.5px; } }
+@media (max-width: 360px) { .top nav { gap: 4px; } .top .tbtn { padding-left: 6px; padding-right: 6px; } .top .tbtn .pxl { --fs: 1.25px; } }
 
 /* ---------- Jauge de profondeur ---------- */
 .depth { position: fixed; z-index: 25; right: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -275,6 +278,7 @@ button.slot { cursor: pointer; }
 .j-t { color: #fff3e6; font-size: 15.5px; line-height: 1.4; }
 .j-d { color: #bda89c; font-size: 12.5px; white-space: nowrap; }
 .journal .j-vide { display: block; color: #bda89c; font-size: 14px; }
+.j-tout { margin: calc(var(--u) * 6) 0 0; }
 @media (max-width: 560px) { .journal li { grid-template-columns: 1fr auto; } .j-t { grid-column: 1 / -1; grid-row: 2; } }
 
 dialog { border: 0; padding: 0; background: none; color: var(--fg); width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }

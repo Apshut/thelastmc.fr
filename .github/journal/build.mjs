@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SOURCES = ['Apshut/the-last-launcher'];                 // ajouter ici le dépôt du serveur quand il existera
-const KEEP = 30, PAGES = 5;                                    // entrées gardées dans le fichier ; pages de 100 commits lues au plus
+const KEEP = 5000, PAGES = 5;                                  // tout l'historique (la page Chantier l'affiche) ; pages de 100 commits lues à chaque passage
 const LINE = /^Journal\((site|launcher|jeu)\)\s*:\s*(.+?)\s*$/gim;
 
 const args = process.argv.slice(2), opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
@@ -33,7 +33,7 @@ async function fromGitHub(repo, token, into) {
     if (!r.ok) throw new Error(`${repo} : HTTP ${r.status} ${await r.text()}`);
     const list = await r.json();
     for (const c of list) parse(c.commit.message, c.commit.committer.date, into);
-    if (list.length < 100 || into.length >= KEEP) break;
+    if (list.length < 100) break;
   }
 }
 function fromGit(dir, into) {
@@ -42,6 +42,8 @@ function fromGit(dir, into) {
 }
 
 const entries = JSON.parse(readFileSync(join(HERE, 'historique.json'), 'utf8'));
+// ce qui est déjà publié reste : l'historique ne dépend pas des seuls derniers commits relus
+try { entries.push(...JSON.parse(readFileSync(out, 'utf8')).entries); } catch { /* premier passage */ }
 if (opt('--git')) fromGit(opt('--git'), entries);
 else {
   const token = process.env.JOURNAL_TOKEN;

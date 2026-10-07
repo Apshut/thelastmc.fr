@@ -68,8 +68,9 @@
    Humeurs :
      - calme   : poings sur les hanches (et bras croisés de temps en temps), respiration lente, regard qui suit le
                  curseur, clignements, oreilles et queue qui bougent, craquement de nuque, filet de fumée ;
-     - menace  : cornes baissées vers le client, sabot avant qui racle la pierre, souffle de fumée, poing qui cogne
-                 dans la paume, queue raide ;
+     - menace  : (survol d'un article) en fait, le marchand gourmand : il te regarde droit dans les yeux en se frottant les
+                 mains devant la poitrine, coudes pliés ; des braises jaillissent entre ses poings, oreilles dressées, queue
+                 qui frétille ;
      - énervé  : il se dresse poings levés (ses cornes crépitent), les abat sur le comptoir (secousse, étincelles, les
                  chopes sautent), reste appuyé sur ses poings en soufflant, rue d'une patte arrière, puis se redresse.
    Les poings sont placés par cinématique inverse : ils se posent SUR le comptoir, jamais dedans. */
@@ -559,10 +560,6 @@ function plant(side, Fc, T, pole, rest) {
 /* ================= Les animations ================= */
 const NOSE = [[-1.5, -1.6, -10.2], [1.5, -1.6, -10.2]];
 const snort = (fx, n) => NOSE.forEach(a => fx.push({ kind: 'smoke', part: 'head', at: a, dir: [a[0] * .35, .55, -1], n }));
-/* pistes d'images clés : [[u, a, b], ...] interpolées en douceur */
-const key = (u, K) => { for (let i = 1; i < K.length; i++) if (u <= K[i][0]) { const a = K[i - 1], b = K[i], e = smooth((u - a[0]) / (b[0] - a[0])); return [lerp(a[1], b[1], e), lerp(a[2], b[2], e)]; } return [K[K.length - 1][1], K[K.length - 1][2]]; };
-/* raclement du sabot avant droit : cuisse, canon (relatif) — levé, posé devant, tiré en arrière sur la pierre */
-const SCRAPE = [[0, 0, 0], [.2, -1.45, 2.2], [.3, -.62, .82], [.4, -.12, .6], [.5, .28, .2], [.64, 0, 0], [1, 0, 0]];
 const bump = (ph, w) => ph < w ? sin(ph / w * PI) : 0;       // une bosse de durée w au début d'une période
 const HIT = .53;                                             // instant du coup sur le comptoir (pic du rougeoiement de l'écran)
 const look = { t: -1, x: 0, y: 0 };
@@ -579,6 +576,7 @@ function pose(t, st) {
   const br = sin(t * 1.9), br2 = sin(t * 1.9 - .5);           // respiration (≈ 3,3 s)
   let gy = GY, bx = 0, w = .04, c = 0, ct = 0, hx = .1, hy = 0, hz = 0, arms = null;
   let browL = -.18, tail = [-.7, 0, 0], tail2 = [0, 0, 0], blink = 0, pupil = 0, kick = 0;
+  let ex = lx, ey = ly, tuck = 0;              // où regardent les yeux (le marchand regarde le client) ; barbe rangée
   const legs = { legFL: [0, 0, 0], shinFL: [0, 0, 0], legFR: [0, 0, 0], shinFR: [0, 0, 0], legHL: [0, 0, 0], hockHL: [0, 0, 0], legHR: [0, 0, 0], hockHR: [0, 0, 0] };
   const mug = { A: 0, B: 0, C: 0 }, mugT = { A: [0, 0, 0], B: [0, 0, 0], C: [0, 0, 0] };
   const frames = () => { const Fg = child(ROOT, [0, 0, 0], [0, gy, 0]), Fb = child(Fg, [0, 8, 20], [bx, 0, 0]), Fw = child(Fb, WAIST, [w, -gy, 0]); return child(Fw, [0, -5, 0], [c, ct, 0]); };
@@ -615,28 +613,30 @@ function pose(t, st) {
     if (st.hover) { hx += sin(t * 4.2) * .07; browL = -.04; }     // on lui montre le tronc de soutien : il hoche la tête, radouci
     P._glow = .72;
   } else if (m === 'threat') {
-    // il baisse les cornes vers toi, racle la pierre du sabot, souffle, et cogne son poing dans sa paume
-    const u = (t * .62) % 1;                                    // un raclement toutes les 1,6 s
-    const drag = u >= .3 && u < .5 ? (u - .3) / .2 : 0, jolt = u >= .3 && u < .58 ? sin((u - .3) / .28 * PI) : 0;
-    w = .22 + br * .01 + jolt * .06; c = .08 + jolt * .03; ct = -lx * .12; bx = -jolt * .025;
-    hx = .36 + ly * .12 + jolt * .06; hy = -lx * .3 + sin(t * 1.3) * .07;           // la tête se tourne à peine : les pupilles visent l'article hz = sin(t * 1.3) * .04;
-    browL = -.3;
-    const kf = key(u, SCRAPE); legs.legFR = [kf[0], 0, 0]; legs.shinFR = [kf[1], 0, 0];
-    legs.legFL = [jolt * .05, 0, 0];
-    if (drag > .1 && drag < .7) { fx.push({ kind: 'spark', part: 'shinFR', at: [0, 10, -1.5], n: 220 }, { kind: 'dust', part: 'shinFR', at: [0, 9, 0], n: 90 }); P._shake = .14; }
-    if (u > .3 && u < .62) snort(fx, 75);
-    P.earL = [0, -.9, .55]; P.earR = [0, .9, -.55];
-    tail = [-1.15, 0, sin(t * 15) * .07]; tail2 = [-.1, 0, sin(t * 15 - .6) * .12];
-    blink = bump((t + .7) % 5.9, .15);
-    // poing dans la paume : la main gauche tient, la droite cogne deux fois par cycle
-    const Fc = frames(), pu = (t * 1.35) % 1, up = pu < .62 ? smooth(pu / .62) : 1 - easeIn((pu - .62) / .1), hit = pu >= .72 && pu < .8;
-    const palm = [4.5, 8, -13];                                 // à côté de la barbe : le visage reste dégagé
-    /* le coude droit plie vers l'avant (pôle -z) : plié vers l'arrière, le bras qui traverse le corps passait dans la
-       poitrine et ressortait par le tablier. Le poing qui cogne s'arrête 6,5 px au-dessus de la paume (à 6, son coin
-       entrait dans le poing-paume) et ne remonte que de 2,5 px (à 3,5, il touchait l'anneau du museau, tête baissée) */
-    arms = [reach(1, Fc, palm, [1, .2, .2]), reach(-1, Fc, [palm[0] - 1, palm[1] - 6.5 - Math.max(0, up) * 2.5, palm[2] + .3], [-.4, .4, -1])];
-    if (hit) fx.push({ kind: 'dust', part: 'foreL', at: [0, 9, 0], n: 60 });
-    P._glow = .95;
+    // le marchand gourmand : il te regarde droit dans les yeux en se frottant les mains devant la poitrine, coudes pliés
+    // (des braises jaillissent entre ses poings), les yeux qui brillent, les oreilles dressées, la queue qui frétille
+    const rb = t * PI * 3, ph = sin(rb), pc = cos(rb);              // un aller-retour toutes les 0,67 s
+    ex = 0; ey = 0;                                             // il regarde le client, pas l'article
+    /* le client (la caméra) est à peine plus haut que ses yeux (1 à 2°) : penché vers lui, il relève la tête pour que son
+       visage le vise (buste + tête : -0,02 rad, soit 1° vers le haut ; à +0,29, il regardait le comptoir) */
+    w = .06 + br * .01; c = .02 + abs(pc) * .015; ct = 0;
+    hx = -.12 + abs(ph) * .02; hy = 0; hz = .04;
+    const Fc = frames(), inC = p => add(Fc.t, app(Fc.R, p));
+    /* bouts des poings (repère du torse) : devant la poitrine, à 15 px de l'épaule, coudes pliés de 63 à 78° ; à 2,8 px de
+       l'axe, les poings se frôlent sans se traverser. Les poings glissent l'un contre l'autre en sens opposés, haut-bas et
+       avant-arrière. Coudes (pôles) : le gauche vers le bas et l'extérieur, le droit plus haut, car le corps de bouc part
+       de son côté (plié vers le bas, l'avant-bras droit entrait dans le dos du bouc) */
+    const X = 2.8, Y = 0, Z = -15, A = 1.4, D = .6;
+    arms = [reach(1, Fc, inC([X, Y + ph * A, Z + pc * D]), [1.3, .8, .4]), reach(-1, Fc, inC([-X, Y - ph * A, Z - pc * D]), [-1, .5, .3])];
+    // des braises entre les poings, en gerbe à chaque passage
+    fx.push({ kind: 'spark', part: 'chest', at: [0, Y - 1, Z + 1.5], dir: [0, -1, -.4], n: abs(ph) < .25 ? 70 : 6 });
+    tuck = .25;                                                 // la barbe se range contre le poitrail, derrière les poings
+    P.earL = [0, .3, .12]; P.earR = [0, -.3, -.12];
+    tail = [-.95, 0, sin(t * 13) * .3]; tail2 = [.05, 0, sin(t * 13 - .7) * .3];
+    blink = bump((t + .7) % 4.1, .15);
+    legs.legHL = [sin(t * .6) * .03, 0, 0];
+    if ((t % 2.6) < .3) snort(fx, 30);
+    P._glow = 1;
   } else {
     // il se dresse, abat ses poings sur le comptoir, reste appuyé en soufflant, puis se redresse
     const k = s % 2.4, wind = easeOut(k / .34), slam = easeIn((k - .34) / (HIT - .34)), after = k - HIT, rec = smooth((k - 1.35) / .8);
@@ -721,10 +721,10 @@ function pose(t, st) {
   const lid = LID_OPEN * (1 - clamp(blink * 1.6, 0, 1));
   // la pupille dépasse de l'œil : la paupière qui descend en biais passait derrière elle. Dès que le bord de la
   // paupière atteint le haut de la pupille, celle-ci se range dans l'œil (comme en colère)
-  if (blink > 0 && lid < Math.atan(.2 / Math.max(.2, .58 + .32 * ly))) pupil = 1;
-  P.gazeL = P.gazeR = [ly * .05, -lx * .08 * (1 - pupil), 0];
+  if (blink > 0 && lid < Math.atan(.2 / Math.max(.2, .58 + .32 * ey))) pupil = 1;
+  P.gazeL = P.gazeR = [ey * .05, -ex * .08 * (1 - pupil), 0];
   // rangée vers le centre de l'œil : vers le haut quand le regard descend (sinon elle ressortait sous l'œil)
-  P.pupilL = P.pupilR = [pupil * (ly > 0 ? -1 : 1) * PI / 2, 0, 0];
+  P.pupilL = P.pupilR = [pupil * (ey > 0 ? -1 : 1) * PI / 2, 0, 0];
   P.lidL = P.lidR = [lid, 0, 0];
   // pattes arrière : quand l'avant se lève, la cuisse se plie pour que le sabot reste posé, le canon reste d'aplomb
   ['HL', 'HR'].forEach(k => { const a = legs['leg' + k][0] - bx; legs['leg' + k] = [a, 0, 0]; legs['hock' + k] = [legs['hock' + k][0] - bx - a, 0, 0]; });
@@ -736,7 +736,7 @@ function pose(t, st) {
   // la tresse pend : elle compense l'inclinaison du buste et de la tête ; tête basse, elle part vers le poitrail
   const tilt = bx + w + c + hx;
   // (elle suit le tablier quand il s'écarte du ventre, sinon il la rattrapait)
-  P.braid = [-tilt + .12 + .62 * smooth((tilt - .3) / .5) + sin(t * 1.6) * .05 + P.apron[0] * 1.5, 0, -hz * .8 + sin(t * 1.1) * .05];
+  P.braid = [-tilt + .12 + .62 * smooth((tilt - .3) / .5) + sin(t * 1.6) * .05 + P.apron[0] * 1.5 + tuck, 0, -hz * .8 + sin(t * 1.1) * .05];
   P.braid2 = [sin(t * 1.6 - .7) * .08 - .05, 0, sin(t * 1.1 - .6) * .06];
   P.braid3 = [sin(t * 1.6 - 1.3) * .08, 0, 0];
   // les chopes : levier de 40 px ; la seconde partie annule l'inclinaison du levier
@@ -752,7 +752,7 @@ window.TAVERN_KEEPER = {
   blend,
   lines: {
     idle: ['Grmmh. Tu prends quoi ?', 'Ici, on paie en Braises.', 'Les Braises, ça se dépense au comptoir. En jeu.', 'Herobrine a une ardoise ici. Il paie jamais.', 'Je t\'ai à l\'œil.'],
-    threat: ['Touche avec les yeux.', 'Repose ça. Doucement.', 'Tu touches, tu paies.', 'Mes cornes te regardent.'],
+    threat: ['Ahh. Bon choix.', 'Ça brille, hein ?', 'Celui-là, il part vite.'],
     angry: ['GRAAAH !', 'MON COMPTOIR !', 'On tripote pas la marchandise !', 'Pas de crédit ! JAMAIS !'],
     don: ['Un don ? Grmmh... Merci.', 'Pour le serveur ? Respect.', 'Rien en échange. Juste merci.']
   }

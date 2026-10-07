@@ -45,7 +45,7 @@ const entries = JSON.parse(readFileSync(join(HERE, 'historique.json'), 'utf8'));
 if (opt('--git')) fromGit(opt('--git'), entries);
 else {
   const token = process.env.JOURNAL_TOKEN;
-  if (!token) { console.log('JOURNAL_TOKEN absent : journal inchangé (voir README du journal).'); process.exit(0); }
+  if (!token) { console.log('JOURNAL_TOKEN absent : journal inchangé (secret à ajouter dans Settings > Secrets and variables > Actions).'); process.exit(0); }
   for (const repo of SOURCES) await fromGitHub(repo, token, entries);
 }
 // une même phrase n'apparaît qu'une fois (la plus récente) ; les plus récentes d'abord

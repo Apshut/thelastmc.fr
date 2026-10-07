@@ -382,7 +382,7 @@ function draw(g) {
 /* ================= Le modèle ================= */
 const GY = -1.1;                                           // le corps de bouc, presque de profil : la croupe part vers la gauche de l'écran
 const B = (name, o, s, extra) => Object.assign({ o, s, uv: UV[name] }, extra || {});
-const EYE = [1, .5, .1], GOLD = [.95, .7, .25], IRONC = [.55, .55, .6], ALE = [1, .55, .16], DARKW = [.3, .19, .1];
+const CUFF = [.26, .145, .075], EYE = [1, .5, .1], GOLD = [.95, .7, .25], IRONC = [.55, .55, .6], ALE = [1, .55, .16], DARKW = [.3, .19, .1];
 const PUP = [.05, .02, .015], LID = [.2, .14, .11], LID_OPEN = PI / 2 + .05;
 /* corne : cinq tronçons qui se recouvrent (pas de jour aux articulations), orientés le long d'une ligne médiane
    dessinée dans le repère de la tête : elle monte, part vers l'arrière et vers l'extérieur, puis s'enroule sur le côté */
@@ -416,7 +416,11 @@ const ARM = side => {
     /* coude : bras aminci de 0,05 px et avant-bras gonflé de 0,1 px par côté (patrons inchangés) ; leurs flancs, de
        même largeur, tombaient dans le même plan quand le coude pliait et scintillaient */
     b: [B('delt', [-3, -4, -3], [6, 6, 6], { mir }), B('uarm', [-2.45, 1, -2.45], [4.9, 8, 4.9], { mir, us: [5, 8, 5] })],
-    c: [{ n: L ? 'foreL' : 'foreR', p: [0, 9, 0], b: [B('farm', [-2.6, -1, -2.6], [5.2, 9, 5.2], { mir, us: [5, 9, 5] }), B('fist', [-3, 8, -3], [6, 5, 6], { mir })] }] };
+    c: [{ n: L ? 'foreL' : 'foreR', p: [0, 9, 0], b: [B('farm', [-2.6, -1, -2.6], [5.2, 9, 5.2], { mir, us: [5, 9, 5] })],
+      /* poignet : le poing peut se plier au bout de l'avant-bras (pour se frotter les mains, poing contre poing). La cale
+         de cuir, 0,2 px plus mince que l'avant-bras et qui entre de 1 px dans le poing, reste cachée au repos ; poignet
+         plié, elle bouche le coin qui s'ouvrait entre le bout de l'avant-bras et le dos du poing */
+      c: [{ n: L ? 'handL' : 'handR', p: [0, 8, 0], b: [B('fist', [-3, 0, -3], [6, 5, 6], { mir }), { o: [-2.4, -2.5, -2.4], s: [4.8, 3.5, 4.8], col: CUFF }] }] }] };
 };
 /* pivot de la taille sur le corps de bouc (repère du corps) : le torse humain avance de 0,85 px vers le client (le long
    de son propre axe, d'où ce décalage oblique). Posé en (0, -6, -20), l'arête avant du corps de bouc perçait le tablier
@@ -505,10 +509,11 @@ function armTo(side, E, T) {
 }
 /* cinématique inverse : T = dessous du poing, dans le repère du modèle ; pole = côté où plie le coude (repère du torse).
    Rend [coude, poing] dans le repère du torse. */
-function solve(side, Fc, T, pole) {
+function solve(side, Fc, T, pole, fa) {
+  fa = fa || FA;                                             // fa = 8 : T est alors le poignet, et non le bout du poing
   const S = [side * 9, -8, 0], Tc = appT(Fc.R, sub(T, Fc.t)), d = sub(Tc, S), D = Math.hypot(d[0], d[1], d[2]) || 1;
-  const Dc = clamp(D, FA - UA + .1, UA + FA - .02), dn = scl(d, 1 / D);
-  const a = Math.acos(clamp((UA * UA + Dc * Dc - FA * FA) / (2 * UA * Dc), -1, 1));
+  const Dc = clamp(D, Math.abs(fa - UA) + .1, UA + fa - .02), dn = scl(d, 1 / D);
+  const a = Math.acos(clamp((UA * UA + Dc * Dc - fa * fa) / (2 * UA * Dc), -1, 1));
   let q = sub(pole, scl(dn, dot(pole, dn))); q = Math.hypot(q[0], q[1], q[2]) < 1e-3 ? [0, 0, 1] : norm(q);
   const u = add(scl(dn, cos(a)), scl(q, sin(a)));
   return [add(S, scl(u, UA)), add(S, scl(dn, Dc))];
@@ -622,15 +627,18 @@ function pose(t, st) {
     w = .06 + br * .01; c = .02 + abs(pc) * .015; ct = 0;
     hx = -.12 + abs(ph) * .02; hy = 0; hz = .04;
     const Fc = frames(), inC = p => add(Fc.t, app(Fc.R, p));
-    /* bouts des poings (repère du torse) : devant la poitrine, à 15 px de l'épaule, coudes pliés de 63 à 78° ; à 2,8 px de
-       l'axe, les poings se frôlent sans se traverser. Les poings glissent l'un contre l'autre en sens opposés, haut-bas et
-       avant-arrière. Coudes (pôles) : le gauche vers le bas et l'extérieur, le droit plus haut, car le corps de bouc part
-       de son côté (plié vers le bas, l'avant-bras droit entrait dans le dos du bouc) */
-    const X = 2.8, Y = 0, Z = -15, A = 1.4, D = .6;
-    arms = [reach(1, Fc, inC([X, Y + ph * A, Z + pc * D]), [1.3, .8, .4]), reach(-1, Fc, inC([-X, Y - ph * A, Z - pc * D]), [-1, .5, .3])];
-    // des braises entre les poings, en gerbe à chaque passage
-    fx.push({ kind: 'spark', part: 'chest', at: [0, Y - 1, Z + 1.5], dir: [0, -1, -.4], n: abs(ph) < .25 ? 70 : 6 });
-    tuck = .25;                                                 // la barbe se range contre le poitrail, derrière les poings
+    /* les poings se frottent jointures contre jointures : chaque poignet plie son poing vers l'autre (axe x du torse), et
+       les deux faces des jointures glissent à plat l'une contre l'autre, en sens opposés (haut-bas, avant-arrière).
+       W = poignets (repère du torse) : le poing fait 5 px, ses jointures arrivent à X - 5 de l'axe. Coudes pliés : les
+       poignets sont à 15 px de l'épaule (bras 9, avant-bras 8). Pôles : le coude gauche vers le bas et l'extérieur, le droit
+       plus haut, car le corps de bouc part de son côté */
+    const X = 5.06, Y = -1, Z = -12.5, A = 1.4, D = .6;
+    const W = [[X, Y + ph * A, Z + pc * D], [-X, Y - ph * A, Z - pc * D]], POLE = [[1.3, .8, .4], [-1, .5, .3]];
+    arms = [1, -1].map((sd, i) => { const e = solve(sd, Fc, inC(W[i]), POLE[i], 8); return armTo(sd, e[0], e[1]); });
+    [1, -1].forEach((sd, i) => { P[sd > 0 ? 'handL' : 'handR'] = aim(appT(mul(rot(arms[i][0]), rot(arms[i][1])), [-sd, 0, 0])); });
+    // des braises jaillissent du haut des poings, entre les jointures, en gerbe à chaque passage
+    fx.push({ kind: 'spark', part: 'chest', at: [0, Y - 3.6, Z - .5], dir: [0, -1, -.4], n: abs(ph) < .25 ? 70 : 6 });
+    tuck = .33;                                                 // la barbe se range contre le poitrail, derrière les poings
     P.earL = [0, .3, .12]; P.earR = [0, -.3, -.12];
     tail = [-.95, 0, sin(t * 13) * .3]; tail2 = [.05, 0, sin(t * 13 - .7) * .3];
     blink = bump((t + .7) % 4.1, .15);

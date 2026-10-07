@@ -69,8 +69,9 @@
      - calme   : poings sur les hanches (et bras croisés de temps en temps), respiration lente, regard qui suit le
                  curseur, clignements, oreilles et queue qui bougent, craquement de nuque, filet de fumée ;
      - menace  : (survol d'un article) en fait, le marchand gourmand : il te regarde droit dans les yeux en se frottant les
-                 mains devant la poitrine, coudes pliés ; des braises jaillissent entre ses poings, oreilles dressées, queue
-                 qui frétille ;
+                 mains devant la poitrine, coudes pliés, jointures contre jointures ; des braises jaillissent entre ses
+                 poings ; il ricane en silence (buste et tête qui sautillent, tête penchée), oreilles dressées, queue qui
+                 frétille ;
      - énervé  : il se dresse poings levés (ses cornes crépitent), les abat sur le comptoir (secousse, étincelles, les
                  chopes sautent), reste appuyé sur ses poings en soufflant, rue d'une patte arrière, puis se redresse.
    Les poings sont placés par cinématique inverse : ils se posent SUR le comptoir, jamais dedans. */
@@ -624,8 +625,13 @@ function pose(t, st) {
     ex = 0; ey = 0;                                             // il regarde le client, pas l'article
     /* le client (la caméra) est à peine plus haut que ses yeux (1 à 2°) : penché vers lui, il relève la tête pour que son
        visage le vise (buste + tête : -0,02 rad, soit 1° vers le haut ; à +0,29, il regardait le comptoir) */
-    w = .06 + br * .01; c = .02 + abs(pc) * .015; ct = 0;
-    hx = -.12 + abs(ph) * .02; hy = 0; hz = .04;
+    /* l'air malicieux, pressé de te voir payer : il ricane en silence. Le buste et la tête sautillent ensemble de haut en
+       bas à chaque passage des poings, en douceur (une sinusoïde : hochée seule et par à-coups, la tête avait l'air de dire
+       « d'accord »), la tête un peu en retard sur le buste, penchée de biais ; un petit nuage de fumée à chaque « hé » */
+    const hee = sin(2 * rb);
+    w = .06 + br * .01; c = .03 + hee * .015;
+    hx = -.12 + sin(2 * rb - .6) * .035; hy = 0; hz = .09; ct = 0;
+    if (hee > .85) snort(fx, 60);
     const Fc = frames(), inC = p => add(Fc.t, app(Fc.R, p));
     /* les poings se frottent jointures contre jointures : chaque poignet plie son poing vers l'autre (axe x du torse), et
        les deux faces des jointures glissent à plat l'une contre l'autre, en sens opposés (haut-bas, avant-arrière).
@@ -643,7 +649,6 @@ function pose(t, st) {
     tail = [-.95, 0, sin(t * 13) * .3]; tail2 = [.05, 0, sin(t * 13 - .7) * .3];
     blink = bump((t + .7) % 4.1, .15);
     legs.legHL = [sin(t * .6) * .03, 0, 0];
-    if ((t % 2.6) < .3) snort(fx, 30);
     P._glow = 1;
   } else {
     // il se dresse, abat ses poings sur le comptoir, reste appuyé en soufflant, puis se redresse

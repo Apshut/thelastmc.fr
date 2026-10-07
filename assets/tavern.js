@@ -1019,7 +1019,9 @@ function safeRect() {
     const sr = stage.getBoundingClientRect(), rr = el => el ? el.getBoundingClientRect() : null;
     const intro = rr($('.intro')), deal = rr(dealBox), slate = rr($('.slate')), fine = rr($('.fine')), foot = rr($('.foot')), top = rr($('.top'));
     const l = Math.max(intro ? intro.right : 0, deal ? deal.right : 0) + 24 - sr.left, r = Math.min(slate ? slate.left : W, fine ? fine.left : W) - 24 - sr.left;
-    const t = (top ? top.bottom : 60) + 62 - sr.top, b = (foot ? foot.top : H) - 16 - sr.top;
+    // en bas, la scène s'arrête à 76 px du bord : le pied de page (une ligne, ~30 px) et, au-dessus, la place des
+    // étiquettes qui pendent sous les articles. Cadrée jusqu'au haut du pied, elle y envoyait les prix
+    const t = (top ? top.bottom : 60) + 62 - sr.top, b = Math.min(foot ? foot.top : H, sr.bottom - 76) - 16 - sr.top;
     return { x0: l / W * 2 - 1, x1: r / W * 2 - 1, y0: 1 - b / H * 2, y1: 1 - t / H * 2 };
   }
   return { x0: -1 + 28 / W, x1: 1 - 28 / W, y0: -1 + 120 / H, y1: 1 - 110 / H };

@@ -106,12 +106,13 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   .deal { left: 24px; bottom: 58px; }
   .slate { right: 24px; top: 70px; }
   .fine { right: 24px; bottom: 58px; }
+  /* pied de page sur une ligne : il laisse la place aux étiquettes des articles posés au bas de la scène */
   .foot {
-    position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; margin: 0; padding: 14px 24px 9px;
+    position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; margin: 0; padding: 8px 24px 7px;
     display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 18px; border: 0; font-size: 11.5px;
     background: linear-gradient(rgb(6 2 3 / 0), rgb(6 2 3 / .9) 45%);
   }
-  .foot .disc { flex-basis: 100%; text-align: center; font-size: 11px; }
+  .foot .disc { font-size: 11px; }
 }
 /* petites fenêtres d'ordinateur : panneaux plus compacts */
 @media (min-width: 900px) and (max-height: 720px), (min-width: 900px) and (max-width: 1099px) {
@@ -127,7 +128,7 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   .slate-list li { font-size: 13px; padding-bottom: 3px; }
   .slate-note { font-size: 11.5px; }
   .fine { font-size: 11px; line-height: 1.4; }
-  .foot { padding: 10px 16px 6px; }
+  .foot { padding: 6px 16px 5px; gap: 2px 14px; font-size: 11px; }
   .foot .disc { font-size: 10.5px; }
 }
 /* filet de sécurité (posé par tavern.js si des panneaux se chevauchent encore) */

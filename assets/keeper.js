@@ -651,7 +651,9 @@ function pose(t, st) {
     const PW = [.6, .4, .7], PB = [.5, .1, 1], PH = [.5, -.2, 1], mixP = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
     let tgt, pole;
     if (k < .34) {
-      w = lerp(.1, -.08, wind); c = lerp(0, -.05, wind); bx = -.14 * wind; hx = lerp(.2, -.22, wind); browL = -.5;
+      // l'élan part de la pose où il finit de se redresser (k = 2,4) : quand on reclique, la colère reboucle sans à-coup
+      // (la tête sautait de 26° vers le client, la tresse de 11°) ; venant du calme, le fondu du moteur couvre le départ
+      w = lerp(.14, -.08, wind); c = lerp(.02, -.05, wind); bx = -.14 * wind; hx = lerp(.05 + ly * .25, -.22, wind); hy = -lx * .45 * (1 - wind); browL = -.5;
       legs.legFL = [-.5 * wind, 0, 0]; legs.shinFL = [.9 * wind, 0, 0]; legs.legFR = [-.4 * wind, 0, 0]; legs.shinFR = [.8 * wind, 0, 0];
       tgt = [0, 1].map(i => [lerp(STAND[i][0], UPF[i][0], wind), lerp(STAND[i][1], UPF[i][1], wind), lerp(STAND[i][2], UPF[i][2], wind) - sin(wind * PI) * 6]);
       pole = mixP(PW, PB, smooth((k - .1) / .24));

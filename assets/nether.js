@@ -101,23 +101,128 @@ function band(choose, seed, spin) {
   }
   return c;
 }
-/* Poches de la matière du dessus qui s'enfoncent dans celle du dessous. */
+/* Poches de la matière du dessus qui s'enfoncent dans celle du dessous. mat : une texture du jeu, ou une image déjà
+   dessinée (la croûte de magma) dont chaque poche reprend le bloc de même place, dans le prolongement de la strate du dessus. */
 function seep(mat, seed, tint) {
   const c = mk(512, 48), g = c.getContext('2d'), R = rng(seed), p = [.3, .14, .05];
-  let src = T(mat); if (tint) { src = copy(src); const t = src.getContext('2d'); t.globalCompositeOperation = 'multiply'; t.fillStyle = tint; t.fillRect(0, 0, 16, 16); }
-  for (let y = 0; y < 3; y++) for (let x = 0; x < 32; x++) if (R() < p[y]) g.drawImage(src, x * 16, y * 16);
+  let src = typeof mat === 'string' ? T(mat) : mat;
+  if (tint) { src = copy(src); const t = src.getContext('2d'); t.globalCompositeOperation = 'multiply'; t.fillStyle = tint; t.fillRect(0, 0, src.width, src.height); }
+  for (let y = 0; y < 3; y++) for (let x = 0; x < 32; x++) if (R() < p[y]) g.drawImage(src, x * 16 % src.width, y * 16 % src.height, 16, 16, x * 16, y * 16, 16, 16);
   return c;
 }
+/* ================= Magma : une croûte de lave refroidie, dessinée ici (pas la texture du jeu) =================
+   Chaque bloc de 16 x 16 texels a ses plaques : des cellules de Voronoï raccordées sur ses bords, comme une texture du jeu.
+   Entre elles, des fissures sombres ; celles que croise une « veine » de chaleur (le même dessin que les veines de la lave)
+   rougeoient, plus ou moins selon le bloc. Plus la croûte est jeune (près de la lave), plus elle est rouge et plus ses fissures
+   sont larges et vives. Texture de 512 x 256 texels, aussi large que la bande du front ; tout est calculé une fois, au chargement. */
+function Crust() {
+  const SX = 512, SY = 256, N = SX * SY, R = rng(61), E = new Float32Array(N), J = new Float32Array(N), P = new Float32Array(N), L = new Int8Array(N), heat = [];
+  const pal = (...a) => a.map(c => [1, 3, 5].map(k => parseInt(c.slice(k, k + 2), 16)));
+  const PL = pal('#1e0805', '#2e0c07', '#3e1108', '#50160a', '#631c0b', '#74220d'),       // plaques, de l'ombre à la lumière
+    KR = pal('#250a06', '#701e0a', '#b23a0e', '#e8601a', '#ff9a3a', '#ffd27a'),            // fissures : rainure refroidie ... cœur jaune
+    WR = pal('#80260c', '#a4340e'), LV = pal('#5a1203', '#7c1c06');                        // bords chauds ; croûte encore molle, du rouge de la lave
+  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  const noise = (n, seed) => { const r = rng(seed), m = n * 2, lat = []; for (let k = 0; k < m * n; k++) lat.push(r());      // bruit lisse, raccord sur les bords
+    return (x, y) => { const gx = x / SX * m, gy = y / SY * n, x0 = Math.floor(gx), y0 = Math.floor(gy), fx = gx - x0, fy = gy - y0, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+      const a = x0 % m, b = y0 % n, a1 = (a + 1) % m, b1 = (b + 1) % n;
+      return (lat[b * m + a] * (1 - sx) + lat[b * m + a1] * sx) * (1 - sy) + (lat[b1 * m + a] * (1 - sx) + lat[b1 * m + a1] * sx) * sy; }; };
+  const heatN = noise(5, 62), heatN2 = noise(13, 63);
+  for (let by = 0; by < 16; by++) for (let bx = 0; bx < 32; bx++) {
+    const sd = [], n = 3 + (R() * 3 | 0);                                                  // 3 à 5 plaques par bloc
+    for (let k = 0; k < n; k++) sd.push([R() * 16, R() * 16, R()]);
+    heat.push(R() * R());
+    for (let v = 0; v < 16; v++) for (let u = 0; u < 16; u++) {
+      let d1 = 1e9, d2 = 1e9, d3 = 1e9, s1 = sd[0], ox = 0, oy = 0;
+      for (const s of sd) {                                 // l'image la plus proche du germe et ses voisines : les autres sont trop loin pour compter
+        let ax = u + .5 - s[0], ay = v + .5 - s[1]; ax -= 16 * Math.round(ax / 16); ay -= 16 * Math.round(ay / 16);
+        const bx2 = ax < 0 ? ax + 16 : ax - 16, by2 = ay < 0 ? ay + 16 : ay - 16;
+        for (let q = 0; q < 4; q++) {                       // distances au carré ; racines à la fin
+          const dx = q & 1 ? bx2 : ax, dy = q & 2 ? by2 : ay, d = dx * dx + dy * dy;
+          if (d < d1) { d3 = d2; d2 = d1; d1 = d; s1 = s; ox = dx; oy = dy; } else if (d < d2) { d3 = d2; d2 = d; } else if (d < d3) d3 = d;
+        }
+      }
+      const i = (by * 16 + v) * SX + bx * 16 + u, r1 = Math.sqrt(d1);
+      E[i] = Math.sqrt(d2) - r1; J[i] = Math.sqrt(d3) - r1; P[i] = s1[2]; L[i] = ox + oy < -1.2 ? 1 : 0;         // L : bord de plaque éclairé (en haut à gauche)
+    }
+  }
+  // couleur d'un texel de croûte ; f : jeunesse (0 : vieille croûte, 1 : tout juste figée)
+  const px = (x, y, f) => {
+    x &= 511; y &= 255; const i = y * SX + x, e = E[i], w = 1 + f * 1.2;
+    const hn = heatN(x, y) * .7 + heatN2(x, y) * .3, vein = clamp(1.5 - Math.abs(hn - .5) * 44, 0, 1);   // comme les veines de la lave : là où la chaleur vaut à peu près .5
+    const g0 = clamp(vein * .78 + heat[(y >> 4) * 32 + (x >> 4)] * .4 + (J[i] < 1.5 ? .06 : 0), 0, 1), g = g0 + (1 - g0) * f * .6;
+    if (e < w) {                                                                           // fissure
+      if (g < .2) return KR[0];
+      let k = g < .38 ? 1 : g < .56 ? 2 : g < .74 ? 3 : g < .9 ? 4 : 5;
+      if (e > w * .55 && k > 1) k--;                                                       // le bord d'une fissure large est moins vif que son cœur
+      return k > 2 ? KR[k] : mix(KR[k], LV[1], f * .6);
+    }
+    if (e < w + .6 && g > .62) return mix(WR[g > .8 ? 1 : 0], LV[1], f * .4);              // le bord des plaques rougeoie près d'une fissure chaude
+    let t = 2 + Math.floor(P[i] * 2.99) + (e < 2.2 ? L[i] : 0);
+    if (f < .3 && ((x & 15) === 15 || (y & 15) === 15)) t--;                               // joint des blocs, discret : une ombre d'un texel (pas encore dans la croûte molle)
+    const c = PL[clamp(t, 1, 5)];
+    return f > 0 ? mix(c, LV[P[i] < .5 ? 0 : 1], f * .85) : c;
+  };
+  const paint = (w, hh, fn) => { const c = mk(w, hh), g = c.getContext('2d'), im = g.createImageData(w, hh), d = im.data;
+    for (let y = 0; y < hh; y++) for (let x = 0; x < w; x++) { const r = fn(x, y); if (!r) continue; const o = (y * w + x) * 4; d[o] = r[0]; d[o + 1] = r[1]; d[o + 2] = r[2]; d[o + 3] = r[3] === undefined ? 255 : r[3]; }
+    g.putImageData(im, 0, 0); return c; };
+  const tileC = paint(SX, SY, (x, y) => px(x, y, 0));
+
+  // Le front de refroidissement : le bord de la croûte suit un contour organique, au texel près, avec des chenaux de lave
+  // qui s'y enfoncent et des îlots de croûte qui flottent juste au-dessus. Bande de 512 x 96 texels, posée sur le haut de la strate.
+  const W = SX, H = 96, Rf = rng(71), top = new Int16Array(W), m = new Uint8Array(W * H), LEN = 28;
+  const vn = (k, seed) => { const r = rng(seed), a = []; for (let q = 0; q < k; q++) a.push(r());
+    return x => { const p = x / W * k, q = Math.floor(p), t = p - q, s = t * t * (3 - 2 * t); return a[q % k] * (1 - s) + a[(q + 1) % k] * s; }; };
+  const n1 = vn(5, 72), n2 = vn(14, 73), n3 = vn(41, 74), rimN = vn(23, 75), ch = [];
+  for (let k = 0; k < 4; k++) ch.push([Rf() * W, 7 + Rf() * 9, 7 + Rf() * 10]);             // chenaux : position, demi-largeur, profondeur
+  for (let x = 0; x < W; x++) {
+    let hgt = 16 + n1(x) * 36 + n2(x) * 12 + n3(x) * 2;
+    for (const c of ch) { let d = Math.abs(x - c[0]); d = Math.min(d, W - d) / c[1]; if (d < 1) hgt -= c[2] * (1 - d * d) * (1 - d * d); }
+    top[x] = H - Math.max(16, Math.round(hgt));
+    for (let y = top[x]; y < H; y++) m[y * W + x] = 1;
+  }
+  for (let k = 0; k < 8; k++) {                                                            // îlots de croûte (marqués 2) : deux ou trois galets soudés
+    const x0 = Rf() * W, y0 = top[x0 | 0] - 4 - Rf() * 6;
+    for (let b = 0, nb = 2 + (Rf() * 2 | 0); b < nb; b++) {
+      const cx = x0 + (Rf() - .5) * 9, cy = y0 + (Rf() - .5) * 2, rx = 2.5 + Rf() * 2.5, ry = 1.4 + Rf() * 1;
+      for (let y = Math.floor(cy - ry); y <= cy + ry; y++) for (let x = Math.floor(cx - rx); x <= cx + rx; x++) {
+        const dx = (x + .5 - cx) / rx, dy = (y + .5 - cy) / ry, j = y * W + (x % W + W) % W;
+        if (y >= 0 && dx * dx + dy * dy < 1 && !m[j]) m[j] = 2;
+      }
+    }
+  }
+  const dt = inn => { const d = new Float32Array(W * H);                                  // distance (chanfrein) au premier texel hors de « inn », raccord en x
+    for (let i = 0; i < W * H; i++) d[i] = inn(m[i]) ? 999 : 0;
+    for (let r = 0; r < 2; r++) {
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const i = y * W + x; if (!d[i]) continue; const l = y * W + (x + W - 1) % W, rr = y * W + (x + 1) % W;
+        let b = Math.min(d[i], d[l] + 1); if (y) b = Math.min(b, d[i - W] + 1, d[l - W] + 1.41, d[rr - W] + 1.41); d[i] = b; }
+      for (let y = H - 1; y >= 0; y--) for (let x = W - 1; x >= 0; x--) { const i = y * W + x; if (!d[i]) continue; const l = y * W + (x + W - 1) % W, rr = y * W + (x + 1) % W;
+        let b = Math.min(d[i], d[rr] + 1); if (y < H - 1) b = Math.min(b, d[i + W] + 1, d[l + W] + 1.41, d[rr + W] + 1.41); d[i] = b; }
+    }
+    return d; };
+  const DI = dt(v => v > 0), DO = dt(v => v !== 1), young = d => Math.pow(clamp(1 - (d - 1) / LEN, 0, 1), 1.3);
+  const front = paint(W, H, (x, y) => {
+    const i = y * W + x;
+    if (m[i] === 2) return DI[i] < 1.5 ? KR[3] : px(x, y + SY - H, .15);                   // îlot : une plaque déjà sombre, bordée de feu
+    if (m[i]) { const d = DI[i], r = rimN(x); return d < 1.5 ? KR[r > .55 ? 5 : 4] : d < 2.5 ? KR[r > .6 ? 4 : 3] : px(x, y + SY - H, young(d)); }   // liseré brûlant, puis croûte
+    const d = DO[i]; if (d > 8) return null;                                               // lueur orangée qui déborde sur la lave
+    return (d < 2.5 ? KR[4] : [255, 120, 32]).concat(Math.round(105 * Math.pow(1 - (d - 1) / 8, 2)));
+  });
+  // Sous le haut de la strate, la croûte finit de vieillir (le voile sombre de la strate passe aussi dessus).
+  const seepC = paint(W, 48, (x, y) => { const f = young(DI[(H - 1) * W + x] + 1 + y); return f > .01 ? px(x, y, f) : null; });
+  const block = mk(16, 16), hb = heat.indexOf(Math.max(...heat));
+  block.getContext('2d').drawImage(tileC, (hb & 31) * 16, (hb >> 5) * 16, 16, 16, 0, 0, 16, 16);
+  return { tile: tileC, front, seep: seepC, block };
+}
 function strata() {
-  const sl = r => r < .2 ? 'soul_soil' : 'soul_sand', mg = () => 'magma', bd = () => 'bedrock';
-  setVar('--t-magma', tile(16, 16, 30, mg, true));
+  const sl = r => r < .2 ? 'soul_soil' : 'soul_sand', bd = () => 'bedrock', cr = Crust();
+  setVar('--t-magma', cr.tile);
   setVar('--t-soul', tile(40, 24, 32, sl, false));
   setVar('--t-bedrock', tile(8, 8, 33, bd, true));
-  setVar('--b-magma', band(mg, 41, true));
+  setVar('--b-magma', cr.front);
   setVar('--b-soul', band(sl, 43, false));
   setVar('--b-bedrock', band(bd, 44, true));
-  setVar('--s-magma', seep('lava_still', 51, 'rgb(128,61,38)'));
-  setVar('--s-soul', seep('magma', 53, 'rgb(150,104,92)'));
+  setVar('--s-magma', cr.seep);
+  setVar('--s-soul', seep(cr.tile, 53, 'rgb(205,170,160)'));
   setVar('--lava', T('lava_still'));
   { const S = 64, c = mk(S, S), g = c.getContext('2d'), R = rng(77), n = 8, lat = [];
     for (let k = 0; k < n * n; k++) lat.push(R());
@@ -126,7 +231,7 @@ function strata() {
       const v = (lat[y0 * n + x0] * (1 - sx) + lat[y0 * n + x1] * sx) * (1 - sy) + (lat[y1 * n + x0] * (1 - sx) + lat[y1 * n + x1] * sx) * sy;
       g.fillStyle = 'rgba(0,0,0,' + clamp(.4 + (v - .22) * 4, .4, 1).toFixed(2) + ')'; g.fillRect(x, y, 2, 2); }
     setVar('--lavamask', c); }
-  $$('.depth a').forEach(a => { if (MC.blocks[a.dataset.tex]) a.style.backgroundImage = dataUrl(T(a.dataset.tex)); });
+  $$('.depth a').forEach(a => { if (MC.blocks[a.dataset.tex]) a.style.backgroundImage = dataUrl(a.dataset.tex === 'magma' ? cr.block : T(a.dataset.tex)); });   // le magma : un bloc de la croûte
 }
 
 /* ================= Icônes : objets du jeu, blocs vus en trois quarts ================= */

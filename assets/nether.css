@@ -198,13 +198,18 @@ html:not(.js) #rig, .no-gl #rig { display: none; }
 .s-lava::before, .s-lava::after { display: none; }
 .no-gl .s-lava, html:not(.js) .s-lava { background: #c8480c var(--lava, none) 0 0 / calc(var(--px) * 32) auto; image-rendering: pixelated; }
 .s-magma {
-  --col: #3d150c; --tile: var(--t-magma); --ts: calc(var(--px) * 256); --blend: var(--b-magma); --seep: var(--s-magma);
-  --va: .42;
+  --col: #3a120a; --tile: var(--t-magma); --ts: calc(var(--px) * 512); --blend: var(--b-magma); --seep: var(--s-magma);
+  --vc: 14 4 3; --va: .34;
 }
+.s-magma .seep { z-index: -2; }   /* la croûte qui finit de refroidir passe sous le voile sombre, comme le reste de la strate */
 .s-magma .wrap::before {
   content: ""; position: absolute; inset: -10% -20%; z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse at 18% 30%, rgb(255 120 30 / .26), transparent 55%), radial-gradient(ellipse at 84% 72%, rgb(255 90 20 / .22), transparent 55%);
   animation: breathe 4.5s ease-in-out infinite;
+  /* la lueur s'éteint avant les bords de sa boîte : sur la croûte sombre, ses arêtes se verraient */
+  -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent), linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent), linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
 }
 @keyframes breathe { 50% { opacity: .35; } }
 .s-soul {

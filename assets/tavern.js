@@ -381,29 +381,40 @@ const coins = (list, pre) => list.map((c, i) => ({ n: (pre || 'k') + i, p: [c[0]
 const PILE = (o, s, e) => ({ o, s, us: [8, 1, 8], uv: [24, 0], e });
 const CORD = [.78, .6, .32], ROPE = [.5, .38, .22];
 const PROPS = {
-  heap: { box: [-9, -5, -8, 9, 0, 8], parts: coins([[-3, 0, 1, .2], [-3.2, -1, 1.1, .9], [-2.9, -2, .8, 1.6], [-3.1, -3, 1, .4], [-3, -4, 1.2, 1.1], [3, 0, -2, 1.1], [3.2, -1, -2.1, .3],
-    [.5, 0, 4, .7], [-6, 0, -3, 1.3], [6, 0, 3, .2], [0, 0, -1, .5], [.8, -1, -.7, 1.2], [-.6, -1.4, -4.6, .4, -.35], [4.5, 0, -5.5, .9], [-6.5, 0, 4, .1]]) },
+  /* pièces posées : la peau de la pièce a des coins transparents (encoches de 1 px qui la traversent), on voit donc par
+     l'encoche le dessous d'une pièce et ce qui est dessous. Aucun dessous n'est dans le plan d'un dessus ou du tapis :
+     - au sol, les pièces s'enfoncent de 0,06 à 0,24 px dans le tapis (ou flottent 0,06 px au-dessus) ; celles qui se
+       chevauchent ont des dessus décalés d'au moins 0,06 px (dans le même plan, ils scintillaient en rayures) ;
+     - une pièce posée sur une autre s'y enfonce de 0,08 px ou plus (au contact exact, le dessus de celle du bas
+       scintillait dans l'encoche de celle du haut) ;
+     - la pièce penchée du tas (k12) a le bord avant au sol et l'arrière relevé sur le tas : penchée dans l'autre sens,
+       le coin d'air entre son dessous et la pièce du dessous s'ouvrait vers le client (pointillé clair) */
+  heap: { box: [-9, -5, -8, 9, 0, 8], parts: coins([[-3, .12, 1, .2], [-3.2, -.7, 1.1, .9], [-2.9, -1.62, .8, 1.6], [-3.1, -2.54, 1, .4], [-3, -3.46, 1.2, 1.1], [3, .18, -2, 1.1], [3.2, -.62, -2.1, .3],
+    [.5, .24, 4, .7], [-6, .18, -3, 1.3], [6, .12, 3, .2], [0, -.06, -1, .5], [.8, -.98, -.7, 1.2], [-.6, -.95, -4.6, .4, .35], [4.5, .12, -5.5, .9], [-6.5, .18, 4, .1]]) },
   pouch: { box: [-7, -11, -7, 8, 0, 7], parts: [
     { n: 'body', p: [0, 0, 0], r: [0, .3, .05], b: [{ o: [-3.5, -6, -3.5], s: [7, 6, 7], uv: [0, 10] }, { o: [-3, -7, -3], s: [6, 1, 6], us: [7, 1, 7], uv: [0, 10] }, { o: [-2, -9, -2], s: [4, 2, 4], us: [5, 2, 5], uv: [28, 10] },
       { o: [-3, -10.5, -3], s: [6, 1.5, 6], us: [5, 2, 5], uv: [28, 10] }, PILE([-2.5, -10.6, -2.5], [5, .2, 5], .6),
       { o: [-2.3, -8.6, -2.3], s: [4.6, .8, 4.6], col: CORD }, { o: [1.6, -8.4, -2.8], s: [.8, 3.4, .8], col: CORD }] }
-  ].concat(coins([[5.5, 0, -3, .4], [-5.6, 0, 2.5, 1.1], [4.6, 0, 3.8, .2, 0, .25], [5.6, -1, -3.1, 1.2]])) },
+  ].concat(coins([[5.5, .12, -3, .4], [-5.6, .12, 2.5, 1.1], [4.6, 0, 3.8, .2, 0, .25], [5.6, -.8, -3.1, 1.2]])) },
   sack: { box: [-8, -15, -8, 9, 0, 8], parts: [
     { n: 'body', p: [0, 0, 0], r: [0, -.2, 0], b: [{ o: [-5, -11, -4.5], s: [10, 11, 9], uv: [0, 24] }, { o: [-4, -14, -3.5], s: [8, 3, 7], uv: [40, 24] }, PILE([-3.5, -14.2, -3], [7, .2, 6], .55),
       { o: [-4.4, -12.6, -3.9], s: [8.8, 1, 7.8], col: ROPE }, { o: [3.7, -12.4, -4.3], s: [1, 4, 1], col: ROPE }] }
-  ].concat(coins([[6.5, 0, -4, .3], [6.7, -1, -4.1, 1], [6.4, -2, -3.8, .6], [-6.8, 0, 3, .8], [-1, 0, -7, .2], [2.4, 0, -7.2, 1.3], [-6.5, 0, -4.5, .5]])) },
+  ].concat(coins([[6.5, .12, -4, .3], [6.7, -.74, -4.1, 1], [6.4, -1.66, -3.8, .6], [-6.8, .12, 3, .8], [-1, .12, -7, .2], [2.4, .18, -7.2, 1.3], [-6.5, .18, -4.5, .5]])) },
   chest: { box: [-9, -22, -11, 9, 0, 9], lid: -1.12, parts: [
     { n: 'pile', p: [0, 0, 0], b: [PILE([-6, -10.6, -6], [12, .6, 12], .5), PILE([-4.5, -11.8, -4], [9, 1.2, 8], .6)] }
-  ].concat(coins([[-2, -11.8, -1, .3], [2, -12.2, 1, 1.2], [.5, -12.8, -2, .7, .2], [-3.5, -11.4, 3, 1.5], [3.4, -11.6, -3, .2]], 'm'))
-   .concat(coins([[-4, 0, -10, .5], [-3.8, -1, -10.2, 1.4], [3, 0, -10.5, .9], [6.8, 0, -8, .2], [-7, 0, -6, 1.1], [0, 0, -11.5, .3]], 's')) },
+  ].concat(coins([[-2, -11.72, -1, .3], [2, -12.2, 1, 1.2], [.5, -12.8, -2, .7, .2], [-3.5, -11.4, 3, 1.5], [3.4, -11.6, -3, .2]], 'm'))
+   .concat(coins([[-4, .12, -10, .5], [-3.8, -.74, -10.2, 1.4], [3, .18, -10.5, .9], [6.8, .12, -8, .2], [-7, .18, -6, 1.1], [0, .06, -11.5, .3]], 's')) },
   jar: { box: [-5, -12, -5, 5, 0, 5], parts: [{ n: 'jar', p: [0, 0, 0], r: [0, .5, 0], b: [{ o: [-3, -6, -3], s: [6, 6, 6], uv: [56, 0] }, { o: [-2, -8, -2], s: [4, 2, 4], uv: [80, 0] },
     { o: [-2.5, -8.6, -2.5], s: [5, .6, 5], col: [.3, .2, .14] }, { o: [-1.5, -8.7, -.3], s: [3, .15, .6], col: [.06, .03, .02] }],
-    c: [{ n: 'coin', p: [0, -10.2, 0], r: [Math.PI / 2, 0, 0], b: [COIN] }] }] }
+    // la pièce glissée dans la fente : relevée de 0,4 px, seule sa rangée du bas (4 px) entre dans le couvercle ; ses
+    // rangées de 6 px traversaient les bords du couvercle (5 px) et ressortaient sur ses flancs
+    c: [{ n: 'coin', p: [0, -10.6, 0], r: [Math.PI / 2, 0, 0], b: [COIN] }] }] }
 };
 /* coffre du jeu (texture mc/chest.png) : même découpe que le jeu ; le modèle se dessine retourné, comme en jeu */
 const CHEST = [
   { n: 'base', p: [0, 0, 0], b: [{ o: [-7, 0, -7], s: [14, 10, 14], uv: [0, 19] }] },
-  { n: 'lid', p: [0, 9, -7], b: [{ o: [-7, 0, 0], s: [14, 5, 14], uv: [0, 0] }, { o: [-1, -2, 14], s: [2, 4, 1], uv: [0, 0] }] }
+  // couvercle aminci de 0,05 px par côté (patron inchangé) : ouvert, ses flancs recouvraient ceux de la caisse près des charnières
+  { n: 'lid', p: [0, 9, -7], b: [{ o: [-6.95, 0, 0], s: [13.9, 5, 14], us: [14, 5, 14], uv: [0, 0] }, { o: [-1, -2, 14], s: [2, 4, 1], uv: [0, 0] }] }
 ];
 
 /* ================= Construction des quads d'un modèle ================= */
@@ -467,13 +478,16 @@ const HEAD = '#version 300 es\nprecision highp float; precision highp sampler2DA
 const FOG = `
 uniform vec3 uCam, uFog; uniform float uFogD;
 vec3 fogged(vec3 col, vec3 pos, out float f) { float d = length(pos - uCam); f = 1. - exp(-pow(d * uFogD, 1.6)); return mix(col, uFog, f); }`;
+/* uv « centroid » (comme pour les entités, plus bas) : avec le multi-échantillonnage, un pixel du bord d'une face était
+   calculé hors de la face ; l'uv sortait de la zone de texture (pointillés clairs au bord haut des flammes, lu en
+   boucle au bas de la texture ; liserés étrangers sur les arêtes des lanternes et des chaînes) */
 const VS_WORLD = `#version 300 es
 layout(location=0) in vec3 aPos; layout(location=1) in vec2 aUv; layout(location=2) in vec2 aTex; layout(location=3) in vec4 aL; layout(location=4) in vec2 aS;
-uniform mat4 uPV; out vec3 vPos; out vec2 vUv; flat out vec2 vTex; out vec4 vL; out vec2 vS;
+uniform mat4 uPV; out vec3 vPos; centroid out vec2 vUv; flat out vec2 vTex; out vec4 vL; out vec2 vS;
 void main() { vPos = aPos; vUv = aUv; vTex = aTex; vL = aL; vS = aS; gl_Position = uPV * vec4(aPos, 1.); }`;
 const FS_WORLD = HEAD + `
 uniform sampler2DArray uTex; uniform float uTime, uExp; uniform vec3 uAmb, uC0, uC1, uC2, uC3; uniform vec4 uK;
-in vec3 vPos; in vec2 vUv; flat in vec2 vTex; in vec4 vL; in vec2 vS; out vec4 o;
+in vec3 vPos; centroid in vec2 vUv; flat in vec2 vTex; in vec4 vL; in vec2 vS; out vec4 o;
 ${FOG}
 void main() {
   vec4 c;
@@ -485,12 +499,14 @@ void main() {
   vec3 col = fogged(c.rgb * mix(li * uExp, vec3(1.12), e), vPos, f);
   o = vec4(col, e * e * (1. - f) * (.3 + dot(c.rgb, vec3(.5, .5, .2))));
 }`;
+/* uv « centroid » : avec le multi-échantillonnage, un pixel du bord d'une face est calculé en son centre, parfois hors de
+   la face ; l'uv débordait alors sur le texel voisin de la peau (autre boîte) et liserait les arêtes d'une couleur étrangère */
 const VS_ENT = `#version 300 es
 layout(location=0) in vec3 aPos; layout(location=1) in vec2 aUv; layout(location=2) in vec4 aLit; layout(location=3) in vec3 aTint;
-uniform mat4 uPV; out vec3 vPos; out vec2 vUv; out vec4 vLit; out vec3 vTint;
+uniform mat4 uPV; out vec3 vPos; centroid out vec2 vUv; out vec4 vLit; out vec3 vTint;
 void main() { vPos = aPos; vUv = aUv; vLit = aLit; vTint = aTint; gl_Position = uPV * vec4(aPos, 1.); }`;
 const FS_ENT = HEAD + `
-uniform sampler2D uSkin; uniform float uExp; in vec3 vPos; in vec2 vUv; in vec4 vLit; in vec3 vTint; out vec4 o;
+uniform sampler2D uSkin; uniform float uExp; in vec3 vPos; centroid in vec2 vUv; in vec4 vLit; in vec3 vTint; out vec4 o;
 ${FOG}
 void main() {
   vec4 c = vUv.x < -.5 ? vec4(1.) : texture(uSkin, vUv);

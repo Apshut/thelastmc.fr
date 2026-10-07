@@ -373,7 +373,7 @@ function draw(g) {
 const GY = -1.1;                                           // le corps de bouc, presque de profil : la croupe part vers la gauche de l'écran
 const B = (name, o, s, extra) => Object.assign({ o, s, uv: UV[name] }, extra || {});
 const EYE = [1, .5, .1], GOLD = [.95, .7, .25], IRONC = [.55, .55, .6], ALE = [1, .55, .16], DARKW = [.3, .19, .1];
-const PUP = [.05, .02, .015], LID = [.2, .14, .11];
+const PUP = [.05, .02, .015], LID = [.2, .14, .11], LID_OPEN = PI / 2 + .05;
 /* corne : cinq tronçons qui se recouvrent (pas de jour aux articulations), orientés le long d'une ligne médiane
    dessinée dans le repère de la tête : elle monte, part vers l'arrière et vers l'extérieur, puis s'enroule sur le côté */
 const HORN_PATH = [[.35, -1, .25], [.6, -.6, .7], [.55, .1, .85], [.45, .85, .35], [.35, .8, -.45]];
@@ -392,16 +392,26 @@ const HORNS = side => {
   }
   return root;
 };
+/* pattes : le flanc extérieur de la cuisse (et du canon arrière) affleurait le flanc du corps (x = ±6) et les deux
+   faces se disputaient les pixels ; les pivots sont écartés de 0,08 px (±4,08 et ±4,58) : la patte passe devant.
+   Genou avant : le pivot du canon est remonté de 1 px dans la cuisse (canon et sabot redescendus d'autant : rien ne
+   bouge au repos). Posé sur la face du dessous, le canon replié du raclement (126°) ressortait au bout de la cuisse */
 const LEGF = (n, x, mir) => ({ n: 'leg' + n, p: [x, 1, -17.5], b: [B('fleg', [-2, -1, -2], [4, 7, 4], { mir })],
-  c: [{ n: 'shin' + n, p: [0, 6, 0], b: [B('fshin', [-1.5, 0, -1.5], [3, 7, 3], { mir })], c: [{ n: 'hoof' + n, p: [0, 7, 0], b: [B('hoof', [-2, 0, -2], [4, 2, 4], { mir })] }] }] });
+  c: [{ n: 'shin' + n, p: [0, 5, 0], b: [B('fshin', [-1.5, 1, -1.5], [3, 7, 3], { mir })], c: [{ n: 'hoof' + n, p: [0, 8, 0], b: [B('hoof', [-2, 0, -2], [4, 2, 4], { mir })] }] }] });
 const LEGH = (n, x, mir) => ({ n: 'leg' + n, p: [x, -2, 0], b: [B('haunch', [-2.5, -2, -4], [5, 9, 7], { mir })],
   c: [{ n: 'hock' + n, p: [0, 7, 1], b: [B('hshin', [-1.5, 0, -1.5], [3, 9, 3], { mir })], c: [{ n: 'hoof' + n, p: [0, 9, 0], b: [B('hoof', [-2, 0, -2], [4, 2, 4], { mir })] }] }] });
 const ARM = side => {
   const L = side > 0, mir = L ? 0 : 1;
   return { n: L ? 'armL' : 'armR', p: [side * 9, -8, 0], r: [0, 0, -side * .1],
-    b: [B('delt', [-3, -4, -3], [6, 6, 6], { mir }), B('uarm', [-2.5, 1, -2.5], [5, 8, 5], { mir })],
-    c: [{ n: L ? 'foreL' : 'foreR', p: [0, 9, 0], b: [B('farm', [-2.5, -1, -2.5], [5, 9, 5], { mir }), B('fist', [-3, 8, -3], [6, 5, 6], { mir })] }] };
+    /* coude : bras aminci de 0,05 px et avant-bras gonflé de 0,1 px par côté (patrons inchangés) ; leurs flancs, de
+       même largeur, tombaient dans le même plan quand le coude pliait et scintillaient */
+    b: [B('delt', [-3, -4, -3], [6, 6, 6], { mir }), B('uarm', [-2.45, 1, -2.45], [4.9, 8, 4.9], { mir, us: [5, 8, 5] })],
+    c: [{ n: L ? 'foreL' : 'foreR', p: [0, 9, 0], b: [B('farm', [-2.6, -1, -2.6], [5.2, 9, 5.2], { mir, us: [5, 9, 5] }), B('fist', [-3, 8, -3], [6, 5, 6], { mir })] }] };
 };
+/* pivot de la taille sur le corps de bouc (repère du corps) : le torse humain avance de 0,85 px vers le client (le long
+   de son propre axe, d'où ce décalage oblique). Posé en (0, -6, -20), l'arête avant du corps de bouc perçait le tablier
+   d'un liseré clair, de 0,2 à 0,7 px selon le regard */
+const WAIST = [-.76, -6, -20.39];
 /* chope posée sur le comptoir, au bout d'un levier de 40 px (le moteur ne fait que tourner les parties : le levier la fait sauter) */
 const MUGS = { A: [-18, -15, 1], B: [16, -19, -1], C: [3, -25, 1] };
 const MUG = n => { const m = MUGS[n]; return { n: 'mug' + n, p: [m[0], 10.98, m[1] + 40], c: [{ n: 'mug' + n + 'b', p: [0, 0, -40], b: [
@@ -412,18 +422,26 @@ const MUG = n => { const m = MUGS[n]; return { n: 'mug' + n, p: [m[0], 10.98, m[
 const PARTS = [
   { n: 'goat', p: [0, 0, 0], r: [0, GY, 0], c: [
     { n: 'barrel', p: [0, 8, 20], b: [B('barrel', [-6, -9, -20], [12, 11, 26])], c: [   // pivot aux hanches
-      LEGF('FL', 4, 0), LEGF('FR', -4, 1), LEGH('HL', 4.5, 0), LEGH('HR', -4.5, 1),
+      LEGF('FL', 4.08, 0), LEGF('FR', -4.08, 1), LEGH('HL', 4.58, 0), LEGH('HR', -4.58, 1),
       { n: 'tail', p: [0, -9, 6], r: [-.7, 0, 0], b: [B('tail', [-1.5, -6, -1], [3, 6, 2])],
-        c: [{ n: 'tail2', p: [0, -5.5, 0], b: [B('tailT', [-1.5, -4, -1], [3, 4, 2])] }] },
-      { n: 'waist', p: [0, -6, -20], r: [0, -GY, 0], b: [B('belly', [-6, -7, -4], [12, 8, 8])], c: [
-        { n: 'chest', p: [0, -5, 0], b: [B('chest', [-7, -11, -4], [14, 11, 8]), B('hump', [-6, -15, -2], [12, 5, 8]), B('apron', [-5, -7, -5], [10, 16, 1])], c: [
+        // pinceau élargi de 0,1 px par côté (patron inchangé) : à la jointure, ses flancs étaient ceux de la queue ; plus
+        // large (et non plus mince), il couvre la jointure sans y ouvrir d'encoche quand la queue fouette
+        c: [{ n: 'tail2', p: [0, -5.5, 0], b: [B('tailT', [-1.6, -4, -1.1], [3.2, 4, 2.2], { us: [3, 4, 2] })] }] },
+      // ventre reculé de 0,15 px : sa face avant était dans le plan de celle du torse (rayures sous les pectoraux)
+      { n: 'waist', p: WAIST, r: [0, -GY, 0], b: [B('belly', [-6, -7, -3.85], [12, 8, 8])], c: [
+        { n: 'chest', p: [0, -5, 0], b: [B('chest', [-7, -11, -4], [14, 11, 8]), B('hump', [-6, -15, -2], [12, 5, 8])], c: [
+          /* le tablier pend de sa bretelle (pivot au milieu de son bord haut) : quand le buste se penche (menace, colère),
+             il reste plus droit. Collé au torse, son bas reculait dans le corps de bouc, dont le coin avant le perçait */
+          { n: 'apron', p: [0, -7, -4.5], b: [B('apron', [-5, 0, -.5], [10, 16, 1])] },
           { n: 'head', p: [0, -11, -1], r: [.1, 0, 0], b: [
               B('neck', [-3, -2, -4], [6, 4, 6]),
               B('head', [-4, -8, -6], [8, 7, 7]),
               B('muzzle', [-2, -3, -10], [4, 4, 5]),
               B('chin', [-2, 1, -9], [4, 3, 3]),
-              { o: [-4, -3.85, -6.6], s: [2, 1.1, .62], col: EYE, e: 1 },
-              { o: [2, -3.85, -6.6], s: [2, 1.1, .62], col: EYE, e: 1 },
+              /* yeux : 0,6 px d'épaisseur, pile jusqu'à la face de la tête (à 0,62, leurs flancs mordaient sur les joues), et
+                 bord extérieur rentré de 0,04 px : leur flanc n'est plus celui de la tête, et la paupière fermée les couvre */
+              { o: [-3.96, -3.85, -6.6], s: [1.96, 1.1, .6], col: EYE, e: 1 },
+              { o: [2, -3.85, -6.6], s: [1.96, 1.1, .6], col: EYE, e: 1 },
               { o: [-.8, -.2, -10.25], s: [.3, 2.2, .3], col: GOLD },
               { o: [.5, -.2, -10.25], s: [.3, 2.2, .3], col: GOLD },
               { o: [-.8, 1.7, -10.25], s: [1.6, .3, .3], col: GOLD }],
@@ -436,16 +454,24 @@ const PARTS = [
               { n: 'pupils', p: [0, -3.3, 0], c: [
                 { n: 'gazeR', p: [-3, 0, -.3], c: [{ n: 'pupilR', p: [0, 0, -6], b: [{ o: [-.55, -.16, -.4], s: [1.1, .32, .05], col: PUP }] }] },
                 { n: 'gazeL', p: [3, 0, -.3], c: [{ n: 'pupilL', p: [0, 0, -6], b: [{ o: [-.55, -.16, -.4], s: [1.1, .32, .05], col: PUP }] }] }] },
-              /* paupières : ouvertes, elles sont rangées dans l'œil et la tête (rx = 1,5) ; à 0, elles le couvrent */
-              { n: 'lidR', p: [-2.95, -3.95, -6.25], r: [1.5, 0, 0], b: [{ o: [-1.05, 0, -.45], s: [2.1, 1.3, .08], col: LID }] },
-              { n: 'lidL', p: [2.95, -3.95, -6.25], r: [1.5, 0, 0], b: [{ o: [-1.05, 0, -.45], s: [2.1, 1.3, .08], col: LID }] },
-              /* sourcils : 0,15 px devant les yeux (leurs faces étaient dans le même plan et scintillaient) */
-              { n: 'browL', p: [4.5, -4.5, -6], r: [0, 0, -.18], b: [B('brow', [-4, -1.5, -.75], [4, 2, 2])] },
-              { n: 'browR', p: [-4.5, -4.5, -6], r: [0, 0, .18], b: [B('brow', [0, -1.5, -.75], [4, 2, 2], { mir: 1 })] },
+              /* paupières : une charnière au bord haut et avant (y = -4,04, z = -6,77), sous le sourcil. Ouvertes
+                 (rx = LID_OPEN, un peu plus d'un quart de tour), elles sont rangées à plat DANS le sourcil, au-dessus de
+                 l'œil ; à 0, elles le couvrent. Rangées dans l'œil, leurs flancs (2,06 px contre 1,96) en dépassaient,
+                 et en se fermant elles sortaient par la face avant de l'œil sous son bord haut (bande lumineuse
+                 au-dessus de la paupière). Fermées, rien ne change : face avant à z = -6,77, 0,07 px devant les
+                 pupilles et 0,08 px derrière les sourcils, de y = -4,04 à -2,65. */
+              { n: 'lidR', p: [-2.95, -4.04, -6.77], r: [LID_OPEN, 0, 0], b: [{ o: [-1.03, 0, 0], s: [2.06, 1.39, .08], col: LID }] },
+              { n: 'lidL', p: [2.95, -4.04, -6.77], r: [LID_OPEN, 0, 0], b: [{ o: [-1.03, 0, 0], s: [2.06, 1.39, .08], col: LID }] },
+              /* sourcils : 0,25 px devant les yeux (leurs faces étaient dans le même plan et scintillaient), et 0,08 px
+                 devant les paupières fermées */
+              { n: 'browL', p: [4.5, -4.5, -6], r: [0, 0, -.18], b: [B('brow', [-4, -1.5, -.85], [4, 2, 2])] },
+              { n: 'browR', p: [-4.5, -4.5, -6], r: [0, 0, .18], b: [B('brow', [0, -1.5, -.85], [4, 2, 2], { mir: 1 })] },
               { n: 'earL', p: [4, -5, -2.5], r: [0, 0, .4], b: [B('ear', [0, -1, -1], [4, 2, 2])] },
               { n: 'earR', p: [-4, -5, -2.5], r: [0, 0, -.4], b: [B('earN', [-4, -1, -1], [4, 2, 2], { mir: 1 })] },
               { n: 'braid', p: [0, 4, -7.5], b: [B('braid', [-1, -1, -1], [2, 4, 2])], c: [
-                { n: 'braid2', p: [0, 3, 0], b: [B('braid', [-1, -1, -1], [2, 4, 2]), { o: [-1.25, 1.2, -1.25], s: [2.5, 1, 2.5], col: IRONC }], c: [
+                // second tronçon élargi de 0,1 px par côté (patron inchangé) : à la jointure, ses flancs étaient ceux du premier ;
+                // plus large (et non plus mince), il couvre la jointure sans y ouvrir d'encoche quand la tresse se balance
+                { n: 'braid2', p: [0, 3, 0], b: [B('braid', [-1.1, -1, -1.1], [2.2, 4, 2.2], { us: [2, 4, 2] }), { o: [-1.25, 1.2, -1.25], s: [2.5, 1, 2.5], col: IRONC }], c: [
                   { n: 'braid3', p: [0, 3, 0], b: [B('tuft', [-1.5, -.5, -1.5], [3, 3, 3])] }] }] }] },
           ARM(1), ARM(-1)] }] }] }] },
   { n: 'mugs', p: [0, 0, 0], c: [MUG('A'), MUG('B'), MUG('C')] }
@@ -515,19 +541,26 @@ function pose(t, st) {
   let browL = -.18, tail = [-.7, 0, 0], tail2 = [0, 0, 0], blink = 0, pupil = 0, kick = 0;
   const legs = { legFL: [0, 0, 0], shinFL: [0, 0, 0], legFR: [0, 0, 0], shinFR: [0, 0, 0], legHL: [0, 0, 0], hockHL: [0, 0, 0], legHR: [0, 0, 0], hockHR: [0, 0, 0] };
   const mug = { A: 0, B: 0, C: 0 }, mugT = { A: [0, 0, 0], B: [0, 0, 0], C: [0, 0, 0] };
-  const frames = () => { const Fg = child(ROOT, [0, 0, 0], [0, gy, 0]), Fb = child(Fg, [0, 8, 20], [bx, 0, 0]), Fw = child(Fb, [0, -6, -20], [w, -gy, 0]); return child(Fw, [0, -5, 0], [c, ct, 0]); };
+  const frames = () => { const Fg = child(ROOT, [0, 0, 0], [0, gy, 0]), Fb = child(Fg, [0, 8, 20], [bx, 0, 0]), Fw = child(Fb, WAIST, [w, -gy, 0]); return child(Fw, [0, -5, 0], [c, ct, 0]); };
 
   if (m === 'idle') {
     // il respire lentement et te suit des yeux
-    w = .04 + br * .012; c = -.03 + br2 * .02; ct = -lx * .1;
-    hx = .1 + ly * .3 + sin(t * .7) * .015; hy = -lx * .6;
+    // il se tourne vers ce qu'il regarde du buste autant que de la tête (0,25 + 0,45, comme 0,1 + 0,6 avant) : la tête
+    // seule, tournée et baissée vers un article du bord, entrait dans l'épaule (oreille, sourcil, joue)
+    w = .04 + br * .012; c = -.03 + br2 * .02; ct = -lx * .25;
+    hx = .1 + ly * .3 + sin(t * .7) * .015; hy = -lx * .45;
     const nk = (t + 4) % 9.7;                                   // craquement de nuque : la tête bascule d'un côté puis de l'autre
-    if (nk < 1.2) { const e = nk / 1.2; hz = sin(e * PI * 2) * .3 * sin(e * PI); hx += sin(e * PI) * .08; }
+    // (moins ample quand il regarde vers le bas : tête baissée, elle penchait jusque dans l'épaule)
+    if (nk < 1.2) { const e = nk / 1.2; hz = sin(e * PI * 2) * .3 * sin(e * PI) * (1 - .6 * clamp(ly, 0, 1)); hx += sin(e * PI) * .08; }
     // poings sur les hanches ; de temps en temps il croise les bras (on fond les cibles coude/poing, pas les angles)
     const b = br2 * .35, Fc = frames(), cy = (t + 3) % 17, mix = cy < 9 ? 0 : cy < 9.9 ? smooth((cy - 9) / .9) : cy < 15.6 ? 1 : smooth(1 - (cy - 15.6) / .9);
-    const CROSS = [[[8.5, 1.5, -4.5], [-6, 2.5, -9.5]], [[-8.5, 4, -4], [6, 5, -8.5]]];
+    /* bras croisés (coude, bout du poing ; repère du torse, longueurs exactes : 9 et 13 px) : l'avant-bras gauche passe
+       devant, coude avancé, poing devant la tresse ; le droit dessous, près du tablier, poing sous la tresse. Les deux
+       poings, qui finissaient au même endroit (à 2 px l'un de l'autre pour 6 d'épaisseur), se fondaient en un seul bloc
+       où disparaissait le pompon de la tresse. En chemin, ils passent 6 px devant le ventre (4 : ils traversaient le tablier) */
+    const CROSS = [[[9.4, -3.55, -7.81], [-1.27, -.81, -14.71]], [[-9.93, -.25, -4.48], [-.5, 6.7, -10.12]]];
     arms = [1, -1].map((sd, i) => {
-      const h = solve(sd, Fc, [sd * 8, 4.2 + b, -1.2], [sd, -.25, .45]), x = CROSS[i], arc = sin(mix * PI) * 4;
+      const h = solve(sd, Fc, [sd * 8, 4.2 + b, -1.2], [sd, -.25, .45]), x = CROSS[i], arc = sin(mix * PI) * 6;
       const E = [lerp(h[0][0], x[0][0], mix), lerp(h[0][1], x[0][1] + b, mix), lerp(h[0][2], x[0][2], mix) - arc * .5];
       const T = [lerp(h[1][0], x[1][0], mix), lerp(h[1][1], x[1][1] + b, mix), lerp(h[1][2], x[1][2], mix) - arc];
       return armTo(sd, E, T);
@@ -550,26 +583,32 @@ function pose(t, st) {
     browL = -.3;
     const kf = key(u, SCRAPE); legs.legFR = [kf[0], 0, 0]; legs.shinFR = [kf[1], 0, 0];
     legs.legFL = [jolt * .05, 0, 0];
-    if (drag > .1 && drag < .7) { fx.push({ kind: 'spark', part: 'shinFR', at: [0, 9, -1.5], n: 220 }, { kind: 'dust', part: 'shinFR', at: [0, 8, 0], n: 90 }); P._shake = .14; }
+    if (drag > .1 && drag < .7) { fx.push({ kind: 'spark', part: 'shinFR', at: [0, 10, -1.5], n: 220 }, { kind: 'dust', part: 'shinFR', at: [0, 9, 0], n: 90 }); P._shake = .14; }
     if (u > .3 && u < .62) snort(fx, 75);
     P.earL = [0, -.9, .55]; P.earR = [0, .9, -.55];
     tail = [-1.15, 0, sin(t * 15) * .07]; tail2 = [-.1, 0, sin(t * 15 - .6) * .12];
     blink = bump((t + .7) % 5.9, .15);
     // poing dans la paume : la main gauche tient, la droite cogne deux fois par cycle
     const Fc = frames(), pu = (t * 1.35) % 1, up = pu < .62 ? smooth(pu / .62) : 1 - easeIn((pu - .62) / .1), hit = pu >= .72 && pu < .8;
-    const palm = [5.5, 8, -12.8];                               // à côté de la barbe : le visage reste dégagé
-    arms = [reach(1, Fc, palm, [.6, .3, 1]), reach(-1, Fc, [palm[0] - 1, palm[1] - 6 - Math.max(0, up) * 3.5, palm[2] + .3], [-.7, -.1, 1])];
+    const palm = [4.5, 8, -13];                                 // à côté de la barbe : le visage reste dégagé
+    /* le coude droit plie vers l'avant (pôle -z) : plié vers l'arrière, le bras qui traverse le corps passait dans la
+       poitrine et ressortait par le tablier. Le poing qui cogne s'arrête 6,5 px au-dessus de la paume (à 6, son coin
+       entrait dans le poing-paume) et ne remonte que de 2,5 px (à 3,5, il touchait l'anneau du museau, tête baissée) */
+    arms = [reach(1, Fc, palm, [1, .2, .2]), reach(-1, Fc, [palm[0] - 1, palm[1] - 6.5 - Math.max(0, up) * 2.5, palm[2] + .3], [-.4, .4, -1])];
     if (hit) fx.push({ kind: 'dust', part: 'foreL', at: [0, 9, 0], n: 60 });
     P._glow = .95;
   } else {
     // il se dresse, abat ses poings sur le comptoir, reste appuyé en soufflant, puis se redresse
     const k = s % 2.4, wind = easeOut(k / .34), slam = easeIn((k - .34) / (HIT - .34)), after = k - HIT, rec = smooth((k - 1.35) / .8);
-    const PLANT = [[7.5, COUNTER - 1.3, -16], [-7.5, COUNTER - 1.3, -15.5]], UPF = [[8, -29, -5], [-8, -29, -5]], STAND = [[11, 3, -6], [-11, 3, -6]];
+    /* poings levés : 10,5 px de l'axe et 6 px devant (à 8 et 5, le poing droit coupait le sourcil et l'œil, tête
+       renversée). En montant, ils passent 6 px devant les épaules : tirés droit vers le haut, ils frôlaient l'épaule,
+       le coude se repliait à fond et chaque poing entrait dans son deltoïde */
+    const PLANT = [[7.5, COUNTER - 1.3, -16], [-7.5, COUNTER - 1.3, -15.5]], UPF = [[10.5, -29, -6], [-10.5, -29, -6]], STAND = [[11, 3, -6], [-11, 3, -6]];
     let tgt, pole = [[.5, -.2, 1], [-.5, -.2, 1]];
     if (k < .34) {
       w = lerp(.1, -.08, wind); c = lerp(0, -.05, wind); bx = -.14 * wind; hx = lerp(.2, -.22, wind); browL = -.5;
       legs.legFL = [-.5 * wind, 0, 0]; legs.shinFL = [.9 * wind, 0, 0]; legs.legFR = [-.4 * wind, 0, 0]; legs.shinFR = [.8 * wind, 0, 0];
-      tgt = [0, 1].map(i => [lerp(STAND[i][0], UPF[i][0], wind), lerp(STAND[i][1], UPF[i][1], wind), lerp(STAND[i][2], UPF[i][2], wind)]);
+      tgt = [0, 1].map(i => [lerp(STAND[i][0], UPF[i][0], wind), lerp(STAND[i][1], UPF[i][1], wind), lerp(STAND[i][2], UPF[i][2], wind) - sin(wind * PI) * 6]);
       pole = [[.6, .4, .7], [-.6, .4, .7]];
     } else if (k < HIT) {
       w = lerp(-.08, .44, slam); c = lerp(-.05, .2, slam); bx = lerp(-.14, 0, slam); hx = lerp(-.22, .3, slam); browL = -.5;
@@ -620,13 +659,25 @@ function pose(t, st) {
   }
 
   P.goat = [0, gy, 0]; P.barrel = [bx, 0, 0]; P.waist = [w, -gy, 0]; P.chest = [c, ct, 0];
+  // le tablier compense une partie de l'inclinaison du buste (et de sa torsion) : au calme, regard au client, il ne bouge pas
+  P.apron = [-.5 * Math.max(0, w + c - .03) - .15 * abs(ct), 0, 0];
   P.head = [hx, hy, hz];
+  // au calme, les oreilles se relèvent quand la tête se baisse, se tourne ou penche de leur côté : tombantes, elles
+  // entraient dans le deltoïde (sd = 1 : oreille gauche, côté +x)
+  if (m === 'idle') { const lf = sd => clamp(.6 * (hx - .1) + .4 * Math.max(0, -sd * hy) + 1.2 * Math.max(0, sd * hz), 0, .6);
+    if (P.earL) P.earL = [P.earL[0], P.earL[1], P.earL[2] - lf(1)]; if (P.earR) P.earR = [P.earR[0], P.earR[1], P.earR[2] + lf(-1)]; }
   P.browL = [0, 0, browL]; P.browR = [0, 0, -browL];
   P.tail = tail; P.tail2 = tail2;
-  // les yeux : pupilles qui suivent le regard ; paupières rangées (1,5) ou fermées (0)
+  // les yeux : pupilles qui suivent le regard ; paupières rangées (LID_OPEN) ou fermées (0)
   if (REDUCE) blink = 0;
-  P.gazeL = P.gazeR = [ly * .05, -lx * .08 * (1 - pupil), 0]; P.pupilL = P.pupilR = [pupil * PI / 2, 0, 0];
-  P.lidL = P.lidR = [1.5 * (1 - clamp(blink * 1.6, 0, 1)), 0, 0];
+  const lid = LID_OPEN * (1 - clamp(blink * 1.6, 0, 1));
+  // la pupille dépasse de l'œil : la paupière qui descend en biais passait derrière elle. Dès que le bord de la
+  // paupière atteint le haut de la pupille, celle-ci se range dans l'œil (comme en colère)
+  if (blink > 0 && lid < Math.atan(.2 / Math.max(.2, .58 + .32 * ly))) pupil = 1;
+  P.gazeL = P.gazeR = [ly * .05, -lx * .08 * (1 - pupil), 0];
+  // rangée vers le centre de l'œil : vers le haut quand le regard descend (sinon elle ressortait sous l'œil)
+  P.pupilL = P.pupilR = [pupil * (ly > 0 ? -1 : 1) * PI / 2, 0, 0];
+  P.lidL = P.lidR = [lid, 0, 0];
   // pattes arrière : quand l'avant se lève, la cuisse se plie pour que le sabot reste posé, le canon reste d'aplomb
   ['HL', 'HR'].forEach(k => { const a = legs['leg' + k][0] - bx; legs['leg' + k] = [a, 0, 0]; legs['hock' + k] = [legs['hock' + k][0] - bx - a, 0, 0]; });
   // les sabots restent à plat sur l'estrade, quel que soit l'angle de la patte
@@ -636,7 +687,8 @@ function pose(t, st) {
   if (arms) { P.armL = arms[0][0]; P.foreL = arms[0][1]; P.armR = arms[1][0]; P.foreR = arms[1][1]; }
   // la tresse pend : elle compense l'inclinaison du buste et de la tête ; tête basse, elle part vers le poitrail
   const tilt = bx + w + c + hx;
-  P.braid = [-tilt + .12 + .62 * smooth((tilt - .3) / .5) + sin(t * 1.6) * .05, 0, -hz * .8 + sin(t * 1.1) * .05];
+  // (elle suit le tablier quand il s'écarte du ventre, sinon il la rattrapait)
+  P.braid = [-tilt + .12 + .62 * smooth((tilt - .3) / .5) + sin(t * 1.6) * .05 + P.apron[0] * 1.5, 0, -hz * .8 + sin(t * 1.1) * .05];
   P.braid2 = [sin(t * 1.6 - .7) * .08 - .05, 0, sin(t * 1.1 - .6) * .06];
   P.braid3 = [sin(t * 1.6 - 1.3) * .08, 0, 0];
   // les chopes : levier de 40 px ; la seconde partie annule l'inclinaison du levier

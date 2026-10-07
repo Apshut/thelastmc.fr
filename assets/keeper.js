@@ -751,7 +751,7 @@ window.TAVERN_KEEPER = {
   pose,
   blend,
   lines: {
-    idle: ['Grmmh. Tu prends quoi ?', 'Ici, on paie en Braises.', 'Les Braises, ça se dépense au comptoir. En jeu.', 'Pas de cape. Jamais. Demande pas.', 'Je t\'ai à l\'œil.'],
+    idle: ['Grmmh. Tu prends quoi ?', 'Ici, on paie en Braises.', 'Les Braises, ça se dépense au comptoir. En jeu.', 'Herobrine a une ardoise ici. Il paie jamais.', 'Je t\'ai à l\'œil.'],
     threat: ['Touche avec les yeux.', 'Repose ça. Doucement.', 'Tu touches, tu paies.', 'Mes cornes te regardent.'],
     angry: ['GRAAAH !', 'MON COMPTOIR !', 'On tripote pas la marchandise !', 'Pas de crédit ! JAMAIS !'],
     don: ['Un don ? Grmmh... Merci.', 'Pour le serveur ? Respect.', 'Rien en échange. Juste merci.']

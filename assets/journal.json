@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Nouvelle page Chantier : tout l'historique, mois par mois, avec un filtre par projet",
+   "d": "2026-10-07T17:08:58.000Z"
+  },
+  {
+   "p": "site",
    "t": "Nouveau : le journal du chantier sur la page d'accueil",
    "d": "2026-10-07T16:24:11.000Z"
   },

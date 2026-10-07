@@ -972,7 +972,7 @@ const nb = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const stage = $('#stage'), canvas = $('#tavern'), etal = $('#etal'), dealBox = $('#deal'), say = $('#say'), topBar = $('#top');
 const IMG = {};
 const loadImg = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ko(new Error('image ' + src)); i.src = src; });
-const deskMQ = matchMedia('(min-width: 900px) and (min-height: 600px)');
+const deskMQ = matchMedia('(min-width: 900px) and (min-height: 600px) and (min-aspect-ratio: 21/20)');   // = le bloc « Ordinateur » de tavern.css
 let eng = null, desk = deskMQ.matches, tall = false;
 const items = LIST.map(p => ({ id: p.id, prop: PROPS[p.prop] ? p.prop : p.kind === 'don' ? 'jar' : 'heap', p, pos: [0, 1.0625, 2], ry: 0, hl: 0, btn: null }));
 

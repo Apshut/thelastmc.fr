@@ -1009,7 +1009,9 @@ function placeItems() {
     it.pos = [s[0], Y, s[1]]; it.ry = s[2];
     if (it.btn) it.btn.dataset.row = tall && s[1] < 2.6 ? 'back' : 'front';
   });
-  jars.forEach((it, i) => { it.pos = [(tall ? 1.7 : 2.05) - i * .7, COUNTER_TOP, -.45]; it.ry = 0; });
+  // le tronc de soutien, sur le comptoir à gauche de l'écran (à droite, le coffre et le panneau des prix le serraient),
+  // tourné en miroir de sa première place (-1 + 0,5 du modèle) : on voit toujours la pièce dans sa fente de face
+  jars.forEach((it, i) => { it.pos = [-(tall ? 1.7 : 2.05) + i * .7, COUNTER_TOP, -.45]; it.ry = -1; });
 }
 
 /* ---------- la zone libre de l'interface : la caméra s'y cadre ---------- */

@@ -10,7 +10,14 @@
        prop  = l'objet 3D : "heap" (tas de pièces), "pouch" (bourse), "sack" (sac), "chest" (coffre), "jar" (tronc, sur le comptoir) ;
        url   = lien de paiement propre à l'article (facultatif, sinon checkoutUrl).
      inGame      : ce qu'on obtient en jeu avec les Braises (EXEMPLES). Jamais de cape, jamais d'avantage en jeu.
-       icon  = un objet du jeu (liste dans tools/site-textures/build.py). */
+       icon  = un objet du jeu (liste dans tools/site-textures/build.py).
+   - roadmap         : la feuille de route, dessinée par le portail de la grotte (page d'accueil, sous la lave).
+                       Le cadre du portail compte 22 blocs ; chaque étape en prend « blocks », dans l'ordre :
+                       la base de gauche à droite, puis les deux montants en alternance, puis le haut.
+     state = "fait" (obsidienne), "attente" (obsidienne pleureuse), "encours" (en pointillés, mis en avant)
+             ou "avenir" (en pointillés) ;
+     date  = jour où l'étape est faite (ou demandée, pour « attente »), au format "2026-10-05". Facultatif.
+     Quand toutes les étapes sont « fait », le portail s'allume. */
 window.THE_LAST = {
   launcher: {
     url: "",
@@ -22,6 +29,22 @@ window.THE_LAST = {
     url: "",
     label: "Rejoindre le Discord"
   },
+  roadmap: [
+    { name: "Le site", state: "fait", date: "2026-10-05", blocks: 3,
+      text: "Le site que tu lis, avec la taverne et le journal du chantier." },
+    { name: "Le launcher", state: "fait", date: "2026-10-05", blocks: 3,
+      text: "Il installe et met à jour Minecraft, Java, NeoForge, les mods et les réglages du serveur." },
+    { name: "La connexion Microsoft", state: "fait", date: "2026-10-06", blocks: 2,
+      text: "La connexion par la page officielle de Microsoft, prête dans le launcher." },
+    { name: "La taverne", state: "fait", date: "2026-10-07", blocks: 1,
+      text: "La boutique des Braises, en aperçu : rien n'y est encore en vente." },
+    { name: "L'accès à la connexion Minecraft", state: "attente", date: "2026-10-06", blocks: 1,
+      text: "Chaque launcher doit être autorisé à utiliser la connexion Minecraft. Demande envoyée, réponse attendue." },
+    { name: "Le monde de The Last", state: "avenir", blocks: 5,
+      text: "Le contenu du serveur. Aucune image tant qu'elle n'est pas vraie." },
+    { name: "L'ouverture", state: "avenir", blocks: 7,
+      text: "Le jour où le dernier bloc est posé, le portail s'allume." }
+  ],
   shop: {
     checkoutUrl: "",
     products: [

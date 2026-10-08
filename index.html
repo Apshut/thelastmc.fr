@@ -28,6 +28,8 @@
   <script src="assets/castle.js" defer></script>
   <script src="assets/world.js" defer></script>
   <script src="assets/nether.js" defer></script>
+  <script src="assets/cave.js" defer></script>
+  <script src="assets/grotte.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#launcher">Aller au téléchargement</a>
@@ -46,8 +48,7 @@
     <ol>
       <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span>Le lac de lave</span></a></li>
       <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span>Sous la lave · le launcher</span></a></li>
-      <li><a href="#magma" data-sec="#magma" data-tex="magma"><span>Magma · chantier</span></a></li>
-      <li><a href="#ames" data-sec="#ames" data-tex="soul_sand"><span>Sable des âmes · questions</span></a></li>
+      <li><a href="#grotte" data-sec="#grotte" data-tex="crying_obsidian"><span>La grotte · le portail du chantier</span></a></li>
       <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span>Bedrock · le fond</span></a></li>
     </ol>
     <p class="depth-y" aria-hidden="true">Y <b>48</b></p>
@@ -100,66 +101,89 @@
       <div class="bones" aria-hidden="true"></div>
     </section>
 
-    <!-- ============ Magma : le chantier ============ -->
-    <section class="stratum s-magma" id="magma" aria-labelledby="t-chantier">
-      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
-      <div class="wrap">
-        <h2 class="px" id="t-chantier" data-fs="4">Le chantier</h2>
-        <p class="sub">Ce qui avance sur le site, le launcher et le jeu, au fil des corrections. Les cinq dernières nouvelles.</p>
-        <ol class="journal" id="journal">
-          <li class="j-vide">Le journal du chantier s'affiche ici.</li>
-        </ol>
-        <p class="j-tout"><a class="btn btn-sm" href="chantier.html">Tout le journal du chantier</a></p>
+    <!-- ============ La grotte, sous le lac : le portail inachevé ============ -->
+    <section class="grotte" id="grotte" aria-labelledby="t-grotte">
+      <div class="g-stage" id="g-stage">
+        <canvas id="g-cv" role="img" aria-label="Une grotte sous le lac de lave, au plafond troué de lave. Au centre, sur une estrade, un portail du Nether à moitié construit en obsidienne, les blocs manquants dessinés en pointillés. À gauche, un squelette attend assis près d'un panneau. À droite, un piglin monte un bloc sur un échafaudage."></canvas>
+        <div class="g-layer" id="g-layer"></div>
       </div>
-    </section>
-
-    <!-- ============ Sable des âmes : questions ============ -->
-    <section class="stratum s-soul" id="ames" aria-labelledby="t-ames">
-      <i class="blend" aria-hidden="true"></i><i class="seep" aria-hidden="true"></i>
-      <div class="wrap">
-        <h2 class="px" id="t-ames" data-fs="4">Les âmes répondent</h2>
-        <p class="sub">Tout en bas, on sait tout. Choisis une lanterne.</p>
-        <div class="faq">
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>C'est quoi, The Last&nbsp;?</summary>
-            <p>Un serveur Minecraft: Java Edition moddé (NeoForge), au contenu fait maison. De l'aventure,
-              de la construction et de la progression, pas un énième PvP faction. C'est un projet indépendant,
-              développé en France.</p>
-          </details>
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
-            <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="boutique.html">La taverne</a> vend des Braises,
-              la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
-              d'avantage en jeu, et il n'y a pas de cape.</p>
-          </details>
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
-            <p>La monnaie du serveur. On l'achète dans <a href="boutique.html">la taverne</a>, puis on la dépense en jeu,
-              au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
-              ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
-          </details>
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
-            <p>Un PC sous Windows et un compte Microsoft qui possède Minecraft: Java Edition. Le serveur
-              vérifie chaque compte auprès de Mojang&nbsp;: il n'y a pas de mode hors ligne.</p>
-          </details>
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
-            <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
-              Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
-              Le détail est dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
-          </details>
-          <details>
-            <summary><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
-            <p>Quand ce sera prêt. Le launcher sera proposé sur cette page, et nulle part ailleurs.</p>
-          </details>
+      <div class="g-doc">
+        <div class="g-head">
+          <h2 class="px" id="t-grotte" data-fs="4">Le portail du chantier</h2>
+          <p class="sub">Chaque bloc posé est une étape finie. Le jour où le dernier bloc est posé, le portail s'allume et le serveur ouvre.</p>
         </div>
+        <section class="g-box" id="g-route" aria-labelledby="t-route">
+          <h3 id="t-route">La feuille de route</h3>
+          <ol class="route" id="route">
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">Le site</span> <span class="r-s">Posé le 5 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">Le launcher</span> <span class="r-s">Posé le 5 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">La connexion Microsoft</span> <span class="r-s">Posé le 6 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">La taverne</span> <span class="r-s">Posé le 7 octobre 2026</span></span></li>
+            <li class="r-step" data-state="attente"><span class="r-b"><span class="r-n">L'accès à la connexion Minecraft</span> <span class="r-s">En attente</span></span></li>
+            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n">Le monde de The Last</span> <span class="r-s">À venir</span></span></li>
+            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n">L'ouverture</span> <span class="r-s">À venir</span></span></li>
+          </ol>
+        </section>
+        <section class="g-box" id="g-ouv" aria-labelledby="t-ouv">
+          <h3 id="t-ouv">Ouverture</h3>
+          <p id="ouv">Pas encore de date. Elle sera annoncée ici, sur ce panneau, et nulle part ailleurs.</p>
+        </section>
+        <section class="g-box g-panel" id="g-news" aria-labelledby="t-news">
+          <h3 id="t-news">Le chantier : quoi de neuf ?</h3>
+          <ol class="journal" id="journal">
+            <li class="j-vide">Le journal du chantier s'affiche ici.</li>
+          </ol>
+          <p class="j-tout"><a class="btn btn-sm" href="chantier.html">Tout le journal du chantier</a></p>
+        </section>
+        <section class="g-box g-panel" id="g-faq" aria-labelledby="t-faq">
+          <h3 id="t-faq">Questions</h3>
+          <div class="faq">
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>C'est quoi, The Last&nbsp;?</summary>
+              <p>Un serveur Minecraft: Java Edition moddé (NeoForge), au contenu fait maison. De l'aventure,
+                de la construction et de la progression, pas un énième PvP faction. C'est un projet indépendant,
+                développé en France.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
+              <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="boutique.html">La taverne</a> vend des Braises,
+                la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
+                d'avantage en jeu, et il n'y a pas de cape.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
+              <p>La monnaie du serveur. On l'achète dans <a href="boutique.html">la taverne</a>, puis on la dépense en jeu,
+                au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
+                ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
+              <p>Un PC sous Windows et un compte Microsoft qui possède Minecraft: Java Edition. Le serveur
+                vérifie chaque compte auprès de Mojang&nbsp;: il n'y a pas de mode hors ligne.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
+              <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
+                Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
+                Le détail est dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>Pourquoi aucune image du jeu&nbsp;?</summary>
+              <p>Parce que le monde du serveur n'est pas encore prêt, et qu'on ne montrera pas de fausses captures.
+                Les premières vraies images arriveront ici, dans le portail.</p>
+            </details>
+            <details>
+              <summary><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
+              <p>Quand le dernier bloc du portail sera posé. La date sera annoncée sur cette page, et nulle part ailleurs&nbsp;;
+                le launcher sera proposé ici, et uniquement ici.</p>
+            </details>
+          </div>
+        </section>
       </div>
     </section>
 
-    <!-- ============ Bedrock : le fond ============ -->
-    <footer class="stratum s-bedrock" id="fond">
-      <i class="blend" aria-hidden="true"></i>
+    <!-- ============ Le fond ============ -->
+    <footer class="fond" id="fond">
       <div class="wrap">
         <div class="cols">
           <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>

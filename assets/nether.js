@@ -145,7 +145,9 @@ function drawScene(t) {
   // Plongée finie, on descend vers la coupe sombre : le décor cesse de suivre la souris (sinon il se décale
   // par rapport à la coupe et à l'encart, et la ligne de pêche se désaxe). Il se recentre en douceur.
   const after = Math.max(0, sy - pin), s = clamp(after / 80, 0, 1), follow = 1 - s * s * (3 - 2 * s);
-  world.frame(REDUCE ? 20 : t, { p: pin ? clamp(sy / pin, 0, 1) : 0, after, vh: innerHeight, mx: mx * follow, my: my * follow, texel: innerWidth < 700 ? 2 : 3, scroll: sy, origin: pin, depth: aby.offsetHeight, calm: REDUCE });
+  // la chaleur qui fait onduler l'image s'éteint dans la lave profonde : sous la coupe, la grotte (grotte.js) prend le relais au pixel près
+  const heat = REDUCE ? 0 : 1 - clamp((after - innerHeight * .5) / innerHeight, 0, 1);
+  world.frame(REDUCE ? 20 : t, { p: pin ? clamp(sy / pin, 0, 1) : 0, after, vh: innerHeight, mx: mx * follow, my: my * follow, texel: innerWidth < 700 ? 2 : 3, scroll: sy, origin: pin, depth: aby.offsetHeight, calm: REDUCE, heat });
   return true;
 }
 
@@ -338,6 +340,7 @@ function start() {
       let t = +(QS.get('t') || 20) - 5;
       for (let i = 0; i < 100; i++) { t += .05; drawScene(t); align(); if (align.frame) align.frame(t, true); rig.frame(t, .05); }
       depth();
+      if (window.GROTTE_SHOT) window.GROTTE_SHOT();        // la grotte se recale après nous, dans cet ordre
     };
     shoot(); addEventListener('resize', shoot); const tops = {}; ['abysse', 'launcher', 'grotte', 'fond'].forEach(id => { tops[id] = Math.round($('#' + id).getBoundingClientRect().top + shotY); }); tops.end = Math.round($('#monde').offsetHeight);
     D.title = 'ready ' + JSON.stringify(tops);
@@ -353,12 +356,14 @@ function start() {
     requestAnimationFrame(tick); return;
   }
   let last = performance.now() / 1000;
+  window.NETHER_LOOP = true;                             // une seule boucle : elle fait aussi avancer la grotte (même instant, même défilement)
   const loop = ms => {
     requestAnimationFrame(loop);
     const t = ms / 1000, raw = t - last;
     if (raw < .012 || D.hidden) return;                  // inutile de dépasser ~80 images par seconde sur les écrans rapides
     last = t;
     drawScene(t); align(); if (align.frame) align.frame(t); rig.frame(t, raw); depth();
+    if (window.GROTTE_STEP) window.GROTTE_STEP(t, raw);
   };
   requestAnimationFrame(loop);
 }

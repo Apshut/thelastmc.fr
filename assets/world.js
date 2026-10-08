@@ -714,7 +714,7 @@ function create(canvas, imgs, opts) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H); gl.useProgram(P.fin.p);
     [texScene, bloom[0].t, bloom[2].t, bloom[4].t].forEach((tx, i) => { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, tx); });
     gl.uniform1i(P.fin.u.uScene, 0); gl.uniform1i(P.fin.u.uB1, 1); gl.uniform1i(P.fin.u.uB2, 2); gl.uniform1i(P.fin.u.uB3, 3);
-    gl.uniform1f(P.fin.u.uTime, t); gl.uniform1f(P.fin.u.uHeat, st.calm ? 0 : 1); gl.uniform1f(P.fin.u.uBloom, .9);
+    gl.uniform1f(P.fin.u.uTime, t); gl.uniform1f(P.fin.u.uHeat, st.heat !== undefined ? st.heat : st.calm ? 0 : 1); gl.uniform1f(P.fin.u.uBloom, .9);
     gl.bindVertexArray(vaoQuad); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     // qualité adaptative : si la machine peine, on baisse la définition
     if (!opts.still && dt > 0) { acc += dt; accN++; if (accN >= 45) { const avg = acc / accN; acc = accN = 0; slow = avg > .045 ? slow + 1 : 0; if (slow >= 2 && quality > .5) { slow = 0; quality = Math.max(.5, quality - .17); } } }

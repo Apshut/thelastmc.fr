@@ -1,9 +1,14 @@
 /* The Last — la grotte sous le lac : le décor, posé bloc par bloc (contrat window.GROTTE, lu par grotte.js).
    Le portail du Nether, au centre, est la feuille de route : config.js (roadmap) dit quels blocs sont posés.
+   La vitre : comme la lave de l'accueil, vue de face à travers une vitre d'aquarium, la grotte est coupée au plan z = 5
+   (face avant des blocs z = 4). Au plan de coupe, le fond du lac est une croûte de roche ; au-dessus, les blocs 'lake'
+   sont dessinés comme la coupe de lave de world.js, au pixel près. grotte.js fait descendre la caméra le long de la vitre,
+   puis la fait passer à travers, jusqu'au plan du portail.
    Repère : x vers la droite, y vers le haut, z vers la caméra. Le sol est à y = 2 (dessus des blocs y = 1). */
 (() => {
 'use strict';
 const FLOOR = 2, PX = 0, PZ = -14;                       // le portail : centre en x, profondeur
+const CZ = 4;                                              // la rangée de blocs coupée par la vitre (face avant en z = 5)
 const smooth = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const floorH = {};
@@ -20,12 +25,17 @@ function frameOrder(X0, X1, Y0) {
 
 window.GROTTE = {
   seed: 2026,
-  size: { x0: -36, x1: 35, y1: 27, z0: -40, z1: 19 },
+  size: { x0: -48, x1: 47, y1: 27, z0: -40, z1: 19 },      // ±48 en x : la coupe couvre un écran de 4K
+  glass: CZ + 1,
   fog: [.03, .014, .03],
   amb: [.075, .055, .08],
   exposure: 1.38,
   floorAt: (x, z) => floorH[Math.floor(x) + ',' + Math.floor(z)] || FLOOR,
-  /* k : 0 = on passe sous la lave (la caméra, juste sous le plafond, regarde la grande trouée), 1 = le plan du portail */
+  /* le plan du portail, où la caméra arrive (grotte.js part de la vitre et y vient) */
+  final(asp) {
+    return asp < .95 ? { eye: [0, 4.8, 6.5], at: [0, 7.9, -14], fov: 1.04 } : { eye: [0, 4.6, 8], at: [0, 7.9, -14], fov: .86 };
+  },
+  /* (repli) k : 0 = sous le plafond, 1 = le plan du portail */
   camera(asp, k) {
     const por = asp < .95, s = smooth(k === undefined ? 1 : k);
     const A = por ? { eye: [0, 7.2, 7], at: [0, 13.5, -8], fov: 1.04 } : { eye: [0, 7.2, 7], at: [0, 13.5, -8], fov: .9 };
@@ -152,7 +162,24 @@ window.GROTTE = {
     a.box(SX + 1, FLOOR, SZ + 1, SX + 1.6, FLOOR + .18, SZ + 1.2, 'bone_block_side');
     a.set(-20, FLOOR, -16, 'bone'); a.set(19, FLOOR, -18, 'bone'); a.set(19, FLOOR + 1, -18, 'bone');
     a.set(-6, FLOOR, -24, 'gilded'); a.set(7, FLOOR, -25, 'debris');
-    return { lit };
+
+    /* --- la vitre : au plan de coupe, le fond du lac. Tout est posé ici, à la fin, pour ne rien changer au tirage au
+       hasard du reste du décor (le plan du portail reste identique) --- */
+    const lake = {}, cut = x => { let c = FLOOR + 6; while (c < 27 && !a.get(x, c, CZ)) c++; return c; };
+    for (let x = -48; x <= 47; x++) {
+      const out = x < -36 || x > 35, c = out ? 0 : cut(x);
+      const st = nz(x * .23 + 31, 4.5), lb = Math.max(13 + (st < .36 ? -1 : st > .64 ? 1 : 0), c + 2);
+      if (out) for (let y = 0; y < lb; y++) a.set(x, y, CZ, y === 0 ? 'bedrock' : y < FLOOR ? 'soul_soil' : R() < .55 ? 'basalt' : 'blackstone');
+      for (let y = c; y < lb; y++) a.set(x, y, CZ, y === lb - 1 ? (R() < .72 ? 'magma' : 'basalt') : y === lb - 2 && R() < .18 ? 'magma' : R() < .55 ? 'basalt' : R() < .8 ? 'blackstone' : 'netherrack');
+      for (let y = lb; y < 27; y++) a.set(x, y, CZ, 'lake');
+      lake[x] = lb;
+      // des gouttes de lave perlent sous la croûte, derrière la vitre
+      if (!out && c < 27 && c > FLOOR + 5 && (x % 4 === 0)) a.emit('drip', [x + .5, c - .02, CZ - .5], .22, [.6, 0, .5]);
+    }
+    a.fill(-48, 0, CZ + 1, 47, 27, 19, null);                // devant la vitre : rien
+    // sous le monde, la bedrock en coupe : quand la caméra descend le long de la vitre, le bas de l'image reste plein
+    a.box(-48, -30, CZ, 48, 0, CZ + 1, 'bedrock', { emit: .11 });
+    return { lit, cut: { z: CZ, lake } };
   }
 };
 })();

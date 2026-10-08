@@ -106,6 +106,7 @@ def('shroom', 'shroomlight', { light: 14, emit: 1 });
 def('bars', 'iron_bars', { cut: true });
 def('scaffold', ['scaffolding_top', 'scaffolding_bottom', 'scaffolding_side'], { cut: true });
 def('portal', 'nether_portal', { light: 11, ch: 2, emit: .9, cut: true });
+def('lake', 'lava_still', { lake: true });               // le lac, au-dessus de la croûte : seule sa face sur la vitre est dessinée
 
 /* ================= Le décor ================= */
 const S0 = G.size || { x0: -36, x1: 35, y1: 43, z0: -40, z1: 19 };
@@ -201,6 +202,8 @@ function buildRoom(data) {
     anchor(id, x, y, z) { anchors[id] = [x, y, z]; }
   };
   const info = G.build(a, data) || {};
+  /* la vitre : rien ne se propage devant elle ; les faces de coupe (face avant des blocs z = CZ) prennent la lueur du lac */
+  const CUT = info.cut || null, CZ = CUT ? CUT.z : 1e9;
 
   /* lumière : propagation case par case, un canal par couleur */
   const qu = new Int32Array(N), SY = WX * WZ;
@@ -212,7 +215,7 @@ function buildRoom(data) {
     while (qh < qt) {
       const i = qu[qh++], l = L[i] - 1; if (l <= 0) continue;
       const x = i % WX, z = ((i / WX) | 0) % WZ, y = (i / SY) | 0;
-      const go = j => { const id = vox[j]; if (L[j] < l && (!id || BL[id].cut || BL[id].light)) { L[j] = l; qu[qt++] = j; } };
+      const go = j => { const id = vox[j]; if (L[j] < l && (!id || BL[id].cut || BL[id].light) && ((j / WX) | 0) % WZ - OZ <= CZ) { L[j] = l; qu[qt++] = j; } };
       if (x > 0) go(i - 1); if (x < WX - 1) go(i + 1);
       if (z > 0) go(i - WX); if (z < WZ - 1) go(i + WX);
       if (y > 0) go(i - SY); if (y < WY - 1) go(i + SY);
@@ -236,15 +239,18 @@ function buildRoom(data) {
       if (!inb(bx, by, bz)) continue;
       const nid = vox[ix(bx, by, bz)];
       if (nid && (!BL[nid].cut || nid === id)) continue;
-      const t = b.t[f === 0 ? 0 : f === 1 ? 1 : 2], ao4 = [], ds = dirShade(Nn);
+      const onGlass = f === 2 && z === CZ;
+      if (b.lake && !onGlass) continue;                     // le lac n'a qu'une face : sur la vitre
+      const t = b.t[f === 0 ? 0 : f === 1 ? 1 : 2], ao4 = [], ds = onGlass ? (b.lake ? 1 : .84 * .7) : dirShade(Nn);
+      const glow = onGlass && !b.lake ? blv(clamp(13 - ((CUT.lake[x] || 13) - y - 1) * 1.3, 0, 15)) : 0;
       for (let k = 0; k < 4; k++) {
         const su = CORN[k][0], sv = CORN[k][1];
         const ax = bx + su * U[0], ay = by + su * U[1], az = bz + su * U[2], cx2 = bx + sv * V[0], cy2 = by + sv * V[1], cz2 = bz + sv * V[2];
         const s1 = solid(ax, ay, az), s2 = solid(cx2, cy2, cz2);
         const dx = bx + su * U[0] + sv * V[0], dy = by + su * U[1] + sv * V[1], dz = bz + su * U[2] + sv * V[2], sc = solid(dx, dy, dz);
         const ao = s1 && s2 ? 3 : (s1 ? 1 : 0) + (s2 ? 1 : 0) + (sc ? 1 : 0);
-        const L4 = [0, 0, 0, 0];
-        for (let c = 0; c < 4; c++) {
+        const L4 = [onGlass && !b.lake ? .1 : 0, onGlass ? glow : 0, 0, 0];    // faces de coupe : la chaleur du lac, et un peu de jour
+        if (!onGlass) for (let c = 0; c < 4; c++) {
           let sum = lv(c, bx, by, bz), cnt = 1;
           if (!s1) { sum += lv(c, ax, ay, az); cnt++; }
           if (!s2) { sum += lv(c, cx2, cy2, cz2); cnt++; }
@@ -252,7 +258,7 @@ function buildRoom(data) {
           L4[c] = blv(sum / cnt);
         }
         push(x + .5 + (Nn[0] + su * U[0] + sv * V[0]) / 2, y + .5 + (Nn[1] + su * U[1] + sv * V[1]) / 2, z + .5 + (Nn[2] + su * U[2] + sv * V[2]) / 2,
-          (su + 1) / 2, (1 - sv) / 2, t, L4, AOF[ao] * ds, b.emit);
+          (su + 1) / 2, (1 - sv) / 2, t, L4, AOF[ao] * ds, b.lake ? (y === CUT.lake[x] ? -2 : -1) : b.emit);    // émission -1 : le shader dessine la lave du lac ; -2 : sa rangée du fond
         ao4.push(ao);
       }
       flips.push(ao4[0] + ao4[2] > ao4[1] + ao4[3] ? 1 : 0); nq++;
@@ -291,7 +297,7 @@ function buildRoom(data) {
   });
   const idxs = new Uint32Array(nq * 6);
   for (let i = 0; i < nq; i++) { const o = i * 4, k = i * 6; if (flips[i]) { idxs[k] = o + 1; idxs[k + 1] = o + 2; idxs[k + 2] = o + 3; idxs[k + 3] = o + 1; idxs[k + 4] = o + 3; idxs[k + 5] = o; } else { idxs[k] = o; idxs[k + 1] = o + 1; idxs[k + 2] = o + 2; idxs[k + 3] = o; idxs[k + 4] = o + 2; idxs[k + 5] = o + 3; } }
-  return { verts: buf.subarray(0, n), idxs, quads: nq, ghosts, ents, emitters, anchors, picks, info,
+  return { verts: buf.subarray(0, n), idxs, quads: nq, ghosts, ents, emitters, anchors, picks, info, cutZ: CZ,
     light: (x, y, z) => { const X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z); return [0, 1, 2, 3].map(c => blv(lv(c, X, Y, Z))); } };
 }
 
@@ -380,8 +386,24 @@ function model(parts, tw, th, base, pose, S, lit, glow, marks) {
 /* ================= Shaders ================= */
 const HEAD = '#version 300 es\nprecision highp float; precision highp sampler2DArray; precision highp sampler2D;\n';
 const FOG = `
-uniform vec3 uCam, uFog; uniform float uFogD;
-vec3 fogged(vec3 col, vec3 pos, out float f) { float d = length(pos - uCam); f = 1. - exp(-pow(d * uFogD, 1.6)); return mix(col, uFog, f); }`;
+uniform vec3 uCam, uFog; uniform float uFogD, uFogOff;
+vec3 fogged(vec3 col, vec3 pos, out float f) { float d = max(0., length(pos - uCam) - uFogOff); f = 1. - exp(-pow(d * uFogD, 1.6)); return mix(col, uFog, f); }`;
+/* La lave du lac, vue à travers la vitre : la même formule que la coupe de world.js (LAVAFN et FS_FLAT), mêmes texels, même
+   bruit, même horloge. w = (x, uLakeW.x - y) vaut, à l'endroit où la grotte entre dans la page, les coordonnées de texture de
+   la coupe : la lave de l'accueil et celle du lac se raccordent au pixel près. Échantillonnage au niveau 0 (agrandissement),
+   pour pouvoir l'appeler dans une branche. */
+const LAVAFN = `
+uniform sampler2D uNoise; uniform float uLava, uLavaN; uniform vec2 uLakeW;
+vec4 lavaAt(vec2 w, float fw) {
+  float f0 = mod(floor(uTime * 20.), uLavaN);
+  vec3 a = textureLod(uTex, vec3(w, uLava + f0), 0.).rgb;
+  vec2 q = mix((floor(w * 16.) + .5) / 16., w, clamp(fw - .9, 0., 1.));
+  float h1 = textureLod(uNoise, q * .0125 + uTime * vec2(.0019, .0012), 0.).r, h2 = textureLod(uNoise, q * .046 - uTime * vec2(.0038, .0016), 0.).r;
+  float heat = h1 * .62 + h2 * .38;
+  float vein = step(abs(heat - .5), .028) * clamp(1.7 - fw * .45, 0., 1.);
+  vec3 col = a * mix(.86, 1.14, smoothstep(.22, .78, heat)) + vec3(1., .78, .34) * vein * .42;
+  return vec4(col, .06 + vein * .32);
+}`;
 const VS_WORLD = `#version 300 es
 layout(location=0) in vec3 aPos; layout(location=1) in vec2 aUv; layout(location=2) in vec2 aTex; layout(location=3) in vec4 aL; layout(location=4) in vec2 aS;
 uniform mat4 uPV; out vec3 vPos; centroid out vec2 vUv; flat out vec2 vTex; out vec4 vL; out vec2 vS;
@@ -390,7 +412,15 @@ const FS_WORLD = HEAD + `
 uniform sampler2DArray uTex; uniform float uTime, uExp; uniform vec3 uAmb, uC0, uC1, uC2, uC3; uniform vec4 uK;
 in vec3 vPos; centroid in vec2 vUv; flat in vec2 vTex; in vec4 vL; in vec2 vS; out vec4 o;
 ${FOG}
+${LAVAFN}
 void main() {
+  vec2 lw = vec2(vPos.x, uLakeW.x - vPos.y); float lfw = max(fwidth(lw.x), fwidth(lw.y)) * 16.;
+  if (vS.y < -.5) {                                       // le lac : la coupe de lave de l'accueil, assombrie avec la profondeur
+    vec4 lc = lavaAt(lw, lfw); float depth = clamp(lw.y * uLakeW.y, 0., 1.);
+    float lip = vS.y < -1.5 ? exp(-fract(vPos.y) * 3.2) : 0.;   // au fond du lac, la lave brûle contre la croûte (comme à la surface)
+    o = vec4(lc.rgb * mix(vec3(1.), vec3(.5, .24, .15), smoothstep(.1, 1., depth)) + vec3(1., .62, .25) * lip * .55, lc.a * .25 * (1. - depth) + lip * .35);
+    return;
+  }
   vec4 c;
   if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + mod(floor(uTime * 20.), vTex.y)));
   else c = texture(uTex, vec3(vUv, vTex.x));
@@ -436,13 +466,14 @@ void main() {
   o = vec4(c, 1.);
 }`;
 const FS_FINAL = HEAD + `
-uniform sampler2D uScene, uB1, uB2, uB3; uniform float uBloom, uVig; in vec2 vUv; out vec4 o;
+uniform sampler2D uScene, uB1, uB2, uB3; uniform float uBloom, uVig; uniform vec3 uScr; in vec2 vUv; out vec4 o;
 void main() {
   vec3 c = texture(uScene, vUv).rgb;
   vec3 b = texture(uB1, vUv).rgb * .5 + texture(uB2, vUv).rgb * .8 + texture(uB3, vUv).rgb * 1.15;
   c += b * uBloom;
   c = c * (1. + c * .12) / (1. + c * .32) * 1.12;
-  vec2 q = vUv - .5; c *= 1. - dot(q, q) * uVig;
+  float sy = (uScr.x + (1. - vUv.y) * uScr.y) / uScr.z;   // vignette de l'écran (comme world.js), pas du canevas qui défile
+  vec2 q = vec2(vUv.x - .5, .5 - sy); c *= 1. - dot(q, q) * uVig;
   c = pow(c, vec3(.96, 1., 1.04));
   o = vec4(c, 1.);
 }`;
@@ -472,6 +503,13 @@ function Engine(canvas, imgs, opts) {
   const tex2d = im => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); [[gl.TEXTURE_MIN_FILTER, gl.NEAREST], [gl.TEXTURE_MAG_FILTER, gl.NEAREST], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]].forEach(p => gl.texParameteri(gl.TEXTURE_2D, p[0], p[1])); return t; };
   const skins = {}; ['skeleton', 'piglin', 'strider'].forEach(k => { if (imgs[k]) skins[k] = tex2d(imgs[k]); });
   const white = tex2d(mk(1, 1));
+  const nd = new Uint8Array(256 * 256);
+  { const R = rng(3), lat = new Float32Array(256); for (let i = 0; i < 256; i++) lat[i] = R();
+    for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) { const gx = x / 16, gy = y / 16, x0 = gx | 0, y0 = gy | 0, fx = gx - x0, fy = gy - y0, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy), x1 = (x0 + 1) & 15, y1 = (y0 + 1) & 15;
+      const v = (lat[y0 * 16 + x0] * (1 - sx) + lat[y0 * 16 + x1] * sx) * (1 - sy) + (lat[y1 * 16 + x0] * (1 - sx) + lat[y1 * 16 + x1] * sx) * sy; nd[y * 256 + x] = clamp((v - .5) * 1.7 + .5, 0, 1) * 255; } }
+  const texNoise = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, texNoise); gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 256, 256, 0, gl.RED, gl.UNSIGNED_BYTE, nd);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
   const room = buildRoom(opts.data);
   const vaoRoom = gl.createVertexArray(); gl.bindVertexArray(vaoRoom);
@@ -569,12 +607,14 @@ function Engine(canvas, imgs, opts) {
     if (w <= .01) return null;
     return { x: ((m[0] * x + m[4] * y + m[8] * z + m[12]) / w * .5 + .5) * canvas.clientWidth, y: (1 - ((m[1] * x + m[5] * y + m[9] * z + m[13]) / w * .5 + .5)) * canvas.clientHeight };
   }
+  /* st.cam = { eye, at, fov, sy, fogOff } : la page pilote la caméra (la vitre, puis le plan du portail) ; sx et sy décalent
+     l'image (en coordonnées de l'écran, -1..1) sans changer la perspective */
   function camera(t, st) {
-    const asp = W / H, c = G.camera(asp, st.k), par = st.par || { x: 0, y: 0 };
-    const eye = [c.eye[0] + par.x * .5, c.eye[1] - par.y * .25, c.eye[2]], at = c.at;
-    const V = look(eye, at), PV = mmul(persp(c.fov || .75, asp, .1, 200), V.m), sx = st.sx || 0;
-    if (sx) for (let q = 0; q < 4; q++) PV[q * 4] += sx * PV[q * 4 + 3];
-    cam = { eye, at, PV, right: V.right, up: V.up, fogD: c.fogD || 1 / 46 };
+    const asp = W / H, c = st.cam || G.camera(asp, st.k);
+    const eye = c.eye, at = c.at;
+    const V = look(eye, at), PV = mmul(persp(c.fov || .75, asp, .1, 200), V.m), sx = st.sx || 0, sy = c.sy || 0;
+    if (sx || sy) for (let q = 0; q < 4; q++) { PV[q * 4] += sx * PV[q * 4 + 3]; PV[q * 4 + 1] += sy * PV[q * 4 + 3]; }
+    cam = { eye, at, PV, right: V.right, up: V.up, fogD: c.fogD || 1 / 44, fogOff: c.fogOff || 0 };
   }
 
   /* particules */
@@ -605,6 +645,7 @@ function Engine(canvas, imgs, opts) {
         else { const dmp = Math.exp(-q.dr * dt); q.vx *= dmp; q.vy = q.vy * dmp - q.g * dt; q.vz *= dmp; q.x += q.vx * dt + (q.k === 'soul' || q.k === 'mote' ? Math.sin(t * 1.7 + q.ph) * .25 * dt : 0); q.y += q.vy * dt; q.z += q.vz * dt; }
         if ((q.k === 'drip' || q.k === 'cry') && q.y < (G.floorAt ? G.floorAt(q.x, q.z) : 1)) q.life = 0;
       }
+      if (q.z > room.cutZ + 1) q.life = 0;                  // devant la vitre : hors de l'aquarium
       if (q.life <= 0) continue;
       const a = q.life / q.max; let r, g, b, al, s = lerp(q.s0, q.s1, 1 - a);
       if (q.k === 'drip') { r = 1; g = .55; b = .14; al = 1; if (q.hang > 0) s *= .5 + .5 * (1 - q.hang / 2); }
@@ -624,7 +665,7 @@ function Engine(canvas, imgs, opts) {
   const S = Sink();
   let last = 0, info = {};
   const pass = (pr, dst, src, set) => { gl.bindFramebuffer(gl.FRAMEBUFFER, dst ? dst.f : null); gl.viewport(0, 0, dst ? dst.w : W, dst ? dst.h : H); gl.useProgram(pr.p); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, src); gl.uniform1i(pr.u.uSrc, 0); if (set) set(); gl.bindVertexArray(vaoQuad); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); };
-  const common = pr => { gl.useProgram(pr.p); const u = pr.u; if (u.uPV) gl.uniformMatrix4fv(u.uPV, false, cam.PV); if (u.uCam) gl.uniform3fv(u.uCam, cam.eye); if (u.uFog) gl.uniform3fv(u.uFog, FOGC); if (u.uFogD) gl.uniform1f(u.uFogD, cam.fogD); if (u.uExp) gl.uniform1f(u.uExp, G.exposure || 1.32); if (u.uTime) gl.uniform1f(u.uTime, last); };
+  const common = pr => { gl.useProgram(pr.p); const u = pr.u; if (u.uPV) gl.uniformMatrix4fv(u.uPV, false, cam.PV); if (u.uCam) gl.uniform3fv(u.uCam, cam.eye); if (u.uFog) gl.uniform3fv(u.uFog, FOGC); if (u.uFogD) gl.uniform1f(u.uFogD, cam.fogD); if (u.uFogOff) gl.uniform1f(u.uFogOff, cam.fogOff || 0); if (u.uExp) gl.uniform1f(u.uExp, G.exposure || 1.32); if (u.uTime) gl.uniform1f(u.uTime, last); };
   function frame(t, st) {
     st = st || {};
     resize();
@@ -652,6 +693,9 @@ function Engine(canvas, imgs, opts) {
     common(P.world);
     gl.uniform3fv(P.world.u.uAmb, AMB); gl.uniform3fv(P.world.u.uC0, LC[0]); gl.uniform3fv(P.world.u.uC1, LC[1]); gl.uniform3fv(P.world.u.uC2, LC[2]); gl.uniform3fv(P.world.u.uC3, LC[3]); gl.uniform4fv(P.world.u.uK, KT);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, texArr); gl.uniform1i(P.world.u.uTex, 0);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texNoise); gl.uniform1i(P.world.u.uNoise, 1); gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1f(P.world.u.uLava, (MC.blocks.lava_still || [0, 1])[0]); gl.uniform1f(P.world.u.uLavaN, (MC.blocks.lava_still || [0, 1])[1]);
+    gl.uniform2fv(P.world.u.uLakeW, st.lake || [0, 0]);
     gl.bindVertexArray(vaoRoom); gl.drawElements(gl.TRIANGLES, nIdx, gl.UNSIGNED_INT, 0);
     common(P.ent); gl.uniform1i(P.ent.u.uSkin, 0); gl.bindVertexArray(DE.vao);
     runs.forEach(r => { if (r[2] > r[1]) { gl.bindTexture(gl.TEXTURE_2D, r[0]); gl.drawArrays(gl.TRIANGLES, r[1] / 12, (r[2] - r[1]) / 12); } });
@@ -673,7 +717,8 @@ function Engine(canvas, imgs, opts) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, W, H); gl.useProgram(P.fin.p);
     [fbRes.t, bloom[0].t, bloom[2].t, bloom[4].t].forEach((tx, i) => { gl.activeTexture(gl.TEXTURE0 + i); gl.bindTexture(gl.TEXTURE_2D, tx); });
     gl.uniform1i(P.fin.u.uScene, 0); gl.uniform1i(P.fin.u.uB1, 1); gl.uniform1i(P.fin.u.uB2, 2); gl.uniform1i(P.fin.u.uB3, 3);
-    gl.uniform1f(P.fin.u.uBloom, G.bloom || .95); gl.uniform1f(P.fin.u.uVig, G.vignette || .7);
+    gl.uniform1f(P.fin.u.uBloom, G.bloom || .95); gl.uniform1f(P.fin.u.uVig, G.vignette || .62);
+    const ch = canvas.clientHeight || 1; gl.uniform3fv(P.fin.u.uScr, st.scr || [0, ch, ch]);
     gl.bindVertexArray(vaoQuad); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     gl.activeTexture(gl.TEXTURE0);
     info = { W, H, msaa, quads: room.quads, ents: nEnt / 72, ghosts: SG.n / 72, parts: np / 6, eye: cam.eye.map(v => +v.toFixed(2)) };
@@ -696,7 +741,8 @@ function Engine(canvas, imgs, opts) {
     room.picks.forEach(pk => { if (pk.id !== id) return; face(pk.p).forEach(p => { if (!p) return; x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }); });
     return x1 > x0 ? { x0, y0, x1, y1 } : null;
   }
-  return { frame, project, pickAt, rectOf, anchors: room.anchors, lit: !!room.info.lit, info: () => info };
+  const lakeMax = room.info.cut ? Math.max(...Object.values(room.info.cut.lake)) : 14;
+  return { frame, project, pickAt, rectOf, anchors: room.anchors, lit: !!room.info.lit, lakeMax, glass: G.glass || 1e9, info: () => info };
 
 }
 
@@ -733,9 +779,10 @@ function pxLabel(el, text) {
   el.append(h('span', { class: 'sr', text }), box);
   return el;
 }
-const stage = $('#g-stage', sec), canvas = $('#g-cv', sec), layer = $('#g-layer', sec), docEl = $('.g-doc', sec);
+const stage = $('#g-stage', sec), pinEl = $('.g-pin', sec) || stage, canvas = $('#g-cv', sec), layer = $('#g-layer', sec), docEl = $('.g-doc', sec);
 const news = $('#g-news', sec), faq = $('#g-faq', sec), routeOl = $('#route', sec), ouvEl = $('#ouv', sec);
 const STEPS = (CFG.roadmap || []).filter(s => s && s.name);
+if (SHOT) root.classList.add('g-shot');                     // captures : hauteurs en vh (le navigateur sans tête agrandit la fenêtre juste avant la photo)
 /* = « Ordinateur » dans nether.css : la scène occupe l'écran et les panneaux s'ouvrent par-dessus */
 const DESK = matchMedia('(min-width: 900px) and (min-height: 560px) and (min-aspect-ratio: 21/20)');
 const IMGS = {};
@@ -828,7 +875,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && panel) toggle(null)
 /* Sur ordinateur, tout le contenu passe dans la scène (panneaux par-dessus, feuille de route lisible au clavier) ;
    sur téléphone ou sans 3D, il reste en dessous, dans le cours de la page. */
 function setMode() {
-  const ov = !!eng && DESK.matches;
+  const ov = !!eng && DESK.matches && !REDUCE;              // « réduire les animations » : le contenu reste dans la page
   if (ov === overlay) return;
   overlay = ov;
   sec.classList.toggle('g-overlay', ov);
@@ -854,12 +901,48 @@ stage.addEventListener('click', e => {
   pinned = id === pinned ? null : id;
 });
 
-/* ---------- la caméra : on passe sous la lave, puis on descend vers le portail ---------- */
-function progress() {
-  if (REDUCE) return 1;
-  const vh = innerHeight;
-  if (overlay) { const r = sec.getBoundingClientRect(), pin = Math.max(1, sec.offsetHeight - vh); return clamp((vh - r.top) / (vh + pin), 0, 1); }
-  return clamp((vh - stage.getBoundingClientRect().top) / (vh * .85), 0, 1);
+/* ---------- la caméra : la vitre, puis le portail ----------
+   La lave de l'accueil est vue de face, à travers une vitre d'aquarium, à 16 texels par bloc (48 px, 32 sur téléphone), et
+   accrochée à la page. La grotte prend la même vitre : coupée au plan z = G.glass, à la même échelle, la même grille de
+   blocs, sous le même angle. 1) Pendant que la scène entre, l'œil reste au centre de l'écran et regarde droit devant : ce
+   qui est sur la vitre (lac, croûte) défile avec la page, l'intérieur bouge un peu moins vite (une vraie fenêtre).
+   2) Une fois la scène collée, l'œil continue de descendre à la vitesse du défilement, freine, et avance à travers la
+   vitre jusqu'au plan du portail (cave.js final()), en levant à peine le regard. */
+const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const sstep = (a, b, x) => smooth((x - a) / (b - a));
+const monde = $('#monde'), lacEl = $('#lac'), abyEl = $('#abysse');
+const pageY = () => SHOT ? -(parseFloat(monde && monde.style.marginTop) || 0) : scrollY;
+let view = { u: 1 };
+function viewNow() {
+  const Hs = innerHeight, Hc = stage.clientHeight || Hs, Wc = stage.clientWidth || innerWidth, asp = Wc / Hc;
+  const texel = innerWidth < 700 ? 2 : 3, ppb = 16 * texel;          // = nether.js (texel de la coupe de lave)
+  const F0 = G.final(asp), fov = F0.fov, d0 = (Hc / 2 / ppb) / Math.tan(fov / 2), ZV = eng.glass;
+  const heroPin = lacEl ? Math.max(0, lacEl.offsetHeight - Hs) : 0, abyH = abyEl ? abyEl.offsetHeight : 1;
+  const pr = pinEl.getBoundingClientRect(), top0 = pr.top + pageY();   // le haut de la scène dans la page, avant qu'elle se colle
+  // le haut du canevas (sur la vitre), choisi pour que la grille des blocs tombe sur celle de la lave de la coupe
+  let Ytop = Math.max(Hc / ppb, eng.lakeMax + 1.5);
+  const C0 = (top0 - heroPin) / ppb + Ytop; Ytop += Math.ceil(C0 - 1e-6) - C0;
+  const C = (top0 - heroPin) / ppb + Ytop, pin = Math.max(1, pinEl.offsetHeight - Hc), fogD = 1 / 44;
+  let eye, at, sy, u;
+  if (REDUCE || pr.top > 0) {                               // 1) la scène entre (ou reste immobile) : la vitre
+    const ec = REDUCE ? Hc / 2 : Hs / 2 - pr.top, y = Ytop - ec / ppb;
+    eye = [0, y, ZV + d0]; at = [0, y, ZV + d0 - 10]; sy = 1 - 2 * ec / Hc; u = 0;
+  } else {                                                  // 2) collée : on descend, on freine, on traverse la vitre
+    u = clamp(-pr.top / pin, 0, 1);
+    const y0 = Ytop - Hs / 2 / ppb, yF = F0.eye[1], m0 = pin / ppb, D = y0 - yF;
+    let y;
+    if (D <= 0) y = y0 + (yF - y0) * smooth(u);
+    else { const uE = 2 * D / m0;
+      if (uE <= 1) y = u < uE ? yF + D * (1 - u / uE) * (1 - u / uE) : yF;              // décélération constante, partie de la vitesse du défilement
+      else { const u2 = u * u, u3 = u2 * u; y = (2 * u3 - 3 * u2 + 1) * y0 - (u3 - 2 * u2 + u) * m0 + (-2 * u3 + 3 * u2) * yF; } }
+    const z = (ZV + d0) + (F0.eye[2] - ZV - d0) * smooth(u), tilt = sstep(.4, 1, u);
+    eye = [0, y, z];
+    const d1 = [F0.at[0], F0.at[1] - y, F0.at[2] - z], l1 = Math.hypot(d1[0], d1[1], d1[2]) || 1;
+    const dir = [d1[0] / l1 * tilt, d1[1] / l1 * tilt, -(1 - tilt) + d1[2] / l1 * tilt], ld = Math.hypot(dir[0], dir[1], dir[2]) || 1;
+    at = [eye[0] + dir[0] / ld * 10, eye[1] + dir[1] / ld * 10, eye[2] + dir[2] / ld * 10];
+    sy = (1 - Hs / Hc) * (1 - sstep(0, .3, u));            // téléphone : l'écran visible est parfois moins haut que la scène
+  }
+  return { u, cam: { eye, at, fov, sy, fogD, fogOff: Math.max(0, eye[2] - F0.eye[2]) }, lake: [C, ppb / abyH], scr: [stage.getBoundingClientRect().top, Hc, Hs] };
 }
 
 /* ---------- une image ---------- */
@@ -869,7 +952,7 @@ const place = (el, id, keep, dx) => {
   if (!p) { el.style.visibility = 'hidden'; return null; }
   let x = p.x + (dx || 0);
   if (keep) { const w = el.offsetWidth / 2, W = stage.clientWidth; x = clamp(x, w + 6, Math.max(w + 6, W - w - 6)); }
-  el.style.visibility = ''; el.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(p.y) + 'px)';
+  if (el === signEl) el.style.visibility = ''; el.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(p.y) + 'px)';
   return p;
 };
 function step(t, dt) {
@@ -879,20 +962,24 @@ function step(t, dt) {
   const hl = hlNow();
   const goal = panel ? -.32 : 0;
   shift = REDUCE ? goal : shift + (goal - shift) * (dt ? 1 - Math.exp(-dt * 7) : 1);
-  eng.frame(REDUCE ? 20 : t, { dt, k: progress(), hl, sx: shift });
+  view = viewNow();
+  eng.frame(REDUCE ? 20 : t, { dt, hl, sx: shift, cam: view.cam, lake: view.lake, scr: view.scr });
+  // les étiquettes arrivent avec le plan du portail ; avant, elles ne sont ni visibles ni atteignables
+  const tk = REDUCE ? 0 : sstep(.7, .92, view.u), tagsOn = tk > .01;
+  [tagNews, tagFaq, tagUp, cap].forEach(el => { el.style.opacity = tk.toFixed(3); el.style.visibility = tagsOn ? '' : 'hidden'; el.inert = !tagsOn; });
   const hr = hl !== null ? eng.rectOf(hl) : null;
   if (hl !== hlShown) { hlShown = hl; if (hl !== null) fillTip(hl); }
   tip.classList.toggle('on', !!hr);
   // le panneau : la taille du texte suit celle du bois
   const ps = place(signEl, 'panneau'), A = eng.anchors.panneau;
   if (ps && A) { const q = eng.project(A[0] + 1, A[1], A[2]); if (q) signEl.style.setProperty('--fs', clamp(Math.abs(q.x - ps.x) / 30, 1, 4).toFixed(2) + 'px'); }
-  place(tagNews, 'chantier', 1); place(tagFaq, 'questions', 1); place(tagUp, 'ligne', 1);
+  if (tagsOn) { place(tagNews, 'chantier', 1); place(tagFaq, 'questions', 1); place(tagUp, 'ligne', 1); }
   // « Questions » (à gauche) et le chantier (à droite) s'écartent de « Remonter au launcher » (au milieu) s'ils le touchent
   const ru = tagUp.getBoundingClientRect(), apart = (el, id, side) => {
     const r = el.getBoundingClientRect(); if (!ru.width || !r.width || r.bottom < ru.top || r.top > ru.bottom) return;
     const d = side < 0 ? r.right + 8 - ru.left : ru.right + 8 - r.left; if (d > 0 && r.left < ru.right && r.right > ru.left) place(el, id, 1, side * d);
   };
-  apart(tagFaq, 'questions', -1); apart(tagNews, 'chantier', 1);
+  if (tagsOn) { apart(tagFaq, 'questions', -1); apart(tagNews, 'chantier', 1); }
   if (hr) {
     const r = hr, W = stage.clientWidth, H = stage.clientHeight;
     if (r) {
@@ -916,6 +1003,7 @@ function create() {
   sec.classList.add(eng ? 'g-on' : 'g-off');
   if (!eng) return;
   layer.append(signEl, tagNews, tagFaq, tagUp, cap, tip);
+  [tagNews, tagFaq, tagUp, cap].forEach(el => { el.style.visibility = 'hidden'; el.inert = true; });   // ils arrivent avec le plan du portail
   setMode();
   if (DESK.addEventListener) DESK.addEventListener('change', setMode);
 }
@@ -923,7 +1011,7 @@ function create() {
 function start() {
   route();
   if (SHOT) {                                               // image figée : on attend que l'accueil ait posé son défilement simulé
-    const T = +(QS.get('t') || 6), hq = QS.get('hl'), pq = QS.get('panel');
+    const T = +(QS.get('t') || 20), hq = QS.get('hl'), pq = QS.get('panel');
     const shoot = () => {
       if (D.title.indexOf('ready') !== 0) { setTimeout(shoot, 40); return; }
       create(); if (!eng) return;
@@ -931,23 +1019,26 @@ function start() {
       if (pq && !panel) toggle(pq === 'faq' ? faq : news, null);
       for (let i = 0; i <= 150; i++) step(T - 5 + i / 30, 1 / 30);
       root.dataset.grotte = 'ready';
-      if (QS.has('bare')) { layer.style.display = 'none'; ['.top', '.depth', '.f3', '.toasts'].forEach(q => { const e = $(q); if (e) e.style.display = 'none'; }); }   // l'image de secours (grotte-poster.jpg)
+      if (QS.has('debug')) { let b = $('#g-dbg'); if (!b) { b = h('pre', { id: 'g-dbg', style: 'position:fixed;left:10px;top:70px;z-index:99;background:#000;color:#0f0;font:15px monospace;padding:6px' }); D.body.appendChild(b); } const pr = pinEl.getBoundingClientRect(); b.textContent = JSON.stringify({ u: +view.u.toFixed(3), prTop: Math.round(pr.top), pinH: pinEl.offsetHeight, Hc: stage.clientHeight, Hs: innerHeight, sy: pageY(), eye: view.cam.eye.map(v => +v.toFixed(2)) }); }
+      if (QS.has('bare')) { layer.style.display = 'none'; ['.top', '.depth', '.f3', '.toasts', '#rig'].forEach(q => { const e = $(q); if (e) e.style.display = 'none'; }); }   // l'image de secours (grotte-poster.jpg)
     };
-    shoot(); addEventListener('resize', shoot);                // le navigateur sans tête change la taille de la fenêtre juste avant la capture
+    window.GROTTE_SHOT = shoot;                              // l'accueil nous rappelle après chaque capture (et après l'agrandissement de fenêtre du navigateur sans tête)
+    shoot();
     return;
   }
   // la scène se construit pendant un temps mort, ou tout de suite si on arrive déjà près d'elle
   const near = () => sec.getBoundingClientRect().top < innerHeight * 2.5;
   if (near()) create(); else (window.requestIdleCallback || (f => setTimeout(f, 1200)))(create, { timeout: 3000 });
+  const tick = (t, dt) => { if (!tried && near()) create(); step(t, Math.min(dt, .05)); };
+  window.GROTTE_STEP = (t, dt) => { if (!(tried && !eng)) tick(t, dt); };
   let last = 0;
   const loop = ms => {
-    if (tried && !eng) return;                              // pas de 3D : la boucle s'arrête
+    if ((tried && !eng) || window.NETHER_LOOP) return;      // pas de 3D, ou l'accueil mène la danse : notre boucle s'arrête
     requestAnimationFrame(loop);
     const t = ms / 1000, raw = t - last;
     if (raw < .012 || D.hidden) return;
     last = t;
-    if (!tried && near()) create();
-    step(t, Math.min(raw, .05));
+    tick(t, raw);
   };
   requestAnimationFrame(loop);
 }

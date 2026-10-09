@@ -94,9 +94,13 @@ function lienSur(u) {
   u = String(u || '').trim();
   if (/^mailto:contact@thelastmc\.fr$/i.test(u)) return u;
   const abs = u.match(/^https:\/\/(?:www\.)?thelastmc\.fr(\/[^\s"'<>]*)?$/i);
-  if (abs) u = (abs[1] || '/').replace(/^\//, '') || 'index.html';
-  if (/^[a-z0-9][a-z0-9-]*(\.html)?\/?(#[a-z0-9-]+)?$/i.test(u) || /^#[a-z0-9-]+$/i.test(u)) return u;
-  return null;
+  if (abs) u = abs[1] || '/';
+  if (/^#[a-z0-9-]+$/i.test(u)) return u;
+  // les pages s'écrivent sans « .html » : boutique.html#x → /boutique#x, index.html → /, discord/ → /discord/
+  const m = u && u.match(/^\/?(?:([a-z0-9][a-z0-9-]*)(\.html|\/)?)?(#[a-z0-9-]+)?$/i);
+  if (!m) return null;
+  const page = !m[1] || (/^index$/i.test(m[1]) && m[2] !== '/') ? '' : m[1] + (m[2] === '/' ? '/' : '');
+  return '/' + page + (m[3] || '');
 }
 function enLigne(parent, txt) {
   // **gras** et [texte](lien) ; tout le reste est du texte brut

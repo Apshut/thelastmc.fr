@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Last — Serveur Minecraft: Java Edition</title>
+  <title>The Last</title>
+  <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
   <meta name="description" content="The Last est un serveur Minecraft: Java Edition moddé (NeoForge) au contenu fait maison, avec son propre launcher sécurisé. Ouverture prochaine.">
   <meta property="og:title" content="The Last — Serveur Minecraft: Java Edition">
   <meta property="og:description" content="Un serveur moddé au contenu fait maison, avec son launcher sécurisé. Ouverture prochaine.">
@@ -16,7 +17,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0608">
   <link rel="canonical" href="https://thelastmc.fr/">
-  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/en.html">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/en">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -38,10 +39,10 @@
     <a class="brand" href="#lac"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
     <nav aria-label="Navigation principale">
       <a class="tbtn tbtn-main" href="#launcher">Télécharger</a>
-      <a class="tbtn" href="boutique.html">Boutique</a>
-      <a class="tbtn" href="chantier.html">Chantier</a>
-      <a class="tbtn" href="faq.html">FAQ</a>
-      <a class="tbtn" href="en.html" lang="en" hreflang="en">EN</a>
+      <a class="tbtn" href="/boutique">Boutique</a>
+      <a class="tbtn" href="/chantier">Chantier</a>
+      <a class="tbtn" href="/faq">FAQ</a>
+      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
     </nav>
   </header>
 
@@ -137,7 +138,7 @@
           <ol class="journal" id="journal">
             <li class="j-vide">Le journal du chantier s'affiche ici.</li>
           </ol>
-          <p class="j-tout"><a class="btn btn-sm" href="chantier.html">Tout le journal du chantier</a></p>
+          <p class="j-tout"><a class="btn btn-sm" href="/chantier">Tout le journal du chantier</a></p>
         </section>
         <section class="g-box g-panel" id="g-faq" aria-labelledby="t-faq">
           <h3 id="t-faq">Questions</h3>
@@ -150,13 +151,13 @@
             </details>
             <details>
               <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
-              <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="boutique.html">La taverne</a> vend des Braises,
+              <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="/boutique">La taverne</a> vend des Braises,
                 la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
                 d'avantage en jeu, et il n'y a pas de cape.</p>
             </details>
             <details>
               <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
-              <p>La monnaie du serveur. On l'achète dans <a href="boutique.html">la taverne</a>, puis on la dépense en jeu,
+              <p>La monnaie du serveur. On l'achète dans <a href="/boutique">la taverne</a>, puis on la dépense en jeu,
                 au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
                 ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
             </details>
@@ -169,7 +170,7 @@
               <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
               <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
                 Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
-                Le détail est dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+                Le détail est dans la <a href="/confidentialite">politique de confidentialité</a>.</p>
             </details>
             <details>
               <summary><i class="flame" aria-hidden="true"></i>Pourquoi aucune image du jeu&nbsp;?</summary>
@@ -182,7 +183,7 @@
                 le launcher sera proposé ici, et uniquement ici.</p>
             </details>
           </div>
-          <p class="j-tout"><a class="btn btn-sm" href="faq.html">Une autre question&nbsp;? Demande à Gromaur</a></p>
+          <p class="j-tout"><a class="btn btn-sm" href="/faq">Une autre question&nbsp;? Demande à Gromaur</a></p>
         </section>
       </div>
     </section>
@@ -193,10 +194,10 @@
         <div class="cols">
           <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
           <nav aria-label="Liens légaux">
-            <a href="confidentialite.html">Confidentialité</a>
-            <a href="cgu.html">Conditions d'utilisation</a>
-            <a href="mentions-legales.html">Mentions légales</a>
-            <a href="en.html" lang="en">English</a>
+            <a href="/confidentialite">Confidentialité</a>
+            <a href="/cgu">Conditions d'utilisation</a>
+            <a href="/mentions-legales">Mentions légales</a>
+            <a href="/en" lang="en">English</a>
           </nav>
         </div>
         <div class="disclaimer">

@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
-  <title>FAQ — The Last</title>
+  <title>The Last</title>
+  <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
   <meta name="description" content="Les questions qu'on nous pose le plus sur le serveur Minecraft The Last, et Gromaur, le tavernier, un assistant IA qui répond au reste à partir de ce que l'équipe lui a appris.">
   <meta property="og:title" content="FAQ — The Last">
   <meta property="og:description" content="Les questions qu'on nous pose le plus, et Gromaur, le tavernier, pour tout le reste.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://thelastmc.fr/faq.html">
+  <meta property="og:url" content="https://thelastmc.fr/faq">
   <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0608">
-  <link rel="canonical" href="https://thelastmc.fr/faq.html">
+  <link rel="canonical" href="https://thelastmc.fr/faq">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -30,13 +31,13 @@
   <a class="skip" href="#questions">Aller aux questions</a>
 
   <header class="top solid" id="top">
-    <a class="brand" href="index.html"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <a class="brand" href="/"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
     <nav aria-label="Navigation principale">
-      <a class="tbtn" href="index.html">Accueil</a>
-      <a class="tbtn" href="boutique.html">Boutique</a>
-      <a class="tbtn" href="chantier.html">Chantier</a>
-      <a class="tbtn tbtn-main" href="faq.html" aria-current="page">FAQ</a>
-      <a class="tbtn" href="en.html" lang="en" hreflang="en">EN</a>
+      <a class="tbtn" href="/">Accueil</a>
+      <a class="tbtn" href="/boutique">Boutique</a>
+      <a class="tbtn" href="/chantier">Chantier</a>
+      <a class="tbtn tbtn-main" href="/faq" aria-current="page">FAQ</a>
+      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
     </nav>
   </header>
 
@@ -56,13 +57,13 @@
         </details>
         <details>
           <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
-          <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="boutique.html">La taverne</a> vend des Braises,
+          <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="/boutique">La taverne</a> vend des Braises,
             la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
             d'avantage en jeu, et il n'y a pas de cape.</p>
         </details>
         <details>
           <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
-          <p>La monnaie du serveur. On l'achète dans <a href="boutique.html">la taverne</a>, puis on la dépense en jeu,
+          <p>La monnaie du serveur. On l'achète dans <a href="/boutique">la taverne</a>, puis on la dépense en jeu,
             au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
             ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
         </details>
@@ -75,16 +76,16 @@
           <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
           <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
             Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
-            Le détail est dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+            Le détail est dans la <a href="/confidentialite">politique de confidentialité</a>.</p>
         </details>
         <details>
           <summary><i class="flame" aria-hidden="true"></i>Pourquoi aucune image du jeu&nbsp;?</summary>
           <p>Parce que le monde du serveur n'est pas encore prêt, et qu'on ne montrera pas de fausses captures.
-            Les premières vraies images arriveront dans <a href="index.html#portail">le portail du chantier</a>, sur la page d'accueil.</p>
+            Les premières vraies images arriveront dans <a href="/#portail">le portail du chantier</a>, sur la page d'accueil.</p>
         </details>
         <details>
           <summary><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
-          <p>Quand le dernier bloc du portail sera posé. La date sera annoncée sur <a href="index.html#portail">la page d'accueil</a> et dans le salon #annonces de <a href="discord/">notre Discord</a>, nulle part ailleurs&nbsp;;
+          <p>Quand le dernier bloc du portail sera posé. La date sera annoncée sur <a href="/#portail">la page d'accueil</a> et dans le salon #annonces de <a href="discord/">notre Discord</a>, nulle part ailleurs&nbsp;;
             le launcher sera proposé sur la page d'accueil, et uniquement là.</p>
         </details>
       </div>
@@ -132,7 +133,7 @@
 
         <p class="gm-mention" id="gm-mention">Gromaur est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
           font foi. N'écris aucune donnée personnelle. Tes questions sont envoyées à Cloudflare et Anthropic (États-Unis)
-          pour générer la réponse, sans être enregistrées par nous. <a href="confidentialite.html#gromaur">Détails</a></p>
+          pour générer la réponse, sans être enregistrées par nous. <a href="/confidentialite#gromaur">Détails</a></p>
         <noscript><p class="gm-mention">Gromaur a besoin de JavaScript pour te répondre. Le Discord, lui, marche sans.</p></noscript>
       </div>
 
@@ -145,9 +146,9 @@
     <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
     <nav aria-label="Liens légaux">
       <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
-      <a href="confidentialite.html">Confidentialité</a>
-      <a href="cgu.html">Conditions d'utilisation</a>
-      <a href="mentions-legales.html">Mentions légales</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="/cgu">Conditions d'utilisation</a>
+      <a href="/mentions-legales">Mentions légales</a>
     </nav>
   </footer>
 </body>

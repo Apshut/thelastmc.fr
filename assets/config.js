@@ -26,7 +26,7 @@ window.THE_LAST = {
     opening: ""
   },
   community: {
-    url: "",
+    url: "/discord/",
     label: "Rejoindre le Discord"
   },
   roadmap: [

@@ -821,7 +821,7 @@ function route() {
 /* ---------- l'ouverture : le panneau du squelette ---------- */
 function opening() {
   const L = CFG.launcher || {}, d = L.opening ? new Date(L.opening) : null;
-  if (!d || isNaN(d)) return { sign: ['OUVERTURE', 'pas encore', 'de date'], text: 'Pas encore de date. Elle sera annoncée ici, sur ce panneau, et nulle part ailleurs.' };
+  if (!d || isNaN(d)) return { sign: ['OUVERTURE', 'pas encore', 'de date'], text: 'Pas encore de date. Elle sera annoncée ici, sur ce panneau, et dans le salon #annonces de notre Discord, nulle part ailleurs.' };
   const day = new Date(d.getFullYear(), d.getMonth(), d.getDate()), today = new Date(), t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const days = Math.round((day - t0) / 864e5), ds = longDate(d), short = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   if (days > 1) return { sign: ['OUVERTURE', short, 'dans ' + days + ' jours'], text: 'Ouverture prévue le ' + ds + ', dans ' + days + ' jours.' };

@@ -6,9 +6,12 @@
    gras, la phrase, puis la date en petit et un lien vers la page Chantier filtrée sur le projet. Un message par jour
    (heure de Paris) ; dans une journée, les nouveautés d'un même projet se rangent dans une seule carte.
 
-   Une seule bannière dans tout le salon : au tout premier passage (rien encore posté, ctx.premier), une ouverture avec
-   la bannière « Depuis le début », une présentation et deux boutons. Ensuite, les passages n'envoient que les cartes
-   (décision de William du 2026-10-09 : la bannière en haut du salon suffit).
+   Les bannières séparent les semaines (décision de William du 2026-10-09) : le premier message de chaque semaine (lundi,
+   heure de Paris) s'ouvre sur la bannière « SEMAINE DU JJ/MM/AAAA » (gazette/semaines/<lundi>.png, dessinée d'avance
+   par gazette.py ; si elle manque, la bannière générique suivie de la date en texte). Les autres messages n'ont que les
+   cartes. ctx.semaine = la dernière semaine qui a déjà sa bannière (noté dans discord.json). Au tout premier passage
+   (rien encore posté, ctx.premier), une ouverture avec la bannière « Depuis le début », une présentation et deux
+   boutons, qui vaut pour la semaine en cours.
 
    Components V2 (docs.discord.com, vérifié le 2026-10-09) : drapeau IS_COMPONENTS_V2 (1<<15), ni content ni embeds ;
    40 composants au plus par message, imbriqués compris ; texte borné ici à 3800 caractères par message ; Section = 1 à 3
@@ -29,6 +32,7 @@ const PROJETS = {
   launcher: { nom: 'Launcher', couleur: 0x5fd8ff, icone: 'progres/launcher.png', alt: 'Portail du Launcher' },
   jeu: { nom: 'Jeu', couleur: 0x62e06a, icone: 'progres/jeu.png', alt: 'Pioche du Jeu' },
 };
+const BANNIERE = { url: 'gazette/banniere.png', alt: 'Le chantier, la gazette du Nether' };
 const BANNIERE_DEBUT = { url: 'gazette/banniere-debut.png', alt: 'Le chantier depuis le début' };
 
 /* profil du webhook « Le chantier » (nom et avatar réglés une fois sur le webhook lui-même) */
@@ -84,13 +88,29 @@ function groupes(entries) {
     parProjet.get(e.p).push(e);
   }
   const out = [];
-  for (const parProjet of jours.values()) {
+  for (const [j, parProjet] of jours) {
     const lots = [];
     for (const [p, items] of parProjet)
       for (let i = 0; i < items.length; i += PAR_CARTE) lots.push({ p, items: items.slice(i, i + PAR_CARTE) });
-    out.push(lots);
+    out.push({ jour: j, lots });
   }
   return out;
+}
+
+/* semaines : le lundi (AAAA-MM-JJ) du jour de Paris, et sa bannière */
+const lundi = j => {
+  const d = new Date(j + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7);
+  return d.toISOString().slice(0, 10);
+};
+export const semaineDe = iso => lundi(jour(iso));
+const jjmmaaaa = s => s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4);
+function banniereSemaine(s, ctx) {
+  const alt = 'Le chantier, semaine du ' + jjmmaaaa(s);
+  if (!ctx.semaineDispo || ctx.semaineDispo(s))
+    return { comps: [galerie(ctx, { url: 'gazette/semaines/' + s + '.png', alt })], n: 1, t: alt.length };
+  const titre = '### Semaine du ' + jjmmaaaa(s);                // repli : image pas encore dessinée
+  return { comps: [galerie(ctx, BANNIERE), { type: 10, content: titre }], n: 2, t: BANNIERE.alt.length + titre.length };
 }
 
 function ouverture(entries, ctx) {
@@ -118,19 +138,28 @@ function ouverture(entries, ctx) {
 
 const corps = components => ({ flags: V2 | SILENT, allowed_mentions: { parse: [] }, components });
 
-/* Les messages d'un passage, dans l'ordre d'envoi : [{ body, entries }], où entries sont les nouveautés que ce message
-   publie (discord.mjs les note comme postées dès que le message est parti). */
+/* Les messages d'un passage, dans l'ordre d'envoi : [{ body, entries, semaine }], où entries sont les nouveautés que ce
+   message publie et semaine la semaine dont il porte la bannière, le cas échéant (discord.mjs note l'une et l'autre dès
+   que le message est parti). */
 export function edition(entries, ctx) {
   const tri = entries.filter(e => PROJETS[e.p]).slice().sort((a, b) => a.d.localeCompare(b.d));
   if (!tri.length) return [];
   const out = [];
-  if (ctx.premier) out.push({ body: corps(ouverture(tri, ctx)), entries: [] });   // la seule bannière du salon
-  for (const lots of groupes(tri)) {                            // un jour = un message (ou plusieurs si les limites l'exigent)
+  let semaine = ctx.semaine || '';                              // la dernière semaine qui a déjà sa bannière
+  if (ctx.premier) {                                            // l'ouverture vaut bannière pour la semaine en cours
+    semaine = semaineDe(tri[tri.length - 1].d);
+    out.push({ body: corps(ouverture(tri, ctx)), entries: [], semaine });
+  }
+  for (const { jour: j, lots } of groupes(tri)) {               // un jour = un message (ou plusieurs si les limites l'exigent)
+    const s = lundi(j);
+    let tete = null;                                            // la bannière ouvre le premier message de la semaine
+    if (s > semaine) { tete = banniereSemaine(s, ctx); semaine = s; }
     let cur = null;
     for (const lot of lots) {
       const c = carte(lot, ctx);
       if (!cur || cur.components.length + 1 > MAX_HAUT || cur.n + 4 > MAX_COMPOSANTS || cur.t + c.texte > MAX_TEXTE) {
         cur = { components: [], entries: [], n: 0, t: 0 };
+        if (tete) { cur.components.push(...tete.comps); cur.n += tete.n; cur.t += tete.t; cur.semaine = s; tete = null; }
         out.push(cur);
       }
       cur.components.push(c.json);
@@ -139,5 +168,5 @@ export function edition(entries, ctx) {
       cur.t += c.texte;
     }
   }
-  return out.map(m => m.body ? m : { body: corps(m.components), entries: m.entries });
+  return out.map(m => m.body ? m : { body: corps(m.components), entries: m.entries, semaine: m.semaine });
 }

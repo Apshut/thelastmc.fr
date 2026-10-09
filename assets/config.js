@@ -2,6 +2,9 @@
    - launcher.url    : lien direct vers l'installateur Windows. Vide = bouton « Bientôt disponible ».
    - launcher.opening: date d'ouverture prévue, par exemple "2026-12-12T18:00:00+01:00". Vide = pas de compte à rebours.
    - community       : lien vers le Discord (ou autre). Vide = pas de bouton.
+   - faq.endpoint    : adresse du Worker de Gromaur, l'assistant IA de la FAQ (faq.html), par exemple
+                       "https://gromaur-faq.<sous-domaine>.workers.dev" (sans / final ; voir faq/README.md).
+                       Vide = le chat affiche « Gromaur arrive bientôt » et la page ne contacte aucun service.
    - shop            : la taverne (boutique.html). Le site ne vend que des Braises, la monnaie du serveur ;
                        on les dépense EN JEU, au comptoir du tavernier (shop.inGame).
      checkoutUrl : lien de paiement (par exemple une boutique Tebex). Vide = aperçu, boutons « Bientôt ».
@@ -28,6 +31,9 @@ window.THE_LAST = {
   community: {
     url: "/discord/",
     label: "Rejoindre le Discord"
+  },
+  faq: {
+    endpoint: "https://gromaur-faq.gromaur-tickets.workers.dev"
   },
   roadmap: [
     { name: "Le site", state: "fait", date: "2026-10-05", blocks: 3,

@@ -1,0 +1,164 @@
+/* The Last — la FAQ (faq.html) : les questions fréquentes (style .faq de nether.css) puis Gromaur, l'assistant IA.
+   Même habillage que le chantier : fond de briques du Nether (dessiné par faq.js), en-tête plein, pied de page sobre.
+   Deux ambiances : les questions sont aux flammes des âmes (cyan), le chat est au comptoir de la taverne (braise, or). */
+.faq-page body {
+  min-height: 100vh; display: flex; flex-direction: column;
+  background: linear-gradient(rgb(10 4 5 / .9), rgb(10 4 5 / .8) 40%, rgb(10 4 5 / .92)), #120709 var(--fq-bg, none) 0 0 / 48px auto;
+  image-rendering: pixelated;
+}
+@media (max-width: 700px) { .faq-page body { background-size: auto, 32px auto; } }
+.fq-main { flex: 1; width: min(880px, calc(100% - 32px)); margin: 0 auto; padding: 110px 0 56px; image-rendering: auto; }
+.fq-main .sub { margin-bottom: 8px; }
+.fq-bloc { margin-top: 44px; scroll-margin-top: 80px; }
+.fq-t { margin: 0 0 18px; }
+.fq-t-ame { color: #9ff3fa; }
+.fq-t-ame svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #0b3a40); }
+.fq-t-braise { color: #ffc56b; }
+.fq-t-braise svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #5a1d06); }
+.fq-main .faq { max-width: none; }
+
+/* ---------- Gromaur : le comptoir ---------- */
+.gm-box {
+  position: relative; background: #1a0f0e; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 var(--u) #050304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #6a3b25,
+    inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #0d0606;
+}
+.gm-head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 16px 20px 14px;
+  background: linear-gradient(rgb(255 107 44 / .13), rgb(255 107 44 / 0)); border-bottom: 2px solid rgb(255 107 44 / .18);
+}
+.gm-av { flex: none; width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 0 0 2px #050304, 0 0 20px rgb(255 107 44 / .45); }
+.gm-id { flex: 1 1 180px; min-width: 0; margin: 0; line-height: 1.35; }
+.gm-nom { color: #fff3e6; font: 700 18px/1.2 "Sora", sans-serif; letter-spacing: .02em; }
+.gm-ia {
+  display: inline-block; margin-left: 4px; padding: 3px 6px 2px; vertical-align: 2px; background: var(--ember); color: #1c0a03;
+  font: 800 10.5px/1 "Sora", sans-serif; letter-spacing: .12em;
+}
+.gm-role { display: block; color: #c9b4a8; font-size: 13.5px; }
+.gm-pill {
+  display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 11px; background: rgb(12 5 6 / .8); color: #ffe9c9;
+  font: 600 11.5px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 2px #050304, inset 4px 4px 0 rgb(255 181 71 / .22);
+}
+.gm-pill i { width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: blink 1.6s step-end infinite; }
+.gm .btn:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+
+/* le fil : il défile tout seul pendant que Gromaur écrit, sauf si on est remonté le lire */
+.gm-log {
+  display: flex; flex-direction: column; gap: 14px; padding: 18px 20px;
+  max-height: clamp(260px, 100vh - 380px, 640px); max-height: clamp(260px, 100dvh - 380px, 640px); overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-color: #5a3a2c transparent;
+}
+/* dès le premier échange, le fil prend sa hauteur finale : le champ ne glisse plus vers le bas à chaque réponse */
+.gm.en-cours .gm-log { height: clamp(260px, 100vh - 380px, 640px); height: clamp(260px, 100dvh - 380px, 640px); }
+.gm-log:focus-visible { outline: 2px dashed rgb(255 181 71 / .6); outline-offset: -6px; }
+.gm-msg { position: relative; max-width: min(640px, 88%); padding: 11px 16px 12px; clip-path: var(--notch); overflow-wrap: anywhere; }
+.gm-bot { align-self: flex-start; background: #26150f; box-shadow: inset 3px 0 0 var(--ember), inset 0 0 0 1px rgb(255 107 44 / .16); }
+.gm-user { align-self: flex-end; background: #2b2112; box-shadow: inset -3px 0 0 var(--gold), inset 0 0 0 1px rgb(255 181 71 / .18); }
+.gm-de { margin: 0 0 5px; color: #ff9a62; font: 700 11px/1.2 "Sora", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.gm-user .gm-de { color: #ffcf80; text-align: right; }
+.gm-txt { color: #f3e6dc; font-size: 15.5px; line-height: 1.55; }
+.gm-txt p { margin: 0 0 .6em; white-space: pre-wrap; }
+.gm-txt > :last-child { margin-bottom: 0; }
+.gm-txt ul, .gm-txt ol { margin: 0 0 .6em; padding-left: 1.3em; }
+.gm-txt li { margin: .15em 0; }
+.gm-txt li::marker { color: var(--ember); }
+.gm-txt strong { color: #fff; }
+.gm-txt a { color: var(--gold); }
+.gm-accueil .gm-txt p { white-space: normal; }
+
+/* « Gromaur réfléchit… » : trois braises */
+.gm-pense { display: inline-flex; align-items: center; gap: 10px; color: #d8c2b5; font-size: 14.5px; }
+.gm-pense i { display: inline-flex; gap: 4px; }
+.gm-pense i::before, .gm-pense i::after, .gm-pense b { content: ""; width: 6px; height: 6px; background: var(--ember); box-shadow: 0 0 8px var(--ember); animation: braise 1.1s step-end infinite; }
+.gm-pense i::after { animation-delay: .36s; }
+.gm-pense b { animation-delay: .18s; }
+@keyframes braise { 50% { opacity: .25; } }
+
+/* sous chaque réponse : les sources, puis le rappel IA */
+.gm-src { margin: 10px 0 0; padding-top: 9px; border-top: 1px dashed rgb(255 181 71 / .28); }
+.gm-src p { margin: 0 0 6px; color: #c9b4a8; font: 600 11px/1.2 "Sora", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.gm-src ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.gm-src a {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 10px; background: rgb(255 181 71 / .08);
+  color: #ffd08a; font-size: 13.5px; line-height: 1.3; text-decoration: none; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .3);
+}
+.gm-src a:hover { background: rgb(255 181 71 / .16); color: #fff; }
+.gm-src a b { color: var(--ember); font: 700 11px/1 "Sora", sans-serif; }
+.gm-note { margin: 8px 0 0; color: #a8958b; font-size: 12px; }
+.gm-coupe { margin: 8px 0 0; color: #e0b98f; font-size: 13px; font-style: italic; }
+
+/* quand il ne sait pas, ou quand ça casse : où trouver un humain */
+.gm-esc { margin: 10px 0 0; padding: 10px 12px; background: rgb(111 230 242 / .06); box-shadow: inset 0 0 0 1px rgb(111 230 242 / .22); color: #d3e6e9; font-size: 14px; }
+.gm-esc p { margin: 0 0 4px; }
+.gm-esc a { color: var(--soul); }
+.gm-err { background: #2c100c; box-shadow: inset 3px 0 0 #ff4d2e, inset 0 0 0 1px rgb(255 77 46 / .3); }
+.gm-err .gm-de { color: #ff7b5c; }
+.gm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+/* suggestions : de vrais boutons, repliés après le premier échange */
+.gm-sugg { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
+.gm-s {
+  min-height: 40px; padding: 8px 13px; border: 0; cursor: pointer; text-align: left; color: #ffdcae; background: #120807;
+  font: 500 14px/1.3 "Inter", system-ui, sans-serif; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 2px rgb(255 181 71 / .42), inset 0 0 0 4px #050304; transition: background .12s, color .12s, transform .08s;
+}
+.gm-s:hover { background: #2a1610; color: #fff; }
+.gm-s:active { transform: translateY(1px); }
+.gm-s:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+
+/* la saisie */
+.gm-form { padding: 14px 20px 12px; border-top: 2px solid rgb(255 107 44 / .16); background: rgb(10 4 4 / .55); }
+.gm-form textarea {
+  display: block; width: 100%; min-height: 58px; max-height: 40vh; padding: 12px 14px; resize: vertical; border: 0;
+  color: var(--fg); background: #0c0607; font: 16px/1.5 "Inter", system-ui, sans-serif;
+  box-shadow: inset 0 0 0 2px #5a3a2c, inset 3px 3px 0 2px #050304;
+}
+.gm-form textarea::placeholder { color: #8f7d74; }
+.gm-form textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.gm-form textarea:disabled { opacity: .55; }
+.gm-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; }
+.gm-aide { flex: 1 1 220px; color: #a8958b; font-size: 12.5px; }
+.gm-compte { color: #a8958b; font: 600 12px/1 "Sora", sans-serif; font-variant-numeric: tabular-nums; }
+.gm-compte.proche { color: var(--gold); }
+.gm-compte.plein { color: var(--ember); }
+.gm-send, .gm-stop { min-width: 118px; }
+.gm-stop { --c: #3a1a12; --hi: #6b2f1d; --lo: #1a0907; }
+.gm-mention { margin: 0; padding: 0 20px 16px; color: #a8958b; font-size: 12.5px; line-height: 1.5; }
+.gm-mention a { color: #ffcf80; }
+.gm-humain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 18px 0 0; color: var(--fg-2); font-size: 15px; }
+
+/* bientôt : le comptoir est fermé, mais tout reste lisible */
+.gm.bientot .gm-av { filter: saturate(.55) brightness(.85); }
+.gm.bientot .gm-log { max-height: none; height: auto; }
+
+.fq-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 18px; padding: 16px 20px 18px; color: var(--fg-3, #a89a93); font-size: 12px; background: rgb(6 2 3 / .9); }
+.fq-foot p { margin: 0; }
+.fq-foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.fq-foot a { color: var(--fg-2, #d8cbc4); text-decoration: none; }
+.fq-foot a:hover { color: #fff; }
+
+@media (pointer: coarse) {
+  .gm-aide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .gm-s, .gm-src a { min-height: 44px; }
+}
+@media (max-width: 560px) {
+  .fq-main { padding-top: 92px; }
+  .fq-bloc { margin-top: 36px; }
+  .gm-head { padding: 12px 14px; }
+  .gm-av { width: 44px; height: 44px; }
+  .gm-log { padding: 14px 12px; max-height: clamp(240px, 100vh - 330px, 640px); max-height: clamp(240px, 100dvh - 330px, 640px); }
+  .gm.en-cours .gm-log { height: clamp(240px, 100vh - 330px, 640px); height: clamp(240px, 100dvh - 330px, 640px); }
+  .gm.bientot .gm-log { max-height: none; height: auto; }
+  .gm-msg { max-width: 100%; padding: 10px 13px 11px; }
+  .gm-user { margin-left: 18px; }
+  .gm-sugg { padding: 0 12px 14px; }
+  .gm-s { flex: 1 1 100%; }
+  .gm-form { padding: 12px 12px 10px; }
+  .gm-bar { justify-content: flex-end; }
+  .gm-send, .gm-stop { flex: 1 1 auto; }
+  .gm-mention { padding: 0 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gm-pense i::before, .gm-pense i::after, .gm-pense b, .gm-pill i { animation: none; }
+  .gm-log { scroll-behavior: auto; }
+}

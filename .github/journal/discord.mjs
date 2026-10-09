@@ -57,7 +57,7 @@ async function poster(body) {
 
 let envoyees = 0, nouveau = false;
 try {
-  for (const m of edition(neuves, { ...CTX, now: new Date().toISOString() })) {
+  for (const m of edition(neuves, { ...CTX, now: new Date().toISOString(), premier: deja.size === 0 })) {
     if (dry) console.log(JSON.stringify(m.body, null, 1));
     else { await poster(m.body); await pause(1200); }
     for (const e of m.entries) deja.add(cle(e));                // noté dès que le message est parti

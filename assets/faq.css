@@ -1,155 +1,322 @@
-/* The Last — la FAQ (faq.html) : les questions fréquentes (style .faq de nether.css) puis Gromaur, l'assistant IA.
-   Même habillage que le chantier : fond de briques du Nether (dessiné par faq.js), en-tête plein, pied de page sobre.
-   Deux ambiances : les questions sont aux flammes des âmes (cyan), le chat est au comptoir de la taverne (braise, or). */
+/* The Last — la FAQ (faq.html) : la forge en toile de fond, puis les questions et Gromaur, l'assistant IA (faq.js).
+   La scène 3D (faq-forge.js) tient la tête de page et porte le spectacle ; elle se fond dans le fond de la page, puis se
+   retire (assombrie) quand on descend lire. Le contenu, lui, reste calme : des plaques de fer noirci sur fond uni,
+   un liseré de métal chaud qui s'allume quand une question s'ouvre, et le comptoir de Gromaur en pierre noire polie.
+   Deux couleurs d'accent seulement : la braise (questions, envoi) et l'or (Gromaur, liens).
+   Aucun texte ne se pose sur la scène : la colonne de lecture a son propre fond uni. */
+:root {
+  --fp-bg: #0c0708;
+  --fp-plate: #161112; --fp-plate-2: #1b1517; --fp-hi: #3b3133; --fp-lo: #070505;
+  --fp-ink: #f4ebe3; --fp-ink-2: #ddd0c6; --fp-ink-3: #a99a92;
+  --fp-hot: linear-gradient(#fff0c0, #ffb347 22%, #ff6b2c 62%, #b8340b);
+}
 .faq-page body {
-  min-height: 100vh; display: flex; flex-direction: column;
-  background: linear-gradient(rgb(10 4 5 / .9), rgb(10 4 5 / .8) 40%, rgb(10 4 5 / .92)), #120709 var(--fq-bg, none) 0 0 / 48px auto;
-  image-rendering: pixelated;
+  position: relative; z-index: 0;                     /* un contexte d'empilement : les lueurs (z-index -1) passent sur le fond */
+  min-height: 100vh; display: flex; flex-direction: column; background: var(--fp-bg);
+  background-image: radial-gradient(90% 520px at 50% 380px, rgb(120 40 12 / .16), rgb(120 40 12 / 0) 70%);
+  background-repeat: no-repeat;
 }
-@media (max-width: 700px) { .faq-page body { background-size: auto, 32px auto; } }
-.fq-main { flex: 1; width: min(880px, calc(100% - 32px)); margin: 0 auto; padding: 110px 0 56px; image-rendering: auto; }
-.fq-main .sub { margin-bottom: 8px; }
-.fq-bloc { margin-top: 44px; scroll-margin-top: 80px; }
-.fq-t { margin: 0 0 18px; }
-.fq-t-ame { color: #9ff3fa; }
-.fq-t-ame svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #0b3a40); }
-.fq-t-braise { color: #ffc56b; }
-.fq-t-braise svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #5a1d06); }
-.fq-main .faq { max-width: none; }
+.fp-main { flex: 1; width: 100%; padding: 0 0 64px; }
+/* l'en-tête : dégradé sur la forge, puis une barre pleine dès qu'on descend (aucun titre ne transparaît dessous) */
+.fp .top::before { transition: background-color .25s, inset .25s; }
+.fp.fp-defile .top::before { inset: 0; background: rgb(9 5 6); box-shadow: 0 1px 0 #21171a, 0 10px 22px rgb(0 0 0 / .45); }
+/* écran large sans forge 3D (repli) : la lueur des braises sur les bords, loin de la colonne de lecture */
+@media (min-width: 1440px) {
+  html:not(.fp-fond) .fp-main::before {
+    content: ""; position: fixed; z-index: -1; inset: 0; pointer-events: none;
+    background: radial-gradient(38% 70% at 0 62%, rgb(140 44 12 / .16), rgb(140 44 12 / 0) 100%), radial-gradient(38% 70% at 100% 62%, rgb(140 44 12 / .16), rgb(140 44 12 / 0) 100%);
+  }
+}
 
-/* ---------- Gromaur : le comptoir ---------- */
-.gm-box {
-  position: relative; background: #1a0f0e; clip-path: var(--notch);
-  box-shadow: inset 0 0 0 var(--u) #050304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #6a3b25,
-    inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #0d0606;
+/* ---------- la scène ---------- */
+.fp-scene {
+  --fp-fade: .6; --fp-recul: 0;
+  position: relative; height: clamp(340px, 56vh, 620px); overflow: hidden;
+  background: var(--fp-bg) url("faq-forge.jpg") 58% 42% / cover no-repeat;
+  -webkit-mask-image: linear-gradient(#000 0, #000 calc(var(--fp-fade) * 100%), rgb(0 0 0 / .55) calc((var(--fp-fade) + .2) * 100%), transparent 100%);
+  mask-image: linear-gradient(#000 0, #000 calc(var(--fp-fade) * 100%), rgb(0 0 0 / .55) calc((var(--fp-fade) + .2) * 100%), transparent 100%);
 }
+.fp-scene canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity .7s ease; transform: translateY(calc(var(--fp-recul) * 22%)); }
+.fp-gl .fp-scene { background-image: none; }
+.fp-gl.fp-ready .fp-scene canvas { opacity: 1; }
+.fp-nogl .fp-scene canvas, html:not(.js) .fp-scene canvas { display: none; }
+.fp-gl .fp-scene { cursor: crosshair; }
+/* grand écran (forge.js pose .fp-fond à partir de 1200 px) : la forge reste en toile de fond, fixe, derrière la page.
+   La colonne de lecture a son propre fond uni (opaque) aux bords fondus : le spectacle vit dans les marges. */
+.fp-fond .fp-scene { -webkit-mask-image: none; mask-image: none; background: none; overflow: visible; }
+.fp-fond .fp-scene canvas { position: fixed; z-index: -1; top: 0; left: 0; width: 100%; height: 100vh; transform: none; }
+/* en haut de page, le sol de la forge s'assombrit vers le bas de l'écran : les marges restent calmes à côté des plaques */
+.fp-fond .fp-scene::after {
+  content: ""; position: fixed; z-index: -1; inset: 0; pointer-events: none; opacity: calc(1 - var(--fp-prog, 0));
+  background: linear-gradient(rgb(12 7 8 / 0) 0, rgb(12 7 8 / 0) 50%, rgb(12 7 8 / .6) 100%);
+}
+.fp-fond .fp-col::before {
+  content: ""; position: absolute; z-index: -1; top: 56px; bottom: -64px; left: -60px; right: -60px; pointer-events: none;
+  background: var(--fp-bg);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 60px, #000 calc(100% - 60px), transparent), linear-gradient(transparent, #000 28px);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 60px, #000 calc(100% - 60px), transparent), linear-gradient(transparent, #000 28px);
+  mask-composite: intersect;
+}
+/* image de repli (crochet &poster=1, pour refaire faq-forge.jpg) : la scène seule, sans masque */
+.fp-poster .top, .fp-poster .fp-col, .fp-poster .fq-foot, .fp-poster .skip { display: none; }
+.fp-poster .fp-scene { height: 640px; -webkit-mask-image: none; mask-image: none; }
+
+/* ---------- la colonne de lecture ---------- */
+.fp-col { position: relative; width: min(820px, calc(100% - 32px)); margin: 0 auto; }
+/* le titre sort du fondu de la forge ; le sous-titre est déjà sur le fond uni */
+.fp-intro { margin-top: -78px; }                    /* le titre (72 px) touche le fondu ; le sous-titre commence sous la scène */
+.fp-intro h1 { --fs: 6px; color: #fff4e6; }
+.fp-intro h1 svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #2b0f05) drop-shadow(0 0 22px rgb(0 0 0 / .9)); }
+.fp-intro-bas { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 28px; margin-top: 18px; }
+.fp-intro .sub { flex: 1 1 380px; margin: 0; max-width: 520px; color: var(--fp-ink-2); font-size: 17px; line-height: 1.6; text-shadow: none; }
+/* le raccourci vers Gromaur : visible dès l'arrivée, même quand le comptoir est sous la ligne de flottaison */
+.fp-go {
+  --c: #1c1411; --hi: #4c3a2a; --lo: #090505; flex: none; gap: 11px; padding: 7px 16px 7px 7px; color: #ffd08a; font-size: 12.5px;
+}
+.fp-go:hover { color: #fff3dc; }
+.fp-go img { display: block; width: 30px; height: 30px; border-radius: 50%; box-shadow: 0 0 0 2px #050303, 0 0 12px rgb(255 150 50 / .4); animation: fp-attend 3.4s ease-in-out infinite; }
+/* le médaillon respire : Gromaur est là, il attend */
+@keyframes fp-attend { 50% { box-shadow: 0 0 0 2px #050303, 0 0 20px rgb(255 140 40 / .75); } }
+.fp-go:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+
+.fq-bloc { margin-top: 52px; scroll-margin-top: 84px; }
+.fp-t { align-items: center; margin: 0 0 20px; color: #f2d2a8; }
+.fp-t svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #3a1607); }
+/* une barre de métal qui refroidit, au bout du titre */
+.fp-t::after { content: ""; flex: 1 1 40px; min-width: 32px; height: 3px; margin-left: 10px; background: linear-gradient(90deg, rgb(255 107 44 / .75), rgb(255 107 44 / .18) 40%, rgb(255 107 44 / 0)); }
+.fp-t-gm { color: #ffd08a; }
+.fp-t-gm::after { background: linear-gradient(90deg, rgb(255 181 71 / .7), rgb(255 181 71 / .16) 40%, rgb(255 181 71 / 0)); }
+
+/* ---------- les plaques : une question = une plaque de fer noirci ---------- */
+.fp-q .faq { display: grid; gap: 10px; max-width: none; }
+.fp-q details {
+  position: relative; margin: 0; background: var(--fp-plate); clip-path: var(--notch);
+  box-shadow: inset 0 0 0 var(--u) #050303, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 var(--fp-hi), inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--fp-lo);
+  transition: background-color .25s;
+}
+/* le liseré : froid, puis chauffé au rouge quand la plaque s'ouvre */
+.fp-q details::before {
+  content: ""; position: absolute; left: var(--u); top: var(--u); bottom: var(--u); width: calc(var(--u) * 2);
+  background: #3a2c29; transition: background-color .25s, box-shadow .25s;
+}
+.fp-q summary {
+  display: grid; grid-template-columns: 34px 1fr 16px; align-items: center; gap: 14px;
+  padding: 18px 26px 18px 26px; cursor: pointer; list-style: none;
+  color: var(--fp-ink); font: 600 17px/1.35 "Sora", sans-serif;
+}
+.fp-q summary::-webkit-details-marker { display: none; }
+.fp-n { display: flex; align-items: center; color: #9a847b; font: 700 14px/1 "Sora", sans-serif; letter-spacing: .06em; transition: color .25s, filter .25s; }
+.fp-n.fp-px svg { display: block; width: calc(var(--w) * 3px); height: 21px; }
+/* plus / moins en pixels */
+.fp-q summary::after {
+  content: ""; width: 14px; height: 14px; justify-self: end; color: #8c7870;
+  background: linear-gradient(currentColor, currentColor) center / 14px 4px no-repeat, linear-gradient(currentColor, currentColor) center / 4px 14px no-repeat;
+  transition: color .2s;
+}
+.fp-q details[open] summary::after { background: linear-gradient(currentColor, currentColor) center / 14px 4px no-repeat; }
+.fp-q summary:hover { color: #fff; }
+.fp-q details:hover { background: var(--fp-plate-2); }
+.fp-q details:hover::before { background: #6a3721; }
+.fp-q summary:hover::after { color: #ffb37a; }
+.fp-q summary:hover .fp-n { color: #b0745a; }
+.fp-q summary:focus-visible { outline: 3px solid #fff; outline-offset: -7px; }
+
+/* ouverte : la plaque rougit doucement, le texte reste sur fond uni */
+.fp-q details[open] { background: #181213; }
+.fp-q details[open]::before { background: var(--fp-hot); box-shadow: 0 0 14px rgb(255 107 44 / .55); }
+.fp-q details[open] summary { color: #ffe3c4; background: linear-gradient(90deg, rgb(255 96 28 / .13), rgb(255 96 28 / 0) 62%); }
+.fp-q details[open] .fp-n { color: #ff8d45; filter: drop-shadow(0 0 6px rgb(255 107 44 / .6)); }
+.fp-q details[open] summary::after { color: #ff8d45; }
+.fp-q details > p {
+  margin: 0; padding: 4px 40px 24px 74px; max-width: calc(530px + 114px);   /* 70 caractères au plus par ligne */
+  color: var(--fp-ink-2); font-size: 16.5px; line-height: 1.65;
+}
+.fp-q details > p::before { content: ""; display: block; height: 1px; margin: 0 0 14px; background: linear-gradient(90deg, rgb(255 140 60 / .28), rgb(255 140 60 / 0) 80%); }
+.fp-q details a { color: #ffc277; }
+.fp-q details a:hover { color: #ffe0b0; }
+.fp-chauffe::before { animation: fp-chauffe 1.1s ease-out; }
+@keyframes fp-chauffe { 0% { filter: brightness(1.8); box-shadow: 0 0 26px rgb(255 200 120 / .95); } 100% { filter: none; } }
+@supports (interpolate-size: allow-keywords) {
+  .fp-q { interpolate-size: allow-keywords; }
+  .fp-q details::details-content { block-size: 0; overflow: hidden; transition: block-size .32s ease, content-visibility .32s allow-discrete; }
+  .fp-q details[open]::details-content { block-size: auto; }
+}
+
+/* ---------- Gromaur : le comptoir, en pierre noire polie ---------- */
+.gm { position: relative; }
+/* la lueur de la forge, derrière le comptoir (hors du texte) */
+.gm::before { content: ""; position: absolute; z-index: -1; left: -18%; right: -18%; top: 30px; bottom: -40px; pointer-events: none; background: radial-gradient(closest-side, rgb(255 110 40 / .09), rgb(255 110 40 / 0)); }
+.gm-box { position: relative; background: #110d0e; clip-path: var(--notch); }
+/* le cadre de fer, posé par-dessus les fonds de l'en-tête et de la saisie */
+.gm-box::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--u) #050303, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #3d3133, inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #060404;
+}
+/* le bord haut : un fil de métal chaud, qui respire lentement */
+.gm-box::before {
+  content: ""; position: absolute; z-index: 3; left: calc(var(--u) * 3); right: calc(var(--u) * 3); top: var(--u); height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, rgb(255 107 44 / 0), #ff8a3d 18%, #ffd27a 50%, #ff8a3d 82%, rgb(255 107 44 / 0));
+  box-shadow: 0 0 10px rgb(255 120 40 / .6); opacity: .7; animation: fp-respire 5s ease-in-out infinite;
+}
+@keyframes fp-respire { 50% { opacity: 1; } }
 .gm-head {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 16px 20px 14px;
-  background: linear-gradient(rgb(255 107 44 / .13), rgb(255 107 44 / 0)); border-bottom: 2px solid rgb(255 107 44 / .18);
+  position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 18px 22px 16px;
+  background: linear-gradient(#211a1b, #171213); border-bottom: 2px solid #070505;
 }
-.gm-av { flex: none; width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 0 0 2px #050304, 0 0 20px rgb(255 107 44 / .45); }
+/* le fil chaud sous l'en-tête */
+.gm-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: linear-gradient(90deg, rgb(255 181 71 / 0), rgb(255 181 71 / .45) 30%, rgb(255 107 44 / .45) 70%, rgb(255 107 44 / 0)); }
+.fp-medal {
+  flex: none; display: grid; place-items: center; width: 66px; height: 66px; border-radius: 50%;
+  background: radial-gradient(circle, #0a0707 60%, #4c3c37 61%, #2a201f 70%, #120c0c 71%);
+  box-shadow: 0 0 0 2px #050303, 0 0 22px rgb(255 140 50 / .28);
+}
+.gm-av { display: block; width: 54px; height: 54px; border-radius: 50%; }
 .gm-id { flex: 1 1 180px; min-width: 0; margin: 0; line-height: 1.35; }
-.gm-nom { color: #fff3e6; font: 700 18px/1.2 "Sora", sans-serif; letter-spacing: .02em; }
+.gm-nom { color: #fff3e6; font: 700 19px/1.2 "Sora", sans-serif; letter-spacing: .02em; }
 .gm-ia {
-  display: inline-block; margin-left: 4px; padding: 3px 6px 2px; vertical-align: 2px; background: var(--ember); color: #1c0a03;
+  display: inline-block; margin-left: 5px; padding: 3px 6px 2px; vertical-align: 2px; background: var(--gold); color: #1c0a03;
   font: 800 10.5px/1 "Sora", sans-serif; letter-spacing: .12em;
 }
-.gm-role { display: block; color: #c9b4a8; font-size: 13.5px; }
+.gm-role { display: block; margin-top: 2px; color: #c9b8ae; font-size: 14px; }
 .gm-pill {
-  display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 11px; background: rgb(12 5 6 / .8); color: #ffe9c9;
-  font: 600 11.5px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 2px #050304, inset 4px 4px 0 rgb(255 181 71 / .22);
+  display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 11px; background: #0b0808; color: #ffe9c9;
+  font: 600 11.5px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 1px #4a3a30;
 }
 .gm-pill i { width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: blink 1.6s step-end infinite; }
 .gm .btn:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+.gm-new { --c: #241d1e; --hi: #4a3d3c; --lo: #0d0909; }
 
-/* le fil : il défile tout seul pendant que Gromaur écrit, sauf si on est remonté le lire */
+/* le fil de la conversation : fond uni, confortable */
 .gm-log {
-  display: flex; flex-direction: column; gap: 14px; padding: 18px 20px;
-  max-height: clamp(260px, 100vh - 380px, 640px); max-height: clamp(260px, 100dvh - 380px, 640px); overflow-y: auto; overscroll-behavior: contain;
-  scrollbar-color: #5a3a2c transparent;
+  display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 18px;
+  max-height: clamp(280px, 100vh - 380px, 640px); max-height: clamp(280px, 100dvh - 380px, 640px); overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-color: #4a3a33 transparent;
 }
-/* dès le premier échange, le fil prend sa hauteur finale : le champ ne glisse plus vers le bas à chaque réponse */
-.gm.en-cours .gm-log { height: clamp(260px, 100vh - 380px, 640px); height: clamp(260px, 100dvh - 380px, 640px); }
+.gm.en-cours .gm-log { height: clamp(280px, 100vh - 380px, 640px); height: clamp(280px, 100dvh - 380px, 640px); }
 .gm-log:focus-visible { outline: 2px dashed rgb(255 181 71 / .6); outline-offset: -6px; }
-.gm-msg { position: relative; max-width: min(640px, 88%); padding: 11px 16px 12px; clip-path: var(--notch); overflow-wrap: anywhere; }
-.gm-bot { align-self: flex-start; background: #26150f; box-shadow: inset 3px 0 0 var(--ember), inset 0 0 0 1px rgb(255 107 44 / .16); }
-.gm-user { align-self: flex-end; background: #2b2112; box-shadow: inset -3px 0 0 var(--gold), inset 0 0 0 1px rgb(255 181 71 / .18); }
-.gm-de { margin: 0 0 5px; color: #ff9a62; font: 700 11px/1.2 "Sora", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.gm-msg { position: relative; max-width: min(520px, 90%); padding: 12px 17px 13px; clip-path: var(--notch); overflow-wrap: anywhere; }
+.gm-bot { align-self: flex-start; background: #1c1617; box-shadow: inset 3px 0 0 #ff7a36, inset 0 0 0 1px rgb(255 255 255 / .04); }
+.gm-user { align-self: flex-end; background: #241c15; box-shadow: inset -3px 0 0 var(--gold), inset 0 0 0 1px rgb(255 181 71 / .1); }
+.gm-de { margin: 0 0 6px; color: #ff9d66; font: 700 11px/1.2 "Sora", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .gm-user .gm-de { color: #ffcf80; text-align: right; }
-.gm-txt { color: #f3e6dc; font-size: 15.5px; line-height: 1.55; }
-.gm-txt p { margin: 0 0 .6em; white-space: pre-wrap; }
+.gm-txt { color: #f2e7de; font-size: 16px; line-height: 1.6; }
+.gm-txt p { margin: 0 0 .65em; white-space: pre-wrap; }
 .gm-txt > :last-child { margin-bottom: 0; }
-.gm-txt ul, .gm-txt ol { margin: 0 0 .6em; padding-left: 1.3em; }
-.gm-txt li { margin: .15em 0; }
+.gm-txt ul, .gm-txt ol { margin: 0 0 .65em; padding-left: 1.3em; }
+.gm-txt li { margin: .2em 0; }
 .gm-txt li::marker { color: var(--ember); }
 .gm-txt strong { color: #fff; }
 .gm-txt a { color: var(--gold); }
 .gm-accueil .gm-txt p { white-space: normal; }
 
-/* « Gromaur réfléchit… » : trois braises */
-.gm-pense { display: inline-flex; align-items: center; gap: 10px; color: #d8c2b5; font-size: 14.5px; }
+/* « Gromaur réfléchit… » : trois braises, et le médaillon qui chauffe */
+.gm-pense { display: inline-flex; align-items: center; gap: 10px; color: #dccabd; font-size: 15px; }
 .gm-pense i { display: inline-flex; gap: 4px; }
 .gm-pense i::before, .gm-pense i::after, .gm-pense b { content: ""; width: 6px; height: 6px; background: var(--ember); box-shadow: 0 0 8px var(--ember); animation: braise 1.1s step-end infinite; }
 .gm-pense i::after { animation-delay: .36s; }
 .gm-pense b { animation-delay: .18s; }
 @keyframes braise { 50% { opacity: .25; } }
+.gm:has(.gm-pense) .fp-medal { animation: fp-souffle 1.6s ease-in-out infinite; }
+@keyframes fp-souffle { 50% { box-shadow: 0 0 0 2px #050303, 0 0 34px rgb(255 120 40 / .7); } }
 
 /* sous chaque réponse : les sources, puis le rappel IA */
-.gm-src { margin: 10px 0 0; padding-top: 9px; border-top: 1px dashed rgb(255 181 71 / .28); }
-.gm-src p { margin: 0 0 6px; color: #c9b4a8; font: 600 11px/1.2 "Sora", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.gm-src { margin: 12px 0 0; padding-top: 10px; border-top: 1px dashed rgb(255 181 71 / .26); }
+.gm-src p { margin: 0 0 7px; color: #c3b2a8; font: 600 11px/1.2 "Sora", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
 .gm-src ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .gm-src a {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 10px; background: rgb(255 181 71 / .08);
-  color: #ffd08a; font-size: 13.5px; line-height: 1.3; text-decoration: none; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .3);
+  display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 5px 11px; background: #15100f;
+  color: #ffd08a; font-size: 14px; line-height: 1.3; text-decoration: none; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .32);
 }
-.gm-src a:hover { background: rgb(255 181 71 / .16); color: #fff; }
+.gm-src a:hover { background: #22170f; color: #fff; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .7); }
 .gm-src a b { color: var(--ember); font: 700 11px/1 "Sora", sans-serif; }
-.gm-note { margin: 8px 0 0; color: #a8958b; font-size: 12px; }
-.gm-coupe { margin: 8px 0 0; color: #e0b98f; font-size: 13px; font-style: italic; }
+.gm-note { margin: 9px 0 0; color: #a99a92; font-size: 12.5px; }
+.gm-coupe { margin: 8px 0 0; color: #e0b98f; font-size: 13.5px; font-style: italic; }
 
-/* quand il ne sait pas, ou quand ça casse : où trouver un humain */
-.gm-esc { margin: 10px 0 0; padding: 10px 12px; background: rgb(111 230 242 / .06); box-shadow: inset 0 0 0 1px rgb(111 230 242 / .22); color: #d3e6e9; font-size: 14px; }
+.gm-esc { margin: 12px 0 0; padding: 11px 13px; background: #141011; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .25); color: #e3d6cc; font-size: 14.5px; }
 .gm-esc p { margin: 0 0 4px; }
-.gm-esc a { color: var(--soul); }
-.gm-err { background: #2c100c; box-shadow: inset 3px 0 0 #ff4d2e, inset 0 0 0 1px rgb(255 77 46 / .3); }
+.gm-esc p:first-child { color: #ffd08a; font-weight: 600; }
+.gm-esc a { color: var(--gold); }
+.gm-err { background: #261111; box-shadow: inset 3px 0 0 #ff4d2e, inset 0 0 0 1px rgb(255 77 46 / .28); }
 .gm-err .gm-de { color: #ff7b5c; }
 .gm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
-/* suggestions : de vrais boutons, repliés après le premier échange */
-.gm-sugg { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
+/* suggestions : des étiquettes de fer, qui chauffent au survol */
+.gm-sugg { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 22px 18px; }
 .gm-s {
-  min-height: 40px; padding: 8px 13px; border: 0; cursor: pointer; text-align: left; color: #ffdcae; background: #120807;
-  font: 500 14px/1.3 "Inter", system-ui, sans-serif; clip-path: var(--notch);
-  box-shadow: inset 0 0 0 2px rgb(255 181 71 / .42), inset 0 0 0 4px #050304; transition: background .12s, color .12s, transform .08s;
+  min-height: 40px; padding: 8px 14px; border: 0; cursor: pointer; text-align: left; color: #f1dcc4; background: #1a1415;
+  font: 500 14.5px/1.3 "Inter", system-ui, sans-serif; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 1px #4a3b35, inset 0 2px 0 rgb(255 255 255 / .04); transition: background .15s, color .15s, box-shadow .15s, transform .08s;
 }
-.gm-s:hover { background: #2a1610; color: #fff; }
+.gm-s:hover { background: #26170f; color: #fff; box-shadow: inset 0 0 0 1px #ff8a3d, inset 0 -2px 0 rgb(255 107 44 / .35); }
 .gm-s:active { transform: translateY(1px); }
 .gm-s:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
 
-/* la saisie */
-.gm-form { padding: 14px 20px 12px; border-top: 2px solid rgb(255 107 44 / .16); background: rgb(10 4 4 / .55); }
+/* la saisie : un creux dans la pierre ; Envoyer : un métal chauffé au rouge */
+.gm-form { padding: 16px 22px 12px; border-top: 2px solid #070505; background: #0e0a0b; }
 .gm-form textarea {
-  display: block; width: 100%; min-height: 58px; max-height: 40vh; padding: 12px 14px; resize: vertical; border: 0;
-  color: var(--fg); background: #0c0607; font: 16px/1.5 "Inter", system-ui, sans-serif;
-  box-shadow: inset 0 0 0 2px #5a3a2c, inset 3px 3px 0 2px #050304;
+  display: block; width: 100%; min-height: 60px; max-height: 40vh; padding: 12px 14px; resize: vertical; border: 0;
+  color: var(--fp-ink); background: #080606; font: 16px/1.5 "Inter", system-ui, sans-serif;
+  box-shadow: inset 0 0 0 2px #3a2f2c, inset 3px 3px 0 2px #030202;
 }
-.gm-form textarea::placeholder { color: #8f7d74; }
+.gm-form textarea::placeholder { color: #8f7e76; }
 .gm-form textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .gm-form textarea:disabled { opacity: .55; }
 .gm-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; }
-.gm-aide { flex: 1 1 220px; color: #a8958b; font-size: 12.5px; }
-.gm-compte { color: #a8958b; font: 600 12px/1 "Sora", sans-serif; font-variant-numeric: tabular-nums; }
+.gm-aide { flex: 1 1 220px; max-width: 400px; color: #a99a92; font-size: 13px; line-height: 1.5; }
+.gm-compte { margin-left: auto; color: #a99a92; font: 600 12px/1 "Sora", sans-serif; font-variant-numeric: tabular-nums; }
 .gm-compte.proche { color: var(--gold); }
 .gm-compte.plein { color: var(--ember); }
-.gm-send, .gm-stop { min-width: 118px; }
-.gm-stop { --c: #3a1a12; --hi: #6b2f1d; --lo: #1a0907; }
-.gm-mention { margin: 0; padding: 0 20px 16px; color: #a8958b; font-size: 12.5px; line-height: 1.5; }
+.gm-send, .gm-stop { min-width: 124px; }
+.gm-send {
+  --hi: #ffe2a6; --lo: #7e2306;
+  background: linear-gradient(#ffcf73 0%, #ff9b3d 26%, #f0641c 64%, #b63c0e 100%); color: #1c0802;
+  transition: filter .15s, transform .08s;
+}
+.gm-send:hover { color: #1c0802; filter: brightness(1.1) saturate(1.1); }
+.gm-stop { --c: #2a2324; --hi: #4d4142; --lo: #0f0b0b; }
+.gm-mention { margin: 0; padding: 0 max(22px, 100% - 22px - 430px) 18px 22px; background: #0e0a0b; color: #a99a92; font-size: 13px; line-height: 1.55; }
 .gm-mention a { color: #ffcf80; }
-.gm-humain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 18px 0 0; color: var(--fg-2); font-size: 15px; }
+.gm-humain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 20px 0 0; color: var(--fp-ink-2); font-size: 15.5px; }
 
-/* bientôt : le comptoir est fermé, mais tout reste lisible */
 .gm.bientot .gm-av { filter: saturate(.55) brightness(.85); }
 .gm.bientot .gm-log { max-height: none; height: auto; }
 
-.fq-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 18px; padding: 16px 20px 18px; color: var(--fg-3, #a89a93); font-size: 12px; background: rgb(6 2 3 / .9); }
+.fq-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 18px; padding: 16px 20px 18px; color: var(--fg-3, #a89a93); font-size: 12px; background: #070405; border-top: 1px solid #1c1416; }
 .fq-foot p { margin: 0; }
 .fq-foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .fq-foot a { color: var(--fg-2, #d8cbc4); text-decoration: none; }
 .fq-foot a:hover { color: #fff; }
 
+.fps { position: fixed; z-index: 90; left: 8px; bottom: 8px; margin: 0; padding: 6px 8px; background: rgb(0 0 0 / .8); color: #9f9; font: 12px/1.3 monospace; }
+.shot .fp-scene canvas, .shot.fp .top::before { transition: none; }
+.fp-virt body { margin-top: var(--fp-vy); }          /* image d'essai : défilement simulé (voir faq-forge.js) */
+.shot .fp-q details::details-content { transition: none; }
+
 @media (pointer: coarse) {
   .gm-aide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .gm-s, .gm-src a { min-height: 44px; }
 }
+@media (max-width: 700px) {
+  .fp-scene { height: clamp(280px, 44vh, 400px); --fp-fade: .56; }
+  .fp-intro { margin-top: -54px; }
+  .fp-intro h1 { --fs: 6px; }
+  .fp-intro .sub { font-size: 16px; }
+}
 @media (max-width: 560px) {
-  .fq-main { padding-top: 92px; }
-  .fq-bloc { margin-top: 36px; }
-  .gm-head { padding: 12px 14px; }
+  .fq-bloc { margin-top: 40px; }
+  .fp-q summary { grid-template-columns: 26px 1fr 14px; gap: 10px; padding: 15px 18px 15px 18px; font-size: 16px; }
+  .fp-n.fp-px svg { width: calc(var(--w) * 2px); height: 14px; }
+  .fp-q summary::after { width: 12px; height: 12px; background-size: 12px 3px, 3px 12px; }
+  .fp-q details[open] summary::after { background-size: 12px 3px; }
+  .fp-q details > p { padding: 2px 22px 20px 18px; font-size: 16px; }
+  .gm-head { padding: 14px 14px; gap: 10px 12px; }
+  .fp-medal { width: 54px; height: 54px; }
   .gm-av { width: 44px; height: 44px; }
-  .gm-log { padding: 14px 12px; max-height: clamp(240px, 100vh - 330px, 640px); max-height: clamp(240px, 100dvh - 330px, 640px); }
+  .gm-log { padding: 16px 12px; max-height: clamp(240px, 100vh - 330px, 640px); max-height: clamp(240px, 100dvh - 330px, 640px); }
   .gm.en-cours .gm-log { height: clamp(240px, 100vh - 330px, 640px); height: clamp(240px, 100dvh - 330px, 640px); }
   .gm.bientot .gm-log { max-height: none; height: auto; }
-  .gm-msg { max-width: 100%; padding: 10px 13px 11px; }
+  .gm-msg { max-width: 100%; padding: 11px 13px 12px; }
   .gm-user { margin-left: 18px; }
   .gm-sugg { padding: 0 12px 14px; }
   .gm-s { flex: 1 1 100%; }
@@ -159,6 +326,8 @@
   .gm-mention { padding: 0 12px 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .gm-pense i::before, .gm-pense i::after, .gm-pense b, .gm-pill i { animation: none; }
+  .gm-pense i::before, .gm-pense i::after, .gm-pense b, .gm-pill i, .gm:has(.gm-pense) .fp-medal, .gm-box::before, .fp-chauffe::before, .fp-go img { animation: none; }
+  .fp-scene canvas { transition: none; transform: none; }
+  .fp-q details::details-content { transition: none; }
   .gm-log { scroll-behavior: auto; }
 }

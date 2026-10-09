@@ -1,6 +1,21 @@
 {
  "entries": [
   {
+   "p": "site",
+   "t": "Le bouton « Rejoindre le Discord » est arrivé : le Discord officiel de The Last est ouvert.",
+   "d": "2026-10-09T13:36:13.000Z"
+  },
+  {
+   "p": "launcher",
+   "t": "Le launcher affichera « Joue à The Last » sur ton profil Discord, et son lien d'aide mène au Discord.",
+   "d": "2026-10-09T13:36:13.000Z"
+  },
+  {
+   "p": "launcher",
+   "t": "Réglage de la mémoire plus lisible, et le lien Boutique mène à la taverne",
+   "d": "2026-10-09T09:43:41.000Z"
+  },
+  {
    "p": "launcher",
    "t": "Accès à la connexion Minecraft obtenu : on se connecte et on lance le jeu avec son vrai compte",
    "d": "2026-10-09T09:26:49.000Z"

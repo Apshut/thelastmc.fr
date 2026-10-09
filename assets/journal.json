@@ -1,6 +1,11 @@
 {
  "entries": [
   {
+   "p": "launcher",
+   "t": "Accès à la connexion Minecraft obtenu : on se connecte et on lance le jeu avec son vrai compte",
+   "d": "2026-10-09T09:26:49.000Z"
+  },
+  {
    "p": "site",
    "t": "La lave continue sous la même vitre jusqu'à la grotte : le fond du lac arrive en coupe, puis on entre dans la grotte",
    "d": "2026-10-08T21:16:38.000Z"

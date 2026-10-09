@@ -1,6 +1,8 @@
 # Journal du chantier : toutes les heures, relit les lignes « Journal(…): » des commits des projets (dépôts privés,
 # lus avec le jeton JOURNAL_TOKEN, en lecture seule) et republie assets/journal.json s'il a changé.
-# Sans le secret JOURNAL_TOKEN, la tâche ne fait rien (et ne signale pas d'erreur).
+# Les nouvelles entrées partent aussi dans #journal-du-chantier sur Discord (webhook DISCORD_WEBHOOK_CHANTIER) ;
+# ce qui y est déjà posté est noté dans .github/journal/discord.json.
+# Sans le secret JOURNAL_TOKEN, la tâche ne fait rien (et ne signale pas d'erreur) ; sans DISCORD_WEBHOOK_CHANTIER, rien ne part sur Discord.
 name: Journal du chantier
 on:
   schedule:
@@ -22,14 +24,22 @@ jobs:
         run: node .github/journal/build.mjs
         env:
           JOURNAL_TOKEN: ${{ secrets.JOURNAL_TOKEN }}
+      - name: Poster les nouveautés sur Discord
+        # un souci côté Discord ne bloque jamais la mise à jour du site ; ce qui est parti reste noté
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node .github/journal/discord.mjs
+        env:
+          DISCORD_WEBHOOK_CHANTIER: ${{ secrets.DISCORD_WEBHOOK_CHANTIER }}
       - name: Publier si le journal a changé
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet -- assets/journal.json; then
+          if [ -n "$(git status --porcelain -- assets/journal.json .github/journal/discord.json)" ]; then
             git add assets/journal.json
+            git add .github/journal/discord.json 2>/dev/null || true
             git commit -m "Journal du chantier : mise à jour automatique"
           elif [ $(( $(date +%s) - $(git log -1 --format=%ct) )) -gt 4320000 ]; then
             # GitHub coupe les tâches planifiées d'un dépôt public sans activité depuis 60 jours : un signe de vie tous les 50 jours
@@ -37,5 +47,12 @@ jobs:
           else
             echo "Rien de neuf."; exit 0
           fi
-          git push
+          # un déploiement du site peut pousser pendant la tâche : on se recale et on réessaie, sinon l'état Discord serait
+          # perdu et les mêmes nouvelles repartiraient au passage suivant
+          ok=""
+          for i in 1 2 3; do
+            if git pull --rebase --quiet && git push --quiet; then ok=1; break; fi
+            sleep 5
+          done
+          [ -n "$ok" ] || { echo "::error::Push impossible : l'état du journal Discord n'a pas pu être enregistré."; exit 1; }
           gh api -X POST "repos/${{ github.repository }}/pages/builds" > /dev/null || true

@@ -1,6 +1,6 @@
 /* Journal du chantier → Discord : poste dans #journal-du-chantier, par le webhook « Le chantier », les entrées de
-   assets/journal.json qui n'y sont pas encore. Même contenu que le site : une carte par entrée, à la couleur du projet
-   (Site, Launcher, Jeu), avec sa date ; la plus ancienne d'abord, 10 cartes au plus par message, sans notification.
+   assets/journal.json qui n'y sont pas encore. La mise en page (cartes « Progrès réalisé », bannière, un message par
+   jour, sans notification) est dans presentation.mjs.
 
    Ce qui est déjà posté est noté dans .github/journal/discord.json (clés « projet|phrase », comme le dédoublonnage du
    site) : au premier passage, tout l'historique part ; ensuite, seulement les nouveautés.
@@ -9,18 +9,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { edition } from './presentation.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const JOURNAL = join(HERE, '..', '..', 'assets', 'journal.json');
 const STATE = join(HERE, 'discord.json');
-const SITE = 'https://thelastmc.fr/chantier.html';
-const PROJETS = {
-  site: { nom: 'Site', couleur: 0xffb547 },
-  launcher: { nom: 'Launcher', couleur: 0x5fd8ff },
-  jeu: { nom: 'Jeu', couleur: 0x62e06a },
-};
-const PAR_MESSAGE = 10;                                         // limite Discord : 10 cartes (embeds) par message
-const SANS_NOTIF = 1 << 12;                                     // SUPPRESS_NOTIFICATIONS
+const CTX = { site: 'https://thelastmc.fr', assets: 'https://thelastmc.fr/assets/discord/' };
+const PROJETS = ['site', 'launcher', 'jeu'];
 
 const dry = process.argv.includes('--dry-run');
 const hook = process.env.DISCORD_WEBHOOK_CHANTIER || '';
@@ -35,31 +30,17 @@ const entries = JSON.parse(readFileSync(JOURNAL, 'utf8')).entries;
 let posted = [];
 try { posted = JSON.parse(readFileSync(STATE, 'utf8')).posted; } catch { /* premier passage : tout l'historique */ }
 const deja = new Set(posted);
-const neuves = entries.filter(e => PROJETS[e.p] && !deja.has(cle(e))).sort((a, b) => a.d.localeCompare(b.d));
+const neuves = entries.filter(e => PROJETS.includes(e.p) && !deja.has(cle(e)));
 if (!neuves.length) { console.log('Discord à jour (' + deja.size + ' entrées déjà postées).'); process.exit(0); }
 
-// le site affiche les phrases en texte brut : on neutralise le Markdown de Discord pour qu'elles s'affichent pareil
-const brut = s => s.replace(/[\\*_~`|>[\]()<#@-]/g, '\\$&');
-const carte = e => ({
-  title: PROJETS[e.p].nom,
-  url: SITE + '?p=' + e.p,
-  description: brut(e.t),
-  color: PROJETS[e.p].couleur,
-  timestamp: e.d,
-});
 const pause = ms => new Promise(r => setTimeout(r, ms));
 function noter() { writeFileSync(STATE, JSON.stringify({ posted: [...deja] }, null, 1) + '\n'); }
 
-async function poster(lot) {
-  const body = JSON.stringify({
-    username: 'Le chantier',
-    embeds: lot.map(carte),
-    flags: SANS_NOTIF,
-    allowed_mentions: { parse: [] },                            // les phrases viennent des commits : jamais de mention
-  });
+async function poster(body) {
+  const json = JSON.stringify(body);                            // ni username ni avatar : le profil du webhook s'en charge
   for (let essai = 1; essai <= 5; essai++) {
-    const r = await fetch(hook + '?wait=true', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(20000) });
+    const r = await fetch(hook + '?wait=true&with_components=true', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: json, signal: AbortSignal.timeout(20000) });
     if (r.ok) return;
     if (r.status === 429) {                                     // limite de débit : attendre le délai indiqué, s'il reste raisonnable
       const j = await r.json().catch(() => ({}));
@@ -74,18 +55,18 @@ async function poster(lot) {
   throw new Error('Discord ne répond pas après 5 essais.');
 }
 
-let envoyees = 0;
+let envoyees = 0, nouveau = false;
 try {
-  for (let i = 0; i < neuves.length; i += PAR_MESSAGE) {
-    const lot = neuves.slice(i, i + PAR_MESSAGE);
-    if (dry) console.log(JSON.stringify(lot.map(carte), null, 1));
-    else { await poster(lot); await pause(1200); }
-    for (const e of lot) deja.add(cle(e));
-    envoyees += lot.length;
+  for (const m of edition(neuves, { ...CTX, now: new Date().toISOString() })) {
+    if (dry) console.log(JSON.stringify(m.body, null, 1));
+    else { await poster(m.body); await pause(1200); }
+    for (const e of m.entries) deja.add(cle(e));                // noté dès que le message est parti
+    envoyees += m.entries.length;
+    nouveau = true;
   }
 } catch (err) {
   console.log('::warning::Journal → Discord : ' + err.message);
   process.exitCode = 1;                                         // l'étape échoue, mais ce qui est déjà parti reste noté
 }
-if (!dry && envoyees) noter();
+if (!dry && nouveau) noter();
 console.log((dry ? 'Simulation : ' : '') + envoyees + ' entrée(s) ' + (dry ? 'seraient postées' : 'postées') + ' sur Discord.');

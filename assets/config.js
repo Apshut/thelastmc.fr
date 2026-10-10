@@ -5,6 +5,15 @@
    - faq.endpoint    : adresse du Worker de Volkar, l'assistant IA de la FAQ (faq.html), par exemple
                        "https://gromaur-faq.<sous-domaine>.workers.dev" (sans / final ; voir faq/README.md).
                        Vide = le chat affiche « Volkar arrive bientôt » et la page ne contacte aucun service.
+   - compte          : le bouton de compte, à droite de « EN » (assets/compte.js, voir compte/SPEC.md §5).
+     api    : adresse de l'API des comptes, "https://api.thelastmc.fr" (sans / final).
+              Vide = l'API n'est pas encore en ligne : le panneau dit « La connexion ouvrira avec le launcher. »
+              et le site ne fait AUCUNE requête. Même rempli, le site ne contacte l'API que si ce navigateur s'est
+              déjà connecté une fois (clé localStorage « thelast:compte », sans aucun identifiant).
+     ouvert : false = le panneau invité dit « La connexion ouvrira avec le launcher. » (la connexion est réservée aux
+              testeurs : ils se connectent quand même par le launcher, et le site les reconnaît si api est rempli).
+              true = le panneau explique comment se connecter depuis le launcher. Ne décide rien côté sécurité :
+              c'est l'API qui filtre (ACCES, TESTEURS).
    - shop            : la taverne (boutique.html). Le site ne vend que des Braises, la monnaie du serveur ;
                        on les dépense EN JEU, au comptoir du tavernier (shop.inGame).
      checkoutUrl : lien de paiement (par exemple une boutique Tebex). Vide = aperçu, boutons « Bientôt ».
@@ -34,6 +43,10 @@ window.THE_LAST = {
   },
   faq: {
     endpoint: "https://gromaur-faq.gromaur-tickets.workers.dev"
+  },
+  compte: {
+    api: "",
+    ouvert: false
   },
   roadmap: [
     { name: "Le site", state: "fait", date: "2026-10-05", blocks: 3,

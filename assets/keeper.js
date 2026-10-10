@@ -58,7 +58,7 @@
      - le cadrage suit la taille du modèle au repos (cornes comprises) : un grand tavernier reste dans l'image.
    ---------------------------------------------------------------------------------------------
 
-   Gromaur, la brute de taverne : un centaure-bouc massif, fait de boîtes comme sur Blockbench (peau de 16 px par
+   Volkar, la brute de taverne : un centaure-bouc massif, fait de boîtes comme sur Blockbench (peau de 16 px par
    bloc). Corps de bouc chamoisé à quatre pattes, de biais (croupe, queue et pattes arrière à gauche de l'écran),
    torse de suie, bosse et crinière grises de vieux mâle, épaules larges d'un bloc et demi, visage brun barré de
    deux raies noires, yeux de braise aux pupilles fendues (comme celles des chèvres) qui suivent le curseur et
@@ -758,7 +758,7 @@ function pose(t, st) {
 }
 
 window.TAVERN_KEEPER = {
-  name: 'Gromaur',
+  name: 'Volkar',
   skin: { w: SW, h: SH, draw },
   parts: PARTS,
   pose,

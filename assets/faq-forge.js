@@ -5,9 +5,9 @@
    La scène est décorative (aria-hidden) : elle s'arrête quand l'onglet est caché ou qu'elle sort de l'écran, et se fige
    avec prefers-reduced-motion. Un clic dans la forge fait jaillir des étincelles. Sur grand écran (1200 px et plus), elle
    reste en toile de fond fixe et se range dans la marge de droite quand on descend lire ; plus petit, elle reste en tête.
-   La forge suit Gromaur sans toucher à faq.js : elle regarde le fil du chat (« Gromaur réfléchit » = elle s'active).
-   Essais : ?shot=1 (image figée) &t=6 &y=<px> (défilement) &ouvre=<n> (question n ouverte) &gm=1 (cadré sur Gromaur)
-   &etat=pense (« Gromaur réfléchit », figé, sans réseau) ; ?fps=1 (coût par image) ; ?nogl=1 (sans 3D : l'image de
+   La forge suit Volkar sans toucher à faq.js : elle regarde le fil du chat (« Volkar réfléchit » = elle s'active).
+   Essais : ?shot=1 (image figée) &t=6 &y=<px> (défilement) &ouvre=<n> (question n ouverte) &gm=1 (cadré sur Volkar)
+   &etat=pense (« Volkar réfléchit », figé, sans réseau) ; ?fps=1 (coût par image) ; ?nogl=1 (sans 3D : l'image de
    repli) ; &poster=1 (la scène seule, pour refaire faq-forge.jpg). */
 (() => {
 'use strict';
@@ -579,7 +579,7 @@ function Engine(canvas, imgs, opts) {
     else { q.k = 'ember'; q.vx = j() * .25; q.vy = .35 + PR() * .5; q.vz = .12 + j() * .25; q.g = -.03; q.dr = .15; q.max = 2.5 + PR() * 3; q.s0 = q.s1 = .016 + PR() * .016; q.ph = PR() * 6.28; }
     q.life = q.max;
   }
-  /* pense : Gromaur réfléchit (événement de la page) ; la forge s'active : lingot plus chaud, gerbes plus serrées */
+  /* pense : Volkar réfléchit (événement de la page) ; la forge s'active : lingot plus chaud, gerbes plus serrées */
   let emb = 0, nextBurst = 2.5, heat = 0, pense = false;
   const INGOT_AT = [AX - .08, ANVIL_TOP, AZ + .02];
   function burst(n, v) { for (let i = 0; i < n; i++) spawn('spark', [INGOT_AT[0] + (PR() - .5) * .45, INGOT_AT[1] + .14, INGOT_AT[2] + (PR() - .5) * .14], v); }
@@ -720,16 +720,16 @@ $$('.fp-q details').forEach(d => d.addEventListener('toggle', () => {
   if (d.open && !REDUCE) { void d.offsetWidth; d.classList.add('fp-chauffe'); }
 }));
 
-/* la forge suit Gromaur : « Gromaur réfléchit » affiché = pense ; puis la réponse (fin) ou une erreur */
+/* la forge suit Volkar : « Volkar réfléchit » affiché = pense ; puis la réponse (fin) ou une erreur */
 const gmLog = $('#gm-log');
-let suitGromaur = null;
+let suitVolkar = null;
 if (gmLog) {
   let avant = false;
   new MutationObserver(() => {
     const p = !!gmLog.querySelector('.gm-pense');
     if (p === avant) return; avant = p;
     const der = gmLog.lastElementChild, err = !!(der && der.classList.contains('gm-err'));
-    if (suitGromaur) suitGromaur(p ? 'pense' : err ? 'erreur' : 'fin');
+    if (suitVolkar) suitVolkar(p ? 'pense' : err ? 'erreur' : 'fin');
   }).observe(gmLog, { childList: true, subtree: true });
 }
 
@@ -747,18 +747,18 @@ const virt = y => {
 {
   const n = parseInt(QS.get('ouvre') || '', 10), dets = $$('.fp-q details');
   if (n >= 1 && n <= dets.length) dets[n - 1].open = true;
-  const box = $('#gromaur');
+  const box = $('#volkar');
   if (QS.get('etat') === 'pense' && box && gmLog) {
-    // image figée de « Gromaur réfléchit », construite comme faq.js le fait, sans rien envoyer à personne
+    // image figée de « Volkar réfléchit », construite comme faq.js le fait, sans rien envoyer à personne
     const el = (tag, cls, txt) => { const e = D.createElement(tag); if (cls) e.className = cls; if (txt) e.textContent = txt; return e; };
     const bulle = (bot, texte) => {
-      const m = el('div', 'gm-msg ' + (bot ? 'gm-bot' : 'gm-user')), de = el('p', 'gm-de'), t = el('div', 'gm-txt'), vu = el('span', null, bot ? 'Gromaur · IA' : 'Toi');
-      vu.setAttribute('aria-hidden', 'true'); de.append(el('span', 'sr', bot ? 'Gromaur, IA :' : 'Toi :'), vu);
+      const m = el('div', 'gm-msg ' + (bot ? 'gm-bot' : 'gm-user')), de = el('p', 'gm-de'), t = el('div', 'gm-txt'), vu = el('span', null, bot ? 'Volkar · IA' : 'Toi');
+      vu.setAttribute('aria-hidden', 'true'); de.append(el('span', 'sr', bot ? 'Volkar, IA :' : 'Toi :'), vu);
       m.append(de, t); if (texte) t.appendChild(el('p', null, texte)); gmLog.appendChild(m); return { m, t };
     };
     bulle(false, 'Les Braises, ça sert à quoi ?');
     const b = bulle(true); b.m.setAttribute('aria-busy', 'true');
-    const p = el('p', 'gm-pense', 'Gromaur réfléchit'), i = el('i'); i.setAttribute('aria-hidden', 'true'); i.appendChild(el('b')); p.appendChild(i); b.t.appendChild(p);
+    const p = el('p', 'gm-pense', 'Volkar réfléchit'), i = el('i'); i.setAttribute('aria-hidden', 'true'); i.appendChild(el('b')); p.appendChild(i); b.t.appendChild(p);
     box.classList.add('en-cours');
     ['#gm-sugg', '#gm-send', '#gm-pill'].forEach(s => { const e = $(s); if (e) e.hidden = true; });
     ['#gm-form', '#gm-stop', '#gm-new', '#gm-mention'].forEach(s => { const e = $(s); if (e) e.hidden = false; });
@@ -836,8 +836,8 @@ function start(IMG) {
   root.classList.add(eng ? 'fp-gl' : 'fp-nogl');
   if (!eng) return;
   setMode(); relayout();
-  /* Gromaur réfléchit : la forge s'active ; la réponse arrive : un dernier coup (pas après une erreur) */
-  suitGromaur = etat => { penseOn = etat === 'pense'; eng.setPense(penseOn, etat === 'erreur'); if (redraw) redraw(); };
+  /* Volkar réfléchit : la forge s'active ; la réponse arrive : un dernier coup (pas après une erreur) */
+  suitVolkar = etat => { penseOn = etat === 'pense'; eng.setPense(penseOn, etat === 'erreur'); if (redraw) redraw(); };
   if (D.querySelector('#gm-log .gm-pense')) { penseOn = true; eng.setPense(true); }
   const reflow = () => { setMode(); relayout(); onScroll(); };
   addEventListener('resize', () => { reflow(); if (REDUCE) step(20, 0); });

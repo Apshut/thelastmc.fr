@@ -1,5 +1,5 @@
-/* The Last — la FAQ (faq.html) : habillage (police du jeu, briques, lanternes des âmes) et Gromaur, l'assistant IA.
-   Gromaur parle à un Worker Cloudflare (faq/worker, adresse dans config.js : faq.endpoint) qui répond en flux SSE :
+/* The Last — la FAQ (faq.html) : habillage (police du jeu, briques, lanternes des âmes) et Volkar, l'assistant IA.
+   Volkar parle à un Worker Cloudflare (faq/worker, adresse dans config.js : faq.endpoint) qui répond en flux SSE :
    sources, texte, cite, fin, erreur (contrat dans faq/README.md). Rien n'est stocké : l'historique vit dans cette page
    et disparaît quand on la ferme. Aucun appel au Worker tant qu'on ne touche pas au chat (la confidentialité le promet).
    Le texte du modèle n'est jamais injecté en HTML : on construit les nœuds un par un (textContent). */
@@ -58,8 +58,8 @@ $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
 $$('h1.px, h2.px').forEach(pxText);
 textures();
 
-/* ================= Gromaur ================= */
-const box = $('#gromaur'), log = $('#gm-log'), form = $('#gm-form'), q = $('#gm-q'), send = $('#gm-send'), stop = $('#gm-stop');
+/* ================= Volkar ================= */
+const box = $('#volkar'), log = $('#gm-log'), form = $('#gm-form'), q = $('#gm-q'), send = $('#gm-send'), stop = $('#gm-stop');
 const sugg = $('#gm-sugg'), btnNew = $('#gm-new'), compte = $('#gm-compte'), etat = $('#gm-etat'), mention = $('#gm-mention'), pill = $('#gm-pill');
 const DISCORD = (CFG.community && CFG.community.url ? String(CFG.community.url).replace(/^\//, '') : '') || 'discord/';
 const SUGGESTIONS = [
@@ -136,7 +136,7 @@ function rendreTexte(el, txt) {
 function bulle(role, extra) {
   const bot = role !== 'user';
   const m = h('div', { class: 'gm-msg ' + (bot ? 'gm-bot' : 'gm-user') + (extra ? ' ' + extra : '') },
-    h('p', { class: 'gm-de' }, h('span', { class: 'sr', text: bot ? 'Gromaur, IA :' : 'Toi :' }), h('span', { 'aria-hidden': 'true', text: bot ? 'Gromaur · IA' : 'Toi' })),
+    h('p', { class: 'gm-de' }, h('span', { class: 'sr', text: bot ? 'Volkar, IA :' : 'Toi :' }), h('span', { 'aria-hidden': 'true', text: bot ? 'Volkar · IA' : 'Toi' })),
     h('div', { class: 'gm-txt' }));
   log.appendChild(m); descendre(true);
   return m;
@@ -159,7 +159,7 @@ function erreur(texte, question) {
   }
   act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, text: 'Aller sur le Discord' }));
   m.appendChild(act); descendre(true);
-  annonce('Gromaur n\'a pas pu répondre.');
+  annonce('Volkar n\'a pas pu répondre.');
 }
 
 /* ---------- l'état « bientôt » : pas de Worker, Worker injoignable ou clé absente ---------- */
@@ -170,10 +170,10 @@ function passerBientot() {
   const avaitFocus = form.contains(D.activeElement);
   if (ctrl) ctrl.abort();
   const m = bulle('bot');
-  rendreTexte($('.gm-txt', m), 'Gromaur arrive bientôt. En attendant, les questions ci-dessus et le Discord sont là pour t\'aider.');
+  rendreTexte($('.gm-txt', m), 'Volkar arrive bientôt. En attendant, les questions ci-dessus et le Discord sont là pour t\'aider.');
   // le champ qui avait le focus vient d'être caché : on le pose sur le message, pour ne pas perdre le visiteur au clavier
   if (avaitFocus) { m.tabIndex = -1; m.focus({ preventScroll: true }); }
-  annonce('Gromaur arrive bientôt.');
+  annonce('Volkar arrive bientôt.');
 }
 function verifier() {
   if (!sante) sante = (async () => {
@@ -217,8 +217,8 @@ async function envoyer() {
 
   const m = bulle('bot'), txt = $('.gm-txt', m);
   m.setAttribute('aria-busy', 'true');
-  txt.appendChild(h('p', { class: 'gm-pense' }, 'Gromaur réfléchit', h('i', { 'aria-hidden': 'true' }, h('b'))));
-  annonce('Gromaur écrit…');
+  txt.appendChild(h('p', { class: 'gm-pense' }, 'Volkar réfléchit', h('i', { 'aria-hidden': 'true' }, h('b'))));
+  annonce('Volkar écrit…');
   ctrl = new AbortController(); occupe(true);
   box.classList.add('en-cours');
   form.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
@@ -242,8 +242,8 @@ async function envoyer() {
         msg = msg || 'Trop de questions d\'un coup : reviens dans quelques instants.';
         if (ra > 0) msg += ' (Tu pourras réessayer dans ' + (ra < 90 ? ra + ' secondes' : Math.ceil(ra / 60) + ' minutes') + '.)';
       }
-      if (r.status === 503 && !msg) msg = 'Gromaur est parti à la cave. Réessaie plus tard, ou passe par le Discord.';
-      throw { visible: msg || 'Gromaur n\'a pas compris la demande. Réessaie avec une question plus courte.', code: j && j.code, status: r.status };
+      if (r.status === 503 && !msg) msg = 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.';
+      throw { visible: msg || 'Volkar n\'a pas compris la demande. Réessaie avec une question plus courte.', code: j && j.code, status: r.status };
     }
     const lecteur = r.body.getReader(), dec = new TextDecoder();
     let tampon = '';
@@ -268,9 +268,9 @@ async function envoyer() {
     }
     if (!fin && !err) err = { message: 'La réponse s\'est coupée en route. Réessaie dans un instant.' };
   } catch (e) {
-    if (delai) err = { message: 'Gromaur ne répond plus. Réessaie dans un instant, ou passe par le Discord.', avant: !ecrit.trim() };
+    if (delai) err = { message: 'Volkar ne répond plus. Réessaie dans un instant, ou passe par le Discord.', avant: !ecrit.trim() };
     else if (ctrl && ctrl.signal.aborted) coupe = true;
-    else err = { message: e && e.visible ? e.visible : 'Gromaur est parti à la cave. Réessaie plus tard, ou passe par le Discord.', avant: true, status: e && e.status };
+    else err = { message: e && e.visible ? e.visible : 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.', avant: true, status: e && e.status };
   }
 
   /* fin de l'échange */
@@ -286,13 +286,13 @@ async function envoyer() {
   } else if (!ecrit.trim()) {
     m.remove(); hist.pop();
     if (coupe) annonce('Réponse arrêtée.');
-    else erreur(err && typeof err.message === 'string' && err.message ? err.message : 'Gromaur n\'a rien trouvé à dire. Réessaie autrement.', texte);
+    else erreur(err && typeof err.message === 'string' && err.message ? err.message : 'Volkar n\'a rien trouvé à dire. Réessaie autrement.', texte);
   } else {
     // forme signée par le Worker : les MAX_A premiers caractères (points de code), sans autre retouche
     hist.push({ role: 'assistant', content: Array.from(ecrit).slice(0, MAX_A).join(''), sig: !coupe && !err && fin && /^[0-9a-f]{64}$/.test(fin.sig || '') ? fin.sig : undefined });
     if (coupe) m.appendChild(h('p', { class: 'gm-coupe', text: 'Réponse arrêtée.' }));
     else if (err) m.appendChild(h('p', { class: 'gm-coupe', text: typeof err.message === 'string' && err.message ? err.message : 'La réponse s\'est coupée en route.' }));
-    else if (fin && fin.raison === 'longueur') m.appendChild(h('p', { class: 'gm-coupe', text: 'Gromaur s\'est arrêté en chemin : la réponse était trop longue. Demande-lui la suite.' }));
+    else if (fin && fin.raison === 'longueur') m.appendChild(h('p', { class: 'gm-coupe', text: 'Volkar s\'est arrêté en chemin : la réponse était trop longue. Demande-lui la suite.' }));
     // sources : les documents cités ; à défaut, les pages retrouvées (dédoublonnées)
     ((fin && Array.isArray(fin.cites)) ? fin.cites : []).forEach(n => { if (Number.isInteger(n) && !cites.includes(n)) cites.push(n); });
     const cits = sources.filter(s => cites.includes(s.n)), liste = cits.length ? cits : sources, vus = new Set(), liens = [];
@@ -307,7 +307,7 @@ async function envoyer() {
     }
     if (!coupe && (!cits.length || err || (fin && fin.raison === 'refus'))) escalade(m);
     m.appendChild(h('p', { class: 'gm-note', text: 'Généré par une IA, peut contenir des erreurs.' }));
-    annonce(coupe ? 'Réponse arrêtée.' : err ? 'Réponse interrompue : ' + (typeof err.message === 'string' && err.message ? err.message : 'la réponse s\'est coupée en route.') : 'Réponse de Gromaur prête.');
+    annonce(coupe ? 'Réponse arrêtée.' : err ? 'Réponse interrompue : ' + (typeof err.message === 'string' && err.message ? err.message : 'la réponse s\'est coupée en route.') : 'Réponse de Volkar prête.');
   }
   occupe(false); descendre(suivre);
   if (suivre && !bientot) form.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
@@ -331,7 +331,7 @@ else {
     b.addEventListener('click', () => { q.value = s; majCompte(); envoyer(); });
     sugg.appendChild(b);
   });
-  // premier geste dans le chat : on vérifie que Gromaur est là (pas avant, pour ne contacter personne pour rien)
+  // premier geste dans le chat : on vérifie que Volkar est là (pas avant, pour ne contacter personne pour rien)
   const geste = () => { verifier(); };
   q.addEventListener('focus', geste, { once: true });
   sugg.addEventListener('pointerdown', geste, { once: true });

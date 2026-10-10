@@ -1,8 +1,8 @@
-/* The Last — la FAQ (faq.html) : la forge en toile de fond, puis les questions et Gromaur, l'assistant IA (faq.js).
+/* The Last — la FAQ (faq.html) : la forge en toile de fond, puis les questions et Volkar, l'assistant IA (faq.js).
    La scène 3D (faq-forge.js) tient la tête de page et porte le spectacle ; elle se fond dans le fond de la page, puis se
    retire (assombrie) quand on descend lire. Le contenu, lui, reste calme : des plaques de fer noirci sur fond uni,
-   un liseré de métal chaud qui s'allume quand une question s'ouvre, et le comptoir de Gromaur en pierre noire polie.
-   Deux couleurs d'accent seulement : la braise (questions, envoi) et l'or (Gromaur, liens).
+   un liseré de métal chaud qui s'allume quand une question s'ouvre, et le comptoir de Volkar en pierre noire polie.
+   Deux couleurs d'accent seulement : la braise (questions, envoi) et l'or (Volkar, liens).
    Aucun texte ne se pose sur la scène : la colonne de lecture a son propre fond uni. */
 :root {
   --fp-bg: #0c0708;
@@ -70,13 +70,13 @@
 .fp-intro h1 svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 #2b0f05) drop-shadow(0 0 22px rgb(0 0 0 / .9)); }
 .fp-intro-bas { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px 28px; margin-top: 18px; }
 .fp-intro .sub { flex: 1 1 380px; margin: 0; max-width: 520px; color: var(--fp-ink-2); font-size: 17px; line-height: 1.6; text-shadow: none; }
-/* le raccourci vers Gromaur : visible dès l'arrivée, même quand le comptoir est sous la ligne de flottaison */
+/* le raccourci vers Volkar : visible dès l'arrivée, même quand le comptoir est sous la ligne de flottaison */
 .fp-go {
   --c: #1c1411; --hi: #4c3a2a; --lo: #090505; flex: none; gap: 11px; padding: 7px 16px 7px 7px; color: #ffd08a; font-size: 12.5px;
 }
 .fp-go:hover { color: #fff3dc; }
 .fp-go img { display: block; width: 30px; height: 30px; border-radius: 50%; box-shadow: 0 0 0 2px #050303, 0 0 12px rgb(255 150 50 / .4); animation: fp-attend 3.4s ease-in-out infinite; }
-/* le médaillon respire : Gromaur est là, il attend */
+/* le médaillon respire : Volkar est là, il attend */
 @keyframes fp-attend { 50% { box-shadow: 0 0 0 2px #050303, 0 0 20px rgb(255 140 40 / .75); } }
 .fp-go:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
 
@@ -143,7 +143,7 @@
   .fp-q details[open]::details-content { block-size: auto; }
 }
 
-/* ---------- Gromaur : le comptoir, en pierre noire polie ---------- */
+/* ---------- Volkar : le comptoir, en pierre noire polie ---------- */
 .gm { position: relative; }
 /* la lueur de la forge, derrière le comptoir (hors du texte) */
 .gm::before { content: ""; position: absolute; z-index: -1; left: -18%; right: -18%; top: 30px; bottom: -40px; pointer-events: none; background: radial-gradient(closest-side, rgb(255 110 40 / .09), rgb(255 110 40 / 0)); }
@@ -210,7 +210,7 @@
 .gm-txt a { color: var(--gold); }
 .gm-accueil .gm-txt p { white-space: normal; }
 
-/* « Gromaur réfléchit… » : trois braises, et le médaillon qui chauffe */
+/* « Volkar réfléchit… » : trois braises, et le médaillon qui chauffe */
 .gm-pense { display: inline-flex; align-items: center; gap: 10px; color: #dccabd; font-size: 15px; }
 .gm-pense i { display: inline-flex; gap: 4px; }
 .gm-pense i::before, .gm-pense i::after, .gm-pense b { content: ""; width: 6px; height: 6px; background: var(--ember); box-shadow: 0 0 8px var(--ember); animation: braise 1.1s step-end infinite; }

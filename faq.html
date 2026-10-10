@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="Les questions qu'on nous pose le plus sur le serveur Minecraft The Last, et Gromaur, le tavernier, un assistant IA qui répond au reste à partir de ce que l'équipe lui a appris.">
+  <meta name="description" content="Les questions qu'on nous pose le plus sur le serveur Minecraft The Last, et Volkar, le tavernier, un assistant IA qui répond au reste à partir de ce que l'équipe lui a appris.">
   <meta property="og:title" content="FAQ — The Last">
-  <meta property="og:description" content="Les questions qu'on nous pose le plus, et Gromaur, le tavernier, pour tout le reste.">
+  <meta property="og:description" content="Les questions qu'on nous pose le plus, et Volkar, le tavernier, pour tout le reste.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://thelastmc.fr/faq">
   <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
@@ -52,9 +52,9 @@
       <div class="fp-intro">
         <h1 class="px" data-fs="6">Questions</h1>
         <div class="fp-intro-bas">
-          <p class="sub">Les réponses aux questions qu'on nous pose le plus. Pour tout le reste, Gromaur, le tavernier,
+          <p class="sub">Les réponses aux questions qu'on nous pose le plus. Pour tout le reste, Volkar, le tavernier,
             t'attend juste en dessous.</p>
-          <a class="btn fp-go" href="#gromaur"><img src="assets/gromaur-128.png" alt="" width="30" height="30">Demande à Gromaur</a>
+          <a class="btn fp-go" href="#volkar"><img src="assets/gromaur-128.png" alt="" width="30" height="30">Demande à Volkar</a>
         </div>
       </div>
 
@@ -103,24 +103,24 @@
         </div>
       </section>
 
-      <!-- Gromaur : l'assistant IA. Il ne contacte aucun service tant qu'on ne touche pas au chat (voir faq.js). -->
-      <section class="fq-bloc gm" id="gromaur" aria-labelledby="t-gm">
-        <h2 class="px fq-t fp-t fp-t-gm" id="t-gm" data-fs="3">Demande à Gromaur</h2>
+      <!-- Volkar : l'assistant IA. Il ne contacte aucun service tant qu'on ne touche pas au chat (voir faq.js). -->
+      <section class="fq-bloc gm" id="volkar" aria-labelledby="t-gm">
+        <h2 class="px fq-t fp-t fp-t-gm" id="t-gm" data-fs="3">Demande à Volkar</h2>
 
         <div class="gm-box">
           <div class="gm-head">
             <span class="fp-medal"><img class="gm-av" src="assets/gromaur-128.png" alt="" width="56" height="56"></span>
-            <p class="gm-id"><span class="gm-nom">Gromaur</span> <span class="gm-ia" title="Intelligence artificielle">IA</span>
+            <p class="gm-id"><span class="gm-nom">Volkar</span> <span class="gm-ia" title="Intelligence artificielle">IA</span>
               <span class="gm-role">Le tavernier, assistant IA de The Last</span></p>
             <p class="gm-pill" id="gm-pill" hidden><i aria-hidden="true"></i>Bientôt</p>
             <button class="btn btn-sm gm-new" id="gm-new" type="button" hidden>Nouvelle conversation</button>
           </div>
 
-          <div class="gm-log" id="gm-log" role="log" aria-label="Conversation avec Gromaur">
+          <div class="gm-log" id="gm-log" role="log" aria-label="Conversation avec Volkar">
             <div class="gm-msg gm-bot gm-accueil">
-              <p class="gm-de"><span class="sr">Gromaur, IA&nbsp;:</span><span aria-hidden="true">Gromaur · IA</span></p>
+              <p class="gm-de"><span class="sr">Volkar, IA&nbsp;:</span><span aria-hidden="true">Volkar · IA</span></p>
               <div class="gm-txt">
-                <p>Salut, voyageur&nbsp;! Moi, c'est Gromaur, le tavernier. Attention&nbsp;: je suis une
+                <p>Salut, voyageur&nbsp;! Moi, c'est Volkar, le tavernier. Attention&nbsp;: je suis une
                   <strong>intelligence artificielle</strong>. Je ne connais que ce que l'équipe m'a appris sur The Last,
                   et je peux me tromper.</p>
                 <p class="gm-invite">Pose ta question ou choisis-en une ci-dessous. Si je ne sais pas, je te dirai où trouver un humain
@@ -129,12 +129,12 @@
             </div>
           </div>
 
-          <div class="gm-sugg" id="gm-sugg" role="group" aria-label="Questions à poser à Gromaur" hidden></div>
+          <div class="gm-sugg" id="gm-sugg" role="group" aria-label="Questions à poser à Volkar" hidden></div>
 
           <form class="gm-form" id="gm-form" hidden>
-            <label class="sr" for="gm-q">Ta question à Gromaur</label>
+            <label class="sr" for="gm-q">Ta question à Volkar</label>
             <textarea id="gm-q" name="q" rows="2" maxlength="500" enterkeyhint="send" autocomplete="off" spellcheck="true"
-              placeholder="Pose ta question à Gromaur…" aria-describedby="gm-aide gm-mention"></textarea>
+              placeholder="Pose ta question à Volkar…" aria-describedby="gm-aide gm-mention"></textarea>
             <div class="gm-bar">
               <span class="gm-aide" id="gm-aide">Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 500 caractères au plus.</span>
               <span class="gm-compte" id="gm-compte" aria-hidden="true">0 / 500</span>
@@ -143,10 +143,10 @@
             </div>
           </form>
 
-          <p class="gm-mention" id="gm-mention">Gromaur est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
+          <p class="gm-mention" id="gm-mention">Volkar est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
             font foi. N'écris aucune donnée personnelle. Tes questions sont envoyées à Cloudflare et Anthropic (États-Unis)
-            pour générer la réponse, sans être enregistrées par nous. <a href="/confidentialite#gromaur">Détails</a></p>
-          <noscript><p class="gm-mention">Gromaur a besoin de JavaScript pour te répondre. Le Discord, lui, marche sans.</p></noscript>
+            pour générer la réponse, sans être enregistrées par nous. <a href="/confidentialite#volkar">Détails</a></p>
+          <noscript><p class="gm-mention">Volkar a besoin de JavaScript pour te répondre. Le Discord, lui, marche sans.</p></noscript>
         </div>
 
         <p class="gm-humain">Tu préfères un humain&nbsp;? <a class="btn btn-sm" href="discord/">Parler à l'équipe sur le Discord</a></p>

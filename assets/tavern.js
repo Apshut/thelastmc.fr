@@ -741,7 +741,7 @@ function Engine(canvas, imgs, opts) {
     if (b < 1) {
       out = { rot: {}, root: {}, glow: lerp(kFrom.glow, cur.glow, b) };
       for (const n in kRest) out.rot[n] = slerpE(kFrom.rot[n], cur.rot[n], b);
-      // le tavernier peut fondre lui-même certaines parties (Gromaur : les bras, par positions plutôt que par angles)
+      // le tavernier peut fondre lui-même certaines parties (Volkar : les bras, par positions plutôt que par angles)
       let own = null;
       if (KEEPER.blend) try { own = KEEPER.blend(kFrom.rot, cur.rot, b); } catch (e) { if (!kErr++ && window.console) console.error(e); }
       if (own) for (const n in own) if (n in kRest && Array.isArray(own[n])) out.rot[n] = own[n];

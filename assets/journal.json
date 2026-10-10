@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Le tavernier et l'assistant de la FAQ s'appellent désormais Volkar.",
+   "d": "2026-10-10T17:56:14.000Z"
+  },
+  {
+   "p": "site",
    "t": "La page FAQ a sa forge : une enclume en 3D en toile de fond, et des questions numérotées, plus lisibles.",
    "d": "2026-10-09T22:49:19.000Z"
   },

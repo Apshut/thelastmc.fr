@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Un bouton de compte avec ta tête de joueur arrive en haut à droite du site ; la connexion ouvrira avec le launcher.",
+   "d": "2026-10-10T22:24:41.000Z"
+  },
+  {
+   "p": "site",
    "t": "La FAQ a un sommaire dans la marge de gauche, sous une lanterne d'âme qui s'allume quand on lit.",
    "d": "2026-10-10T18:59:04.000Z"
   },

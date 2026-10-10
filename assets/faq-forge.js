@@ -5,6 +5,8 @@
    La scène est décorative (aria-hidden) : elle s'arrête quand l'onglet est caché ou qu'elle sort de l'écran, et se fige
    avec prefers-reduced-motion. Un clic dans la forge fait jaillir des étincelles. Sur grand écran (1200 px et plus), elle
    reste en toile de fond fixe et se range dans la marge de droite quand on descend lire ; plus petit, elle reste en tête.
+   Pendant la lecture, la marge de gauche montre une lanterne d'âme qui s'allume (un objet de la forge, placé selon
+   l'écran) et, dessous, le sommaire des questions (HTML, dans la mise en page plus bas).
    La forge suit Volkar sans toucher à faq.js : elle regarde le fil du chat (« Volkar réfléchit » = elle s'active).
    Essais : ?shot=1 (image figée) &t=6 &y=<px> (défilement) &ouvre=<n> (question n ouverte) &gm=1 (cadré sur Volkar)
    &etat=pense (« Volkar réfléchit », figé, sans réseau) ; ?fps=1 (coût par image) ; ?nogl=1 (sans 3D : l'image de
@@ -151,6 +153,67 @@ function anvil(a, cx, cy, cz) {
   part(0, 10, 3, 16, 16, 13, true);
 }
 
+/* les formes du jeu faites de quads libres (boîtes de modèle, chaînes, lanternes) : q(points, texture, uv, options) les
+   reçoit, light(x, y, z, niveau, canal) la lumière qu'elles émettent. La forge s'en sert, la lanterne de lecture aussi. */
+function formes(q, light) {
+  const f = {
+    /* boîte aux faces texturées à la manière des modèles de blocs du jeu (uv en texels 0..16) ; tex : nom ou {up, side, down} */
+    mbox(x0, y0, z0, x1, y1, z1, tex, fc, o) {
+      const T = typeof tex === 'string' ? { up: tex, side: tex, down: tex } : tex, s = fc.side, e = fc.end || s;
+      q([[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], T.up, fc.up, o);
+      q([[x0, y0, z1], [x1, y0, z1], [x1, y0, z0], [x0, y0, z0]], T.down, fc.down, o);
+      q([[x1, y1, z0], [x0, y1, z0], [x0, y0, z0], [x1, y0, z0]], T.side, s, o);
+      q([[x0, y1, z1], [x1, y1, z1], [x1, y0, z1], [x0, y0, z1]], T.side, s, o);
+      q([[x0, y1, z0], [x0, y1, z1], [x0, y0, z1], [x0, y0, z0]], T.side, e, o);
+      q([[x1, y1, z1], [x1, y1, z0], [x1, y0, z0], [x1, y0, z1]], T.side, e, o);
+    },
+    chain(cx, by, cz) {
+      const s = 1 / 16, c45 = Math.SQRT1_2, rot = (u, w) => [cx + (u - 8) * s * c45 - (w - 8) * s * c45, cz + (u - 8) * s * c45 + (w - 8) * s * c45];
+      for (let y = by; y < CEIL; y += 1) {
+        const top = Math.min(CEIL, y + 1), v0 = 16 - (top - y) * 16;
+        const p1 = rot(6.5, 8), p2 = rot(9.5, 8), p3 = rot(8, 6.5), p4 = rot(8, 9.5);
+        q([[p1[0], top, p1[1]], [p2[0], top, p2[1]], [p2[0], y, p2[1]], [p1[0], y, p1[1]]], 'iron_chain', [0, v0, 3, 16], {});
+        q([[p3[0], top, p3[1]], [p4[0], top, p4[1]], [p4[0], y, p4[1]], [p3[0], y, p3[1]]], 'iron_chain', [3, v0, 6, 16], {});
+      }
+    },
+    /* lanterne du jeu (template_hanging_lantern), avec sa chaîne jusqu'au plafond */
+    lantern(cx, by, cz, tex, hanging, l, ch) {
+      const s = 1 / 16, X = v => cx - .5 + v * s, Y = v => by + v * s, Z = v => cz - .5 + v * s, o = { emit: 1 }, y0 = hanging ? 1 : 0;
+      f.mbox(X(5), Y(y0), Z(5), X(11), Y(y0 + 7), Z(11), tex, { up: [0, 9, 6, 15], down: [0, 9, 6, 15], side: [0, 2, 6, 9] }, o);
+      f.mbox(X(6), Y(y0 + 7), Z(6), X(10), Y(y0 + 9), Z(10), tex, { up: [1, 10, 5, 14], down: [1, 10, 5, 14], side: [1, 0, 5, 2] }, o);
+      const c45 = Math.SQRT1_2, rot = (u, w) => [cx + (u - 8) * s * c45 - (w - 8) * s * c45, cz + (u - 8) * s * c45 + (w - 8) * s * c45];
+      const plane = (u0, w0, u1, w1, ya, yb, uv) => { const p = rot(u0, w0), r = rot(u1, w1); q([[p[0], Y(yb), p[1]], [r[0], Y(yb), r[1]], [r[0], Y(ya), r[1]], [p[0], Y(ya), p[1]]], tex, uv, o); };
+      if (hanging) { plane(6.5, 8, 9.5, 8, 11, 15, [11, 1, 14, 5]); plane(8, 6.5, 8, 9.5, 10, 16, [11, 6, 14, 12]); f.chain(cx, by + 1, cz); }
+      light(cx, by + .3, cz, l, ch);
+    }
+  };
+  return f;
+}
+
+/* un quad libre -> ses 4 sommets (format du maillage de la forge) ; lightAt(point, centre, normale) : ses 4 canaux de lumière */
+const dirShade = N => N[1] > .5 ? 1 : N[1] < -.5 ? .55 : Math.abs(N[2]) > .5 ? .84 : .68;
+function quadVerts(qd, lightAt, push) {
+  const p = qd.p, t = MC.blocks[qd.tex] || [0, 1], e = qd.o.emit || 0, uv = qd.uv;
+  const ax = p[1][0] - p[0][0], ay = p[1][1] - p[0][1], az = p[1][2] - p[0][2], bx = p[3][0] - p[0][0], by = p[3][1] - p[0][1], bz = p[3][2] - p[0][2];
+  let nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx; const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
+  const c0 = [(p[0][0] + p[2][0]) / 2, (p[0][1] + p[2][1]) / 2, (p[0][2] + p[2][2]) / 2];
+  const both = Math.abs(ny) < .5 && !qd.o.oneSide;
+  const Nn = both ? [0, 0, 0] : [nx, ny, nz], ds = both ? .9 : dirShade([nx, ny, nz]);
+  const UV = Array.isArray(uv[0]) ? uv : [[uv[0], uv[1]], [uv[2], uv[1]], [uv[2], uv[3]], [uv[0], uv[3]]];
+  const sh = ds * (qd.o.shade || 1);
+  for (let k = 0; k < 4; k++) push(p[k][0], p[k][1], p[k][2], UV[k][0] / 16, UV[k][1] / 16, t, lightAt(p[k], c0, Nn), sh, e);
+}
+
+/* la lanterne de lecture (grand écran, marge de gauche) : une lanterne d'âme à sa chaîne, posée en (x, y, z) (centre de
+   sa cage), en triangles. Rien n'y est cuit : la lumière mobile du shader (uPL) l'éclaire, elle et le mur derrière. */
+function lanterneLecture(x, y, z) {
+  const quads = [], out = [], v = [], Z4 = [0, 0, 0, 0];
+  formes((p, tex, uv, o) => quads.push({ p, tex, uv: uv || [0, 0, 16, 16], o: o || {} }), () => {}).lantern(x, y - .3, z, 'soul_lantern', true);
+  const push = (px, py, pz, u, w, t, l, sh, e) => v.push([px, py, pz, u, w, t[0], t[1], l[0], l[1], l[2], l[3], sh, e]);
+  quads.forEach(qd => { v.length = 0; quadVerts(qd, () => Z4, push); [0, 1, 2, 0, 2, 3].forEach(k => out.push(...v[k])); });
+  return new Float32Array(out);
+}
+
 function buildForge() {
   const N = WX * WY * WZ, vox = new Uint8Array(N), lit = [0, 1, 2, 3].map(() => new Uint8Array(N)), R = rng(2026);
   const inb = (x, y, z) => x >= -OX && x < WX - OX && y >= 0 && y < WY && z >= -OZ && z < WZ - OZ;
@@ -169,37 +232,9 @@ function buildForge() {
     },
     box(x0, y0, z0, x1, y1, z1, tex, o) { boxes.push({ a: [x0, y0, z0], b: [x1, y1, z1], tex, o: o || {} }); },
     cross(x, y, z, tex, o) { [[0, 0, 1, 1], [0, 1, 1, 0]].forEach(d => q([[x + d[0], y + 1, z + d[1]], [x + d[2], y + 1, z + d[3]], [x + d[2], y, z + d[3]], [x + d[0], y, z + d[1]]], tex, null, o)); },
-    light(x, y, z, l, ch) { lights.push([Math.floor(x), Math.floor(y), Math.floor(z), l, ch || 0]); },
-    /* boîte aux faces texturées à la manière des modèles de blocs du jeu (uv en texels 0..16) ; tex : nom ou {up, side, down} */
-    mbox(x0, y0, z0, x1, y1, z1, tex, f, o) {
-      const T = typeof tex === 'string' ? { up: tex, side: tex, down: tex } : tex, s = f.side, e = f.end || s;
-      q([[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], T.up, f.up, o);
-      q([[x0, y0, z1], [x1, y0, z1], [x1, y0, z0], [x0, y0, z0]], T.down, f.down, o);
-      q([[x1, y1, z0], [x0, y1, z0], [x0, y0, z0], [x1, y0, z0]], T.side, s, o);
-      q([[x0, y1, z1], [x1, y1, z1], [x1, y0, z1], [x0, y0, z1]], T.side, s, o);
-      q([[x0, y1, z0], [x0, y1, z1], [x0, y0, z1], [x0, y0, z0]], T.side, e, o);
-      q([[x1, y1, z1], [x1, y1, z0], [x1, y0, z0], [x1, y0, z1]], T.side, e, o);
-    },
-    chain(cx, by, cz) {
-      const s = 1 / 16, c45 = Math.SQRT1_2, rot = (u, w) => [cx + (u - 8) * s * c45 - (w - 8) * s * c45, cz + (u - 8) * s * c45 + (w - 8) * s * c45];
-      for (let y = by; y < CEIL; y += 1) {
-        const top = Math.min(CEIL, y + 1), v0 = 16 - (top - y) * 16;
-        const p1 = rot(6.5, 8), p2 = rot(9.5, 8), p3 = rot(8, 6.5), p4 = rot(8, 9.5);
-        q([[p1[0], top, p1[1]], [p2[0], top, p2[1]], [p2[0], y, p2[1]], [p1[0], y, p1[1]]], 'iron_chain', [0, v0, 3, 16], {});
-        q([[p3[0], top, p3[1]], [p4[0], top, p4[1]], [p4[0], y, p4[1]], [p3[0], y, p3[1]]], 'iron_chain', [3, v0, 6, 16], {});
-      }
-    },
-    /* lanterne du jeu (template_hanging_lantern), avec sa chaîne jusqu'au plafond */
-    lantern(cx, by, cz, tex, hanging, l, ch) {
-      const s = 1 / 16, X = v => cx - .5 + v * s, Y = v => by + v * s, Z = v => cz - .5 + v * s, o = { emit: 1 }, y0 = hanging ? 1 : 0;
-      a.mbox(X(5), Y(y0), Z(5), X(11), Y(y0 + 7), Z(11), tex, { up: [0, 9, 6, 15], down: [0, 9, 6, 15], side: [0, 2, 6, 9] }, o);
-      a.mbox(X(6), Y(y0 + 7), Z(6), X(10), Y(y0 + 9), Z(10), tex, { up: [1, 10, 5, 14], down: [1, 10, 5, 14], side: [1, 0, 5, 2] }, o);
-      const c45 = Math.SQRT1_2, rot = (u, w) => [cx + (u - 8) * s * c45 - (w - 8) * s * c45, cz + (u - 8) * s * c45 + (w - 8) * s * c45];
-      const plane = (u0, w0, u1, w1, ya, yb, uv) => { const p = rot(u0, w0), r = rot(u1, w1); q([[p[0], Y(yb), p[1]], [r[0], Y(yb), r[1]], [r[0], Y(ya), r[1]], [p[0], Y(ya), p[1]]], tex, uv, o); };
-      if (hanging) { plane(6.5, 8, 9.5, 8, 11, 15, [11, 1, 14, 5]); plane(8, 6.5, 8, 9.5, 10, 16, [11, 6, 14, 12]); a.chain(cx, by + 1, cz); }
-      a.light(cx, by + .3, cz, l, ch);
-    }
+    light(x, y, z, l, ch) { lights.push([Math.floor(x), Math.floor(y), Math.floor(z), l, ch || 0]); }
   };
+  Object.assign(a, formes(q, a.light));
   forge(a);
   anvil(a, AX, 1, AZ);
 
@@ -228,7 +263,6 @@ function buildForge() {
     buf[n++] = x; buf[n++] = y; buf[n++] = z; buf[n++] = u; buf[n++] = v; buf[n++] = t[0]; buf[n++] = t[1];
     buf[n++] = l[0]; buf[n++] = l[1]; buf[n++] = l[2]; buf[n++] = l[3]; buf[n++] = sh; buf[n++] = e;
   };
-  const dirShade = N => N[1] > .5 ? 1 : N[1] < -.5 ? .55 : Math.abs(N[2]) > .5 ? .84 : .68;
   for (let y = 0; y < WY; y++) for (let z = -OZ; z < WZ - OZ; z++) for (let x = -OX; x < WX - OX; x++) {
     const id = vox[ix(x, y, z)]; if (!id) continue;
     const b = BL[id];
@@ -279,18 +313,7 @@ function buildForge() {
       flips.push(0); nq++;
     }
   });
-  quads.forEach(qd => {
-    const p = qd.p, t = MC.blocks[qd.tex] || [0, 1], e = qd.o.emit || 0, uv = qd.uv;
-    const ax = p[1][0] - p[0][0], ay = p[1][1] - p[0][1], az = p[1][2] - p[0][2], bx = p[3][0] - p[0][0], by = p[3][1] - p[0][1], bz = p[3][2] - p[0][2];
-    let nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx; const l = Math.hypot(nx, ny, nz) || 1; nx /= l; ny /= l; nz /= l;
-    const c0 = [(p[0][0] + p[2][0]) / 2, (p[0][1] + p[2][1]) / 2, (p[0][2] + p[2][2]) / 2];
-    const both = Math.abs(ny) < .5 && !qd.o.oneSide;
-    const Nn = both ? [0, 0, 0] : [nx, ny, nz], ds = both ? .9 : dirShade([nx, ny, nz]);
-    const UV = Array.isArray(uv[0]) ? uv : [[uv[0], uv[1]], [uv[2], uv[1]], [uv[2], uv[3]], [uv[0], uv[3]]];
-    const sh = ds * (qd.o.shade || 1);
-    for (let k = 0; k < 4; k++) push(p[k][0], p[k][1], p[k][2], UV[k][0] / 16, UV[k][1] / 16, t, cornerLight(p[k], c0, Nn), sh, e);
-    flips.push(0); nq++;
-  });
+  quads.forEach(qd => { quadVerts(qd, cornerLight, push); flips.push(0); nq++; });
   const idxs = new Uint32Array(nq * 6);
   for (let i = 0; i < nq; i++) { const o = i * 4, k = i * 6; if (flips[i]) { idxs[k] = o + 1; idxs[k + 1] = o + 2; idxs[k + 2] = o + 3; idxs[k + 3] = o + 1; idxs[k + 4] = o + 3; idxs[k + 5] = o; } else { idxs[k] = o; idxs[k + 1] = o + 1; idxs[k + 2] = o + 2; idxs[k + 3] = o; idxs[k + 4] = o + 2; idxs[k + 5] = o + 3; } }
   return { verts: buf.subarray(0, n), idxs, quads: nq, light: (x, y, z) => { const X = Math.floor(x), Y = Math.floor(y), Z = Math.floor(z); return [0, 1, 2, 3].map(c => blv(lv(c, X, Y, Z))); } };
@@ -381,7 +404,7 @@ layout(location=0) in vec3 aPos; layout(location=1) in vec2 aUv; layout(location
 uniform mat4 uPV; out vec3 vPos; centroid out vec2 vUv; flat out vec2 vTex; out vec4 vL; out vec2 vS;
 void main() { vPos = aPos; vUv = aUv; vTex = aTex; vL = aL; vS = aS; gl_Position = uPV * vec4(aPos, 1.); }`;
 const FS_WORLD = HEAD + `
-uniform sampler2DArray uTex; uniform float uTime, uExp; uniform vec3 uAmb, uC0, uC1, uC2, uC3; uniform vec4 uK;
+uniform sampler2DArray uTex; uniform float uTime, uExp, uE; uniform vec3 uAmb, uC0, uC1, uC2, uC3, uPLc; uniform vec4 uK, uPL;
 in vec3 vPos; centroid in vec2 vUv; flat in vec2 vTex; in vec4 vL; in vec2 vS; out vec4 o;
 ${FOG}
 void main() {
@@ -389,8 +412,16 @@ void main() {
   if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + mod(floor(uTime * 20.), vTex.y)));
   else c = texture(uTex, vec3(vUv, vTex.x));
   if (c.a < .4) discard;
-  vec3 li = (uAmb + uC0 * (vL.x * uK.x) + uC1 * (vL.y * uK.y) + uC2 * (vL.z * uK.z) + uC3 * (vL.w * uK.w)) * vS.x;
-  float e = vS.y, f;
+  vec3 li = uAmb + uC0 * (vL.x * uK.x) + uC1 * (vL.y * uK.y) + uC2 * (vL.z * uK.z) + uC3 * (vL.w * uK.w);
+  // la lanterne de lecture : une lumière d'âme qui n'est pas cuite dans la forge (elle se pose selon l'écran) ;
+  // comme dans le jeu, elle baisse d'un cran par bloc, mesurée juste devant la face (uPL.w : sa portée, 0 = éteinte)
+  if (uPL.w > 0.) {
+    vec3 n = normalize(cross(dFdx(vPos), dFdy(vPos))); if (dot(n, uCam - vPos) < 0.) n = -n;
+    float l = clamp(1. - length(vPos + n * .45 - uPL.xyz) / uPL.w, 0., 1.);
+    li += uPLc * (l / (4. - 3. * l));
+  }
+  li *= vS.x;
+  float e = vS.y * uE, f;
   vec3 col = fogged(c.rgb * mix(li * uExp, vec3(1.12), e), vPos, f);
   o = vec4(col, e * e * (1. - f) * (.3 + dot(c.rgb, vec3(.5, .5, .2))));
 }`;
@@ -453,6 +484,7 @@ void main() {
 /* ================= Le moteur ================= */
 const AMB = [.022, .028, .055], LC = [[.62, .92, 1.32], [1.7, .56, .16], [1.8, .84, .3], [2.1, 1.0, .3]];
 const BG = [12 / 255, 7 / 255, 8 / 255], FXW = FXB + .5;  // FXW : centre du foyer, en coordonnées du monde
+const PL_R = 7, PL_K = 1.6;                               // la lanterne de lecture : portée de sa lumière (blocs), force
 function Engine(canvas, imgs, opts) {
   opts = opts || {};
   const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.still });
@@ -487,6 +519,13 @@ function Engine(canvas, imgs, opts) {
   const dyn = (attrs, stride) => { const vao = gl.createVertexArray(), b = gl.createBuffer(); gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER, b); attrs.forEach(a => { gl.enableVertexAttribArray(a[0]); gl.vertexAttribPointer(a[0], a[1], gl.FLOAT, false, stride, a[2]); }); return { vao, b, cap: 0 }; };
   const DE = dyn([[0, 3, 0], [1, 2, 12], [2, 4, 20], [3, 3, 36]], 48), DP = dyn([[0, 3, 0], [1, 4, 12]], 28), DG = dyn([[0, 3, 0], [1, 2, 12], [2, 4, 20]], 36);
   const upload = (d, arr, n) => { gl.bindVertexArray(d.vao); gl.bindBuffer(gl.ARRAY_BUFFER, d.b); if (n > d.cap) { d.cap = Math.max(n, d.cap * 2, 4096); gl.bufferData(gl.ARRAY_BUFFER, d.cap * 4, gl.DYNAMIC_DRAW); } if (n) gl.bufferSubData(gl.ARRAY_BUFFER, 0, arr.subarray(0, n)); };
+  /* la lanterne de lecture : son petit maillage, au format de la forge ; setLanterne la pose (ou la retire) */
+  const DL = dyn([[0, 3, 0], [1, 2, 12], [2, 2, 20], [3, 4, 28], [4, 2, 44]], 52);
+  let lant = null, nL = 0;
+  function setLanterne(p) {
+    lant = p ? p.slice() : null; nL = 0;
+    if (lant) { const v = lanterneLecture(lant[0], lant[1], lant[2]); upload(DL, v, v.length); nL = v.length / 13; }
+  }
   const vaoQuad = gl.createVertexArray(); gl.bindVertexArray(vaoQuad);
   { const qb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, qb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); }
   gl.bindVertexArray(null);
@@ -541,12 +580,13 @@ function Engine(canvas, imgs, opts) {
     return { x: ((m[0] * x + m[4] * y + m[8] * z + m[12]) / w * .5 + .5) * canvas.clientWidth, y: (1 - ((m[1] * x + m[5] * y + m[9] * z + m[13]) / w * .5 + .5)) * canvas.clientHeight };
   }
   /* safe : rectangle libre en coordonnées normalisées (-1..1) ; on cherche la distance qui y fait tenir le sujet */
-  function layout(safe, o) {
+  function layout(safe, o) { Object.assign(view, solve(safe, o)); }
+  function solve(safe, o) {
     o = o || {};
-    view.fov = o.fov || .44; view.pitch = o.pitch || .17; view.yaw = o.yaw === undefined ? .5 : o.yaw; view.T = o.T || [AX, 1.75, AZ];
-    const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight), dir = dirOf(view.yaw, view.pitch);
+    const v = { fov: o.fov || .44, pitch: o.pitch || .17, yaw: o.yaw === undefined ? .5 : o.yaw, T: o.T || [AX, 1.75, AZ] };
+    const asp = canvas.clientWidth / Math.max(1, canvas.clientHeight), dir = dirOf(v.yaw, v.pitch);
     const ext = d => {
-      const eye = [view.T[0] + dir[0] * d, view.T[1] + dir[1] * d, view.T[2] + dir[2] * d], PV = mmul(persp(view.fov, asp, .1, 120), look(eye, view.T).m);
+      const eye = [v.T[0] + dir[0] * d, v.T[1] + dir[1] * d, v.T[2] + dir[2] * d], PV = mmul(persp(v.fov, asp, .1, 120), look(eye, v.T).m);
       let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, bad = false;
       SUBJ.forEach(p => { const w = PV[3] * p[0] + PV[7] * p[1] + PV[11] * p[2] + PV[15]; if (w < .2) { bad = true; return; } const x = (PV[0] * p[0] + PV[4] * p[1] + PV[8] * p[2] + PV[12]) / w, y = (PV[1] * p[0] + PV[5] * p[1] + PV[9] * p[2] + PV[13]) / w; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
       return { x0, x1, y0, y1, bad };
@@ -554,9 +594,22 @@ function Engine(canvas, imgs, opts) {
     const sw = safe.x1 - safe.x0, sh = safe.y1 - safe.y0;
     let lo = 2, hi = 40;
     for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2, b = ext(mid); if (!b.bad && b.x1 - b.x0 <= sw && b.y1 - b.y0 <= sh) hi = mid; else lo = mid; }
-    view.d = Math.min(hi, o.maxD || 40);
-    const b = ext(view.d);
-    view.sx = (safe.x0 + safe.x1) / 2 - (b.x0 + b.x1) / 2; view.sy = (safe.y0 + safe.y1) / 2 - (b.y0 + b.y1) / 2;
+    v.d = Math.min(hi, o.maxD || 40);
+    const b = ext(v.d);
+    v.sx = (safe.x0 + safe.x1) / 2 - (b.x0 + b.x1) / 2; v.sy = (safe.y0 + safe.y1) / 2 - (b.y0 + b.y1) / 2;
+    return v;
+  }
+  /* la lanterne de lecture : le point que la vue (safe, o) montre au pixel (px, py) CSS, à 0,8 bloc du mur de gauche.
+     null s'il tombe hors de la pièce : sur une marge étroite, la caméra recule tant qu'on y verrait le dehors. */
+  const LX = -7.2;
+  function place(safe, o, px, py) {
+    const v = solve(safe, o), cw = canvas.clientWidth, ch = Math.max(1, canvas.clientHeight), dir = dirOf(v.yaw, v.pitch);
+    const eye = [v.T[0] + dir[0] * v.d, v.T[1] + dir[1] * v.d, v.T[2] + dir[2] * v.d], V = look(eye, v.T), t = Math.tan(v.fov / 2);
+    const X = (px / cw * 2 - 1 - v.sx) * t * cw / ch, Y = (1 - py / ch * 2 - v.sy) * t;
+    const r = [0, 1, 2].map(i => -dir[i] + V.right[i] * X + V.up[i] * Y);
+    if (r[0] > -.05) return null;
+    const k = (LX - eye[0]) / r[0], p = [LX, eye[1] + r[1] * k, eye[2] + r[2] * k];
+    return p[2] > -4.5 && p[2] < 6.8 && p[1] > 2.3 && p[1] < 6.2 ? p : null;
   }
   function camera(t, st) {
     const asp = W / H, par = st.par || { x: 0, y: 0 };
@@ -610,7 +663,7 @@ function Engine(canvas, imgs, opts) {
 
   /* ---------- halos : la bouche du foyer derrière l'enclume, le lingot ---------- */
   const gdata = new Float32Array(9 * 6 * 8);
-  function glows(t, kt, kIngot) {
+  function glows(t, kt, kIngot, kL) {
     let k = 0;
     const R = cam.right, U = cam.up;
     const add = (p, s, col, al) => {
@@ -620,6 +673,7 @@ function Engine(canvas, imgs, opts) {
     add([FXW, 1.9, -2.6], 2.8, [1, .42, .1], .24 * kt);
     add([FXW, 1.5, -3.4], 1.4, [1, .62, .22], .3 * kt);
     add([INGOT_AT[0], INGOT_AT[1] + .1, INGOT_AT[2]], .55, [1, .62, .25], .32 * kIngot);
+    if (lant && kL > .003) { add(lant, .7, [.35, .62, 1], .14 * kL); add(lant, 2.2, [.3, .55, 1], .045 * kL); }   // la lanterne de lecture
     upload(DG, gdata, k);
     return k / 9;
   }
@@ -648,7 +702,8 @@ function Engine(canvas, imgs, opts) {
     camera(t, st);
     upload(DE, S.f, S.n);
     NP[0] = 0; if (!st.still) particles(t, dt, NP);
-    const NG = glows(t, KT[2], KT[3]);
+    const kL = lant ? clamp(st.kL || 0, 0, 1) : 0;
+    const NG = glows(t, KT[2], KT[3], kL);
     if (st.sim) return;                                    // image d'essai : on fait vivre les étincelles sans dessiner
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbScene); gl.viewport(0, 0, W, H);
@@ -656,8 +711,12 @@ function Engine(canvas, imgs, opts) {
     gl.clearColor(BG[0], BG[1], BG[2], 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     common(P.world);
     gl.uniform3fv(P.world.u.uAmb, AMB); gl.uniform3fv(P.world.u.uC0, LC[0]); gl.uniform3fv(P.world.u.uC1, LC[1]); gl.uniform3fv(P.world.u.uC2, LC[2]); gl.uniform3fv(P.world.u.uC3, LC[3]); gl.uniform4fv(P.world.u.uK, KT);
+    const IL = PL_K * kL * KT[0];                         // la lanterne de lecture s'allume avec la lecture, et vacille comme les autres
+    gl.uniform4f(P.world.u.uPL, lant ? lant[0] : 0, lant ? lant[1] : 0, lant ? lant[2] : 0, kL > .003 ? PL_R : 0);
+    gl.uniform3f(P.world.u.uPLc, LC[0][0] * IL, LC[0][1] * IL, LC[0][2] * IL); gl.uniform1f(P.world.u.uE, 1);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, texArr); gl.uniform1i(P.world.u.uTex, 0);
     gl.bindVertexArray(vaoRoom); gl.drawElements(gl.TRIANGLES, nIdx, gl.UNSIGNED_INT, 0);
+    if (nL && kL > .003) { gl.uniform1f(P.world.u.uE, kL); gl.bindVertexArray(DL.vao); gl.drawArrays(gl.TRIANGLES, 0, nL); }
     common(P.ent); gl.uniform1i(P.ent.u.uSkin, 0); gl.bindVertexArray(DE.vao); gl.bindTexture(gl.TEXTURE_2D, texObj);
     if (r2) gl.drawArrays(gl.TRIANGLES, 0, r2 / 12);
     gl.enable(gl.BLEND); gl.depthMask(false); gl.blendFunc(gl.ONE, gl.ONE);
@@ -685,7 +744,7 @@ function Engine(canvas, imgs, opts) {
   }
   function strike(n) { heat = Math.min(1, heat + .7); burst(n || 22, 1.25); }
   function setPense(b, sansCoup) { if (b === pense) return; pense = b; nextBurst = 0; if (!b && !sansCoup) strike(26); }   // la réponse arrive : un dernier coup
-  return { frame, layout, project, strike, setPense, info: () => Object.assign({ d: +view.d.toFixed(2) }, info) };
+  return { frame, layout, place, setLanterne, project, strike, setPense, info: () => Object.assign({ d: +view.d.toFixed(2), lanterne: lant && lant.map(v => +v.toFixed(2)) }, info) };
 }
 
 /* ================= La mise en page (indépendante de la 3D) ================= */
@@ -719,6 +778,67 @@ $$('.fp-q details').forEach(d => d.addEventListener('toggle', () => {
   d.classList.remove('fp-chauffe');
   if (d.open && !REDUCE) { void d.offsetWidth; d.classList.add('fp-chauffe'); }
 }));
+
+/* ---------- le sommaire (marge de gauche, 1200 px et plus) ----------
+   Il arrive quand on descend (la tête de page qui sort de l'écran, comme la forge), allume l'entrée de la partie qu'on lit,
+   et un clic sur une question la fait défiler ET l'ouvre. Il remonte au besoin pour ne jamais toucher le pied de page.
+   Tout se mesure avec getBoundingClientRect : le défilement simulé des images d'essai garde window.scrollY à 0. */
+{
+  const nav = $('#sm'), hero = $('#fp-scene'), foot = $('.fq-foot');
+  if (nav) {
+    const MQ = matchMedia('(min-width: 1200px)'), links = $$('.sm-l a', nav), cibles = links.map(a => D.getElementById(a.getAttribute('href').slice(1)));
+    $$('.sm-n[data-n]', nav).forEach(el => { if (MC.font['0']) { el.textContent = ''; el.appendChild(pxNum(el.dataset.n)); } });
+    let actif = -1, choix = -1, choixFin = 0;
+    const maj = () => {
+      if (!MQ.matches) return;
+      const H = innerHeight;
+      let o = 1;
+      if (hero) { const r = hero.getBoundingClientRect(), p = clamp(-r.top / ((r.height || 1) * .9), 0, 1); o = clamp((p - .45) / .4, 0, 1); }
+      nav.style.setProperty('--sm-o', o.toFixed(3));
+      nav.classList.toggle('on', o > .6);
+      // le pied de page : le sommaire remonte pour ne jamais le toucher (et ne monte jamais sous l'en-tête)
+      nav.style.setProperty('--sm-dy', '0px');
+      const b = nav.getBoundingClientRect();
+      let dy = 0;
+      if (foot) { const ft = foot.getBoundingClientRect().top; if (b.bottom > ft - 28) dy = ft - 28 - b.bottom; }
+      if (b.top + dy < 84) dy = 84 - b.top;
+      nav.style.setProperty('--sm-dy', dy.toFixed(0) + 'px');
+      // la partie qu'on lit : celle qui couvre la ligne de lecture (35 % de l'écran) ; entre deux, la dernière passée ;
+      // tout en bas, Volkar ; juste après un clic, l'entrée choisie (même si la page ne peut pas descendre jusqu'à elle)
+      const ligne = H * .35;
+      let i = -1, dans = -1;
+      cibles.forEach((c, k) => { if (!c) return; const r = c.getBoundingClientRect(); if (r.top <= ligne) { i = k; if (r.bottom > ligne) dans = k; } });
+      if (dans >= 0) i = dans;
+      if (foot && foot.getBoundingClientRect().top < H - 4) i = cibles.length - 1;
+      if (choix >= 0 && performance.now() < choixFin) i = choix;
+      if (i !== actif) {
+        if (actif >= 0) links[actif].removeAttribute('aria-current');
+        if (i >= 0) links[i].setAttribute('aria-current', 'location');
+        actif = i;
+      }
+    };
+    addEventListener('scroll', maj, { passive: true });
+    addEventListener('resize', maj);
+    MQ.addEventListener('change', maj);
+    addEventListener('load', maj);
+    if (D.fonts && D.fonts.ready) D.fonts.ready.then(maj);
+    $$('.fp-q details').forEach(d => d.addEventListener('toggle', maj));
+    maj();
+    ['wheel', 'touchstart', 'keydown'].forEach(t => addEventListener(t, () => { choix = -1; }, { passive: true }));   // on reprend la main
+    // un clic : la question s'ouvre, puis on y va ; le focus passe sur son intitulé (le clavier continue de là)
+    links.forEach((a, k) => a.addEventListener('click', e => {
+      const c = cibles[k]; if (!c) return;
+      e.preventDefault();
+      choix = k; choixFin = performance.now() + 1600; setTimeout(maj, 1650);
+      if (c.tagName === 'DETAILS') c.open = true;
+      maj();
+      c.scrollIntoView({ block: 'start', behavior: REDUCE ? 'auto' : 'smooth' });
+      const f = c.tagName === 'DETAILS' ? c.querySelector('summary') : c.querySelector('h2');
+      if (f) { if (f.tagName === 'H2' && !f.hasAttribute('tabindex')) f.setAttribute('tabindex', '-1'); f.focus({ preventScroll: true }); }
+      history.replaceState(null, '', location.pathname + location.search + '#' + c.id);
+    }));
+  }
+}
 
 /* la forge suit Volkar : « Volkar réfléchit » affiché = pense ; puis la réponse (fin) ou une erreur */
 const gmLog = $('#gm-log');
@@ -798,20 +918,37 @@ function relayout() {
     const Hh = fond ? hero.clientHeight : H;                                   // la tête de page
     const c = W / 2 + Math.min(W * .12, 230), half = Math.min(W * .2, 330);
     a = { x0: c - half, x1: c + half, y0: Hh * .88, y1: Math.max(84, Hh * .3) };
-    if (fond && prog > 0) {                                                     // la marge de droite, à côté de la colonne
+    if (fond) {                                                                 // la lecture : la marge de droite, à côté de la colonne
       const colR = (W + Math.min(820, W - 32)) / 2, m = Math.min(72, (W - colR) * .16);
       // l'enclume à gauche de la marge ; la caméra tourne pour que la bouche du foyer brûle à sa droite, dans la marge
       const mw = W - colR - 2 * m, b = { x0: colR + m, x1: colR + m + mw * .58, y0: H * .7, y1: H * .42 }, k = ease(prog);
-      a = { x0: lerp(a.x0, b.x0, k), x1: lerp(a.x1, b.x1, k), y0: lerp(a.y0, b.y0, k), y1: lerp(a.y1, b.y1, k) };
-      if (!(CAM.length === 3 && CAM.every(isFinite))) { o.yaw = lerp(o.yaw, .56, k); o.pitch = lerp(o.pitch, .1, k); }
-    }
+      lanterne(W, H, { x0: nx(b.x0), x1: nx(b.x1), y0: ny(b.y0), y1: ny(b.y1) });
+      if (prog > 0) {
+        a = { x0: lerp(a.x0, b.x0, k), x1: lerp(a.x1, b.x1, k), y0: lerp(a.y0, b.y0, k), y1: lerp(a.y1, b.y1, k) };
+        if (!(CAM.length === 3 && CAM.every(isFinite))) { o.yaw = lerp(o.yaw, LECT.yaw, k); o.pitch = lerp(o.pitch, LECT.pitch, k); }
+      }
+    } else lanterne(W, H, null);
   }
   eng.layout({ x0: nx(a.x0), x1: nx(a.x1), y0: ny(a.y0), y1: ny(a.y1) }, o);
   dirty = true;
 }
+/* la lanterne de lecture, dans la marge de gauche de la vue de lecture (une fois par taille d'écran) : une lanterne d'âme
+   qui s'allume quand l'enclume a fini de glisser à droite. C'est un objet de la forge, vu par la même caméra que le reste
+   (le mur garde sa distance). Le sommaire se range sous elle, sur son axe (--fp-ax). Si la marge ne montre que le dehors
+   de la pièce (écran étroit, la caméra a reculé), pas de lanterne : le sommaire reste seul. */
+const LECT = { yaw: .56, pitch: .1, fov: .4, T: [AX, 1.75, AZ] }, LY = .28;   // LY : hauteur de la lanterne, en part d'écran
+let lantCle = '';
+function lanterne(W, H, lect) {
+  const cle = lect ? W + 'x' + H : '';
+  if (cle === lantCle) return; lantCle = cle;
+  const colL = (W - Math.min(820, W - 32)) / 2, ax = (colL - 40) / 2, p = lect ? eng.place(lect, LECT, ax, H * LY) : null;
+  eng.setLanterne(p);
+  root.classList.toggle('fp-lanterne', !!p); root.style.setProperty('--fp-ax', ax.toFixed(1) + 'px');
+}
+const allume = () => fond ? ease(clamp((prog - .55) / .45, 0, 1)) : 0;
 function step(t, dt) {
   if (!eng) return;
-  eng.frame(t, { dt, par: { x: parX, y: parY }, veil, still: REDUCE, calme: QS.has('calme') });
+  eng.frame(t, { dt, par: { x: parX, y: parY }, veil, still: REDUCE, calme: QS.has('calme'), kL: allume() });
   dirty = false;
 }
 function onScroll() {

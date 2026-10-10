@@ -282,6 +282,87 @@
 .gm.bientot .gm-av { filter: saturate(.55) brightness(.85); }
 .gm.bientot .gm-log { max-height: none; height: auto; }
 
+/* ---------- le sommaire : la marge de gauche, sur grand écran (1200 px et plus) ----------
+   Peu d'encre : un fil de fer vertical, les numéros frappés, des intitulés courts. L'entrée de la partie qu'on lit
+   chauffe comme une plaque ouverte (liseré de métal chaud, numéro braise) ; Volkar en or. Il arrive quand on descend
+   (faq-forge.js) et ne touche jamais le pied de page. Rien sous 1200 px. */
+.sm { display: none; }
+@media (min-width: 1200px) {
+  html.js .sm {
+    --sm-x: calc(50% + 410px + 64px);               /* son bord droit : à 64 px de la colonne (hors du fondu de 60 px) */
+    position: fixed; z-index: 20; top: 50%; right: var(--sm-x); display: block; width: 186px;
+    transform: translateY(calc(-50% + var(--sm-dy, 0px)));
+    opacity: var(--sm-o, 0); pointer-events: none; transition: opacity .2s linear;
+    font: 600 13px/1.2 "Sora", sans-serif;
+  }
+  html.js .sm.on { pointer-events: auto; }
+  html.js .sm:focus-within { opacity: 1; pointer-events: auto; }   /* au clavier, même en haut de page */
+}
+.sm ol { position: relative; margin: 0; padding: 0; list-style: none; }
+/* le fil de fer */
+.sm ol::before { content: ""; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px; background: #2c2224; }
+.sm li { margin: 0; }
+.sm-l a {
+  position: relative; display: flex; align-items: center; gap: 12px; min-height: 30px; padding: 3px 8px 3px 16px;
+  color: #9d8d85; text-decoration: none; transition: color .25s;
+}
+/* le liseré : un segment du fil, froid ; il chauffe sur l'entrée en cours */
+.sm-l a::before {
+  content: ""; position: absolute; left: -1px; top: 6px; bottom: 6px; width: 3px;
+  background: transparent; transition: background-color .25s, box-shadow .25s;
+}
+.sm-n { flex: none; display: flex; align-items: center; width: 22px; color: #8d7c74; font-size: 11px; letter-spacing: .06em; transition: color .25s, filter .25s; }
+.sm-n svg { display: block; width: calc(var(--w) * 2px); height: 14px; }
+.sm-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sm-l a:hover { color: #e9dcd2; }
+.sm-l a:hover::before { background: #6a3721; }
+.sm-l a:hover .sm-n { color: #b0745a; }
+.sm-l a:focus-visible { outline: 2px solid #fff; outline-offset: 0; }
+
+/* l'entrée en cours */
+.sm-l a[aria-current] { color: #ffe3c4; }
+.sm-l a[aria-current]::before { background: var(--fp-hot); box-shadow: 0 0 10px rgb(255 107 44 / .5); }
+.sm-l a[aria-current] .sm-n { color: #ff8d45; filter: drop-shadow(0 0 5px rgb(255 107 44 / .55)); }
+
+/* Volkar : un petit médaillon, terni au repos ; l'or quand on y est */
+.sm-gm { margin-top: 10px; }
+.sm-gm .sm-n img { display: block; width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 1px #050303, 0 0 0 2px #3a2e2b; filter: saturate(.35) brightness(.7); transition: filter .25s, box-shadow .25s; }
+.sm-gm a:hover .sm-n img { filter: saturate(.8) brightness(.9); }
+.sm-gm a[aria-current] { color: #ffd08a; }
+.sm-gm a[aria-current]::before { background: linear-gradient(#fff0c0, #ffd27a 30%, #ffb547 70%, #b8700b); box-shadow: 0 0 10px rgb(255 181 71 / .45); }
+.sm-gm a[aria-current] .sm-n { filter: none; }
+.sm-gm a[aria-current] .sm-n img { filter: none; box-shadow: 0 0 0 1px #050303, 0 0 0 2px #6b4a24, 0 0 10px rgb(255 150 50 / .45); }
+
+/* un humain : en retrait, sous le fil */
+.sm-h {
+  position: relative; display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0 16px; padding: 4px 0;
+  color: #9d8d85; font: 500 12.5px/1.2 "Inter", system-ui, sans-serif; text-decoration: none; transition: color .25s;
+}
+.sm-h::after { content: ""; width: 7px; height: 7px; border: solid currentColor; border-width: 1.5px 1.5px 0 0; transform: rotate(45deg); margin-left: 1px; opacity: .8; }
+.sm-h:hover { color: #ffd08a; }
+.sm-h:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* marges étroites (1200–1365 px) : les numéros seuls ; l'intitulé apparaît au survol ou au focus, dans la marge */
+@media (min-width: 1200px) and (max-width: 1365px) {
+  html.js .sm { --sm-x: auto; left: 22px; right: auto; width: 46px; }
+  .sm-l a { padding-right: 0; }
+  .sm-t {
+    position: absolute; left: 50px; top: 50%; transform: translate(-4px, -50%); padding: 6px 10px; overflow: visible;
+    background: #120d0e; color: #f4ebe3; box-shadow: inset 0 0 0 1px #3d3133, 0 6px 16px rgb(0 0 0 / .5); clip-path: var(--notch);
+    opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s;
+  }
+  .sm-l a:hover .sm-t, .sm-l a:focus-visible .sm-t { opacity: 1; transform: translate(0, -50%); }
+  .sm-h { display: none; }                         /* trop peu de place : le lien Discord reste en bas de page */
+}
+@media (prefers-reduced-motion: reduce) {
+  .sm, .sm-l a, .sm-l a::before, .sm-n, .sm-t, .sm-h, .sm-gm .sm-n img { transition: none !important; }
+}
+.shot .sm, .shot .sm-l a, .shot .sm-l a::before, .shot .sm-n, .shot .sm-gm .sm-n img { transition: none; }
+.fp-q details { scroll-margin-top: 92px; }
+/* avec la lanterne de lecture (faq-forge.js pose .fp-lanterne et --fp-ax, son axe) : le sommaire pend sous elle, dans sa lueur */
+@media (min-width: 1366px) { html.js.fp-lanterne .sm { right: auto; left: calc(var(--fp-ax) - 93px); top: 59%; } }
+
 .fq-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 18px; padding: 16px 20px 18px; color: var(--fg-3, #a89a93); font-size: 12px; background: #070405; border-top: 1px solid #1c1416; }
 .fq-foot p { margin: 0; }
 .fq-foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }

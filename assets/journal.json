@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "La FAQ a un sommaire dans la marge de gauche, sous une lanterne d'âme qui s'allume quand on lit.",
+   "d": "2026-10-10T18:59:04.000Z"
+  },
+  {
+   "p": "site",
    "t": "Le tavernier et l'assistant de la FAQ s'appellent désormais Volkar.",
    "d": "2026-10-10T17:56:14.000Z"
   },

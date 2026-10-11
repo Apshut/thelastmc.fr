@@ -45,7 +45,7 @@ window.THE_LAST = {
     endpoint: "https://gromaur-faq.gromaur-tickets.workers.dev"
   },
   compte: {
-    api: "",
+    api: "https://api.thelastmc.fr",
     ouvert: false
   },
   roadmap: [

@@ -32,7 +32,8 @@
   "site|Un bouton de compte avec ta tête de joueur arrive en haut à droite du site ; la connexion ouvrira avec le launcher.",
   "site|La politique de confidentialité et les conditions d'utilisation expliquent le compte sur le site.",
   "launcher|Une première version de test du launcher est prête pour un premier testeur.",
-  "site|Dans la taverne, une liste d'objets montre tout ce qu'on obtient en jeu et son prix, avec une recherche, le détail en paquets et un calcul de budget."
+  "site|Dans la taverne, une liste d'objets montre tout ce qu'on obtient en jeu et son prix, avec une recherche, le détail en paquets et un calcul de budget.",
+  "site|Une adresse qui n'existe pas mène maintenant sous la bedrock : tu as creusé trop loin, et un bouton te ramène à l'accueil."
  ],
  "semaine": "2026-10-05"
 }

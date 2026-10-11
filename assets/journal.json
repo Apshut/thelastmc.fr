@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Volkar, l'assistant de la FAQ, ne parle plus que de The Last : pour tout autre sujet, il répond toujours la même phrase.",
+   "d": "2026-10-11T22:47:17.000Z"
+  },
+  {
+   "p": "site",
    "t": "Une adresse qui n'existe pas mène maintenant sous la bedrock : tu as creusé trop loin, et un bouton te ramène à l'accueil.",
    "d": "2026-10-11T21:16:56.000Z"
   },

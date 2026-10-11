@@ -27,12 +27,14 @@
   <main class="doc">
     <div class="wrap">
       <h1>Politique de confidentialité</h1>
-      <p class="updated">Dernière mise à jour : 9 octobre 2026</p>
+      <p class="updated">Dernière mise à jour : 11 octobre 2026</p>
 
       <p>Cette page explique quelles données personnelles sont traitées quand tu utilises
         <strong>The Last Launcher</strong>, le <strong>serveur Minecraft The Last</strong> et ce
         <strong>site</strong>, pourquoi, combien de temps, et comment exercer tes droits. Nous en
-        collectons le moins possible : le launcher n'envoie aucune donnée personnelle à The Last.</p>
+        collectons le moins possible : à part ton adresse IP, que voit tout serveur contacté, le launcher
+        n'envoie aucune donnée sur toi à The Last, sauf si tu lui demandes de te connecter au site (voir
+        <a href="#compte">Ton compte sur le site</a>).</p>
 
       <h2>1. Qui est responsable ?</h2>
       <p>The Last est un projet indépendant mené par un particulier en France. Le responsable du
@@ -85,6 +87,12 @@
               <td>Diagnostiquer un problème</td>
               <td>7 jours pour le launcher ; les journaux du jeu sont gérés par Minecraft</td>
             </tr>
+            <tr>
+              <td>Certificat de joueur délivré par Mojang (la clé qui signe tes messages dans le chat)</td>
+              <td>Dans la mémoire du launcher ; jamais écrit dans un fichier ni dans un journal</td>
+              <td>Prouver au site que tu es bien le joueur, quand tu cliques sur « Mon compte sur le site »</td>
+              <td>Tant que le launcher est ouvert (Mojang le renouvelle environ tous les deux jours)</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -97,7 +105,8 @@
       <p>Comme toute connexion à Internet, chacun de ces services reçoit ton adresse IP.</p>
       <ul>
         <li><strong>Microsoft, Xbox Live et Mojang</strong> : connexion, vérification de la possession du
-          jeu, profil et skin, téléchargement de Minecraft et de Java. Leur traitement relève de la
+          jeu, profil et skin, téléchargement de Minecraft et de Java et, quand tu te connectes au site, ton
+          certificat de joueur et ton profil signé. Leur traitement relève de la
           <a href="https://privacy.microsoft.com/fr-fr/privacystatement" rel="noopener">déclaration de
           confidentialité de Microsoft</a>.</li>
         <li><strong>Notre serveur de fichiers</strong> : contenu du serveur (mods, configuration),
@@ -107,6 +116,9 @@
           de certains mods et du chargeur de mods.</li>
         <li><strong>Le serveur de jeu The Last</strong> : le launcher l'interroge pour afficher son statut
           (joueurs en ligne).</li>
+        <li><strong>Notre site</strong> (<code>api.thelastmc.fr</code>), seulement quand tu cliques sur
+          « Mon compte sur le site » : le launcher prouve ton identité au site (voir
+          <a href="#compte">Ton compte sur le site</a>).</li>
         <li><strong>Discord (facultatif)</strong> : si l'option est activée et que l'application Discord
           est ouverte sur ton ordinateur, le launcher lui indique que tu joues sur The Last, pour
           l'afficher sur ton profil Discord. Désactivable dans les paramètres.</li>
@@ -121,13 +133,102 @@
         tu demandes sa suppression.</p>
 
       <h2>4. Ce site</h2>
-      <p>Ce site n'utilise <strong>aucun cookie</strong> ni outil de mesure d'audience, et ne charge
+      <p>Ce site n'utilise <strong>aucun outil de mesure d'audience ni publicité</strong>, et ne charge
         aucun service tiers (même les polices de caractères sont hébergées ici), sauf si tu utilises
-        l'assistant de la FAQ (voir la <a href="#volkar">section 5</a>). Il est hébergé par GitHub Pages ;
+        l'assistant de la FAQ (voir la <a href="#volkar">section 5</a>) ou si tu t'es connecté à ton compte
+        (voir <a href="#compte">Ton compte sur le site</a>). Tant que tu ne te connectes pas à
+        un compte, il ne dépose <strong>aucun cookie</strong>. Il est hébergé par GitHub Pages ;
         GitHub reçoit l'adresse IP des visiteurs et la conserve dans ses journaux de sécurité (voir la
         <a href="https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">déclaration
         de confidentialité de GitHub</a>).</p>
       <p>Si tu nous écris, nous gardons l'échange le temps de traiter ta demande, puis au plus un an.</p>
+
+      <h3 id="compte">Ton compte sur le site</h3>
+      <p>Ton compte se crée à ta première connexion depuis le launcher, avec le bouton « Mon compte sur
+        le site ». Il sert à afficher ta tête de joueur sur le site et, quand la boutique ouvrira, ton
+        historique d'achat. Pour l'instant, la connexion est réservée à quelques testeurs.</p>
+      <p><strong>Comment tu te connectes.</strong> Le launcher prouve que tu es bien le joueur grâce au
+        certificat et au profil que Mojang a signés pour ton compte. Il n'envoie ni mot de passe, ni jeton
+        Microsoft, Xbox ou Minecraft. Notre serveur vérifie les signatures de Mojang sans contacter Mojang ;
+        il télécharge seulement l'image de ton skin sur <code>textures.minecraft.net</code> pour en découper
+        la tête. Avant d'ouvrir la session, le site te montre ton pseudo et ta tête et te demande
+        « C'est bien toi ? ».</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Donnée</th><th>Pourquoi</th><th>Combien de temps</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ton identifiant unique Minecraft (UUID), ton pseudo, le modèle de ton skin (bras larges ou
+                fins), la référence de ton skin et l'image de ta tête</td>
+              <td>Te reconnaître, et afficher ta tête et ton pseudo</td>
+              <td>Tant que le compte existe. Il est supprimé dès que tu le demandes, et automatiquement
+                3 ans après ta dernière connexion depuis le launcher, s'il n'a plus de session ouverte ni
+                d'achat</td>
+            </tr>
+            <tr>
+              <td>Dates de création du compte, de dernière connexion et de dernière visite</td>
+              <td>Sécurité, et suppression des comptes inactifs</td>
+              <td>Comme le compte</td>
+            </tr>
+            <tr>
+              <td>Pour chaque appareil connecté : un identifiant de session (nous n'en gardons qu'une
+                empreinte), le type d'appareil (par exemple « Firefox · Windows », tiré de ton navigateur ;
+                nous ne gardons pas le détail), le pays approximatif (déduit de ton adresse IP par Cloudflare)
+                et les dates</td>
+              <td>Te garder connecté, et te montrer tes appareils pour que tu puisses les déconnecter</td>
+              <td>7 jours sans visite, 30 jours au plus, ou jusqu'à ta déconnexion</td>
+            </tr>
+            <tr>
+              <td>Une empreinte de ton adresse IP, calculée avec une valeur secrète (nous ne gardons jamais
+                l'adresse elle-même). Pour l'export et la suppression, nous comptons aussi les demandes par
+                compte, avec une empreinte de ton identifiant</td>
+              <td>Limiter les abus (nombre de tentatives) et, pendant la connexion, vérifier que le launcher
+                et le navigateur sont sur le même réseau (protection contre les liens piégés)</td>
+              <td>Le temps de la connexion pour la vérification du réseau (le code vit 2 minutes) ; 3 jours
+                au plus pour compter les tentatives ; puis effacement dans la journée</td>
+            </tr>
+            <tr>
+              <td>Le code à usage unique qui passe du launcher à ton navigateur</td>
+              <td>Ouvrir ta session</td>
+              <td>2 minutes, utilisable une seule fois, puis effacé dans la journée</td>
+            </tr>
+            <tr>
+              <td>Tes achats, quand la boutique ouvrira</td>
+              <td>Ton historique d'achat</td>
+              <td>Cette page sera mise à jour avant l'ouverture des paiements</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Les données arrivées à leur terme sont effacées automatiquement chaque jour. Pour pouvoir
+        réparer la base en cas de panne, Cloudflare garde aussi un historique qui s'efface tout seul au bout
+        de 30 jours au plus ; nous ne nous en servons que pour une réparation, jamais pour retrouver un
+        compte supprimé. Nos journaux techniques ne contiennent ni adresse IP, ni identifiant, ni pseudo ;
+        Cloudflare peut garder des journaux techniques selon ses propres règles.</p>
+      <p>Ton pseudo et ta tête se mettent à jour tout seuls à chaque connexion depuis le launcher. Nous
+        ne prenons aucune décision automatique te concernant et ne faisons aucun profilage : les refus
+        automatiques (trop de tentatives, autre réseau, accès réservé aux testeurs) servent seulement à
+        protéger ton compte.</p>
+      <p><strong>Ce que le site garde dans ton navigateur.</strong> Une fois connecté, un cookie de
+        connexion (<code>__Host-session</code>, réservé à <code>api.thelastmc.fr</code>, illisible par les
+        scripts, valable 7 jours, prolongé quand tu reviens, 30 jours au plus) et une marque dans le stockage local (<code>thelast:compte</code>, qui vaut
+        « 1 » et ne contient aucun identifiant : elle évite que le site interroge le serveur si tu ne t'es
+        jamais connecté). Ils sont strictement nécessaires au service que tu demandes, se connecter : ils
+        ne demandent donc pas ton consentement (article 82 de la loi Informatique et Libertés). Ils
+        disparaissent quand tu te déconnectes ; si ta session expire toute seule, la marque s'efface à ta
+        visite suivante.</p>
+      <p><strong>Qui les reçoit.</strong> Cloudflare, Inc. (États-Unis) héberge le serveur du compte et sa
+        base de données ; nous avons demandé que la base soit placée en Europe de l'Ouest. Il agit pour
+        notre compte (sous-traitant). Personne
+        d'autre ne reçoit ces données.</p>
+      <p><strong>Tes droits, en un clic.</strong> Dans <em>Mon compte → Paramètres</em>, tu peux
+        télécharger les données de ton compte (un fichier JSON : identifiant, pseudo, skin, dates,
+        appareils, achats), déconnecter tous tes appareils et supprimer ton
+        compte. Pour supprimer le compte, on te demande de t'être connecté depuis le launcher dans les
+        10 dernières minutes, pour être sûr que c'est bien toi. Ton compte Minecraft n'est jamais touché.
+        Si tu n'as plus accès au site, ouvre un ticket privé sur le Discord ou écris-nous.</p>
 
       <h2 id="volkar">5. Volkar, l'assistant IA de la FAQ</h2>
       <p>Sur la page <a href="/faq">FAQ</a>, tu peux poser des questions à <strong>Volkar</strong>, un
@@ -176,7 +277,10 @@
       <ul>
         <li><strong>Fournir le service que tu demandes</strong> (installer et lancer le jeu, te connecter,
           te permettre de jouer) : exécution des conditions d'utilisation (article 6.1.b du RGPD).</li>
-        <li><strong>Sécurité et modération</strong> (journaux techniques et journaux du serveur) : notre
+        <li><strong>Ton compte sur le site</strong> (te reconnaître, afficher ta tête, tes appareils et,
+          plus tard, tes achats) : exécution des conditions d'utilisation (article 6.1.b du RGPD).</li>
+        <li><strong>Sécurité et modération</strong> (journaux techniques, journaux du serveur, limites de
+          tentatives et contrôle du même réseau à la connexion au site, liste de tes appareils) : notre
           intérêt légitime à protéger le service et ses joueurs (article 6.1.f du RGPD).</li>
         <li><strong>Répondre à tes questions via l'assistant de la FAQ et le protéger des abus</strong> :
           notre intérêt légitime (article 6.1.f du RGPD).</li>
@@ -187,7 +291,9 @@
       <p>Microsoft et GitHub sont des entreprises américaines. Leurs transferts de données vers les
         États-Unis s'appuient sur le cadre de protection des données UE–États-Unis (Data Privacy
         Framework) et sur leurs propres garanties. Pour Cloudflare et Anthropic (assistant de la FAQ),
-        voir la <a href="#volkar">section 5</a>.</p>
+        voir la <a href="#volkar">section 5</a>. Nous avons demandé que la base de données du compte soit
+        placée en Europe de l'Ouest ; comme Cloudflare est une entreprise américaine, un transfert vers les États-Unis reste possible,
+        encadré par les clauses contractuelles types de la Commission européenne.</p>
 
       <h2 id="droits">8. Tes droits</h2>
       <p>Tu peux demander l'accès à tes données, leur rectification, leur effacement, la limitation du
@@ -195,6 +301,11 @@
         <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>. Nous répondons dans un délai
         d'un mois. Si tu estimes que tes droits ne sont pas respectés, tu peux saisir la
         <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>.</p>
+      <p><strong>Ton droit d'opposition.</strong> Tu peux t'opposer à tout moment aux traitements fondés
+        sur notre intérêt légitime (section 6) : écris-nous, et nous arrêtons, sauf raison impérieuse, par
+        exemple la sécurité des autres joueurs.</p>
+      <p>Pour ton compte sur le site, l'export et la suppression se font aussi directement dans
+        <em>Mon compte → Paramètres</em> (voir <a href="#compte">Ton compte sur le site</a>).</p>
       <p>Pour effacer ce que le launcher garde sur ton ordinateur :</p>
       <ul>
         <li>retire le compte dans le launcher (<em>Comptes → Retirer</em>) : son jeton est supprimé ;</li>
@@ -208,6 +319,10 @@
       <p>Minecraft est joué par beaucoup de jeunes. Les comptes Microsoft des enfants sont gérés par leurs
         parents (famille Microsoft). Un parent peut nous écrire pour toute question ou pour faire supprimer
         les données liées au compte de son enfant.</p>
+      <p>Si tu as moins de 15 ans, demande l'accord d'un parent avant de te connecter au site. Un parent
+        peut supprimer le compte sur le site depuis <em>Mon compte → Paramètres</em>, ou nous écrire. Si le
+        jeu en ligne est bloqué par le contrôle parental, la connexion au site ne marche pas : c'est
+        normal.</p>
 
       <h2>10. Modifications</h2>
       <p>Nous mettrons cette page à jour si nos pratiques changent ; la date en haut de page l'indique.

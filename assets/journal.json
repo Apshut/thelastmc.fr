@@ -1,6 +1,11 @@
 {
  "entries": [
   {
+   "p": "launcher",
+   "t": "Une première version de test du launcher est prête pour un premier testeur.",
+   "d": "2026-10-11T10:07:08.000Z"
+  },
+  {
    "p": "site",
    "t": "La politique de confidentialité et les conditions d'utilisation expliquent le compte sur le site.",
    "d": "2026-10-11T09:07:29.000Z"

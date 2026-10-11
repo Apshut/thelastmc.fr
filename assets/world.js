@@ -347,10 +347,13 @@ vec3 fogged(vec3 col, vec3 pos, out float f) {
   float up = clamp(d.y / max(dist, .001) * 3.2 + .28, 0., 1.);
   return mix(col, mix(uFogLo, uFogHi, up), f);
 }`;
+/* L'image d'une animation se choisit en entiers. En flottants, mod(x, N) vaut x - N * floor(x / N), et certains GPU
+   (AMD sous ANGLE D3D11) calculent x / N en x * (1 / N) : pour x multiple exact de N, mod rend N au lieu de 0, et le bloc
+   montre, un tick à chaque tour, la première image du bloc suivant de l'atlas (la lave en magma, le magma en flammes). */
 const LAVAFN = `
 uniform sampler2DArray uTex; uniform sampler2D uNoise; uniform float uTime, uLava, uLavaN;
 vec4 lavaAt(vec2 w) {
-  float f0 = mod(floor(uTime * 20.), uLavaN);         // une couche par tick, comme le jeu (voir build.py)
+  float f0 = float(int(floor(uTime * 20.)) % int(uLavaN + .5));   // une couche par tick, comme le jeu (voir build.py)
   vec3 a = texture(uTex, vec3(w, uLava + f0)).rgb;
   float fw = max(fwidth(w.x), fwidth(w.y)) * 16.;
   vec2 q = mix((floor(w * 16.) + .5) / 16., w, clamp(fw - .9, 0., 1.));
@@ -370,7 +373,7 @@ in vec3 vPos; in vec2 vUv; flat in vec2 vTex; in vec4 vCol; out vec4 o;
 ${FOG}
 void main() {
   vec4 c;
-  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + mod(floor(uTime * 20.), vTex.y)));   // animation déroulée tick par tick
+  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + float(int(floor(uTime * 20.)) % int(vTex.y + .5))));   // animation déroulée tick par tick
   else c = texture(uTex, vec3(vUv, vTex.x));
   if (c.a < .4) discard;
   float e = vCol.a, f;

@@ -513,7 +513,7 @@ in vec3 vPos; centroid in vec2 vUv; flat in vec2 vTex; in vec4 vL; in vec2 vS; o
 ${FOG}
 void main() {
   vec4 c;
-  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + mod(floor(uTime * 20.), vTex.y)));     // animation déroulée tick par tick
+  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + float(int(floor(uTime * 20.)) % int(vTex.y + .5))));     // animation déroulée tick par tick, en entiers (voir world.js)
   else c = texture(uTex, vec3(vUv, vTex.x));
   if (c.a < .4) discard;
   vec3 li = (uAmb + uC0 * (vL.x * uK.x) + uC1 * (vL.y * uK.y) + uC2 * (vL.z * uK.z) + uC3 * (vL.w * uK.w)) * vS.x;

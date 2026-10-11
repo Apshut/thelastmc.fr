@@ -9,6 +9,7 @@
 'use strict';
 const FLOOR = 2, PX = 0, PZ = -14;                       // le portail : centre en x, profondeur
 const CZ = 4;                                              // la rangée de blocs coupée par la vitre (face avant en z = 5)
+const TOP = 27;                                            // la dernière rangée de blocs du monde (size.y1)
 const smooth = t => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const floorH = {};
@@ -25,7 +26,7 @@ function frameOrder(X0, X1, Y0) {
 
 window.GROTTE = {
   seed: 2026,
-  size: { x0: -48, x1: 47, y1: 27, z0: -40, z1: 19 },      // ±48 en x : la coupe couvre un écran de 4K
+  size: { x0: -48, x1: 47, y1: TOP, z0: -40, z1: 19 },     // ±48 en x : la coupe couvre un écran de 4K
   glass: CZ + 1,
   fog: [.03, .014, .03],
   amb: [.075, .055, .08],
@@ -47,14 +48,14 @@ window.GROTTE = {
     /* --- la roche : tout est plein, puis on creuse la salle. Le plafond descend vers nous : il encadre le haut de l'image --- */
     const ceilAt = (x, z) => 14 + 1.6 * nz(x * .14 + 3, z * .14) - Math.pow(Math.abs(x) / 21, 2.4) * 7 - Math.max(0, z - PZ) * .24 - Math.max(0, -z - 24) * .4;
     const halfW = (y, z) => 22 - 3 * n2(y * .15 + 5, z * .1) - Math.max(0, y - 8) * .5;
-    a.fill(-36, 0, -40, 35, 27, 19, (x, y, z) => {
+    a.fill(-36, 0, -40, 35, TOP, 19, (x, y, z) => {
       const back = -31 + 2.5 * nz(x * .1, y * .12);
       if (z > back && Math.abs(x) < halfW(y, z) && y >= FLOOR && y <= ceilAt(x, z)) return null;
       if (y < FLOOR) return y === 0 ? 'bedrock' : 'soul_soil';
       const r = R();
       return r < .03 ? 'gore' : r < .5 ? 'blackstone' : r < .82 ? 'basalt' : r < .9 ? 'netherrack' : 'pbb';
     });
-    const ceil = (x, z) => { let c = FLOOR + 6; while (c < 27 && !a.get(Math.floor(x), c, Math.floor(z))) c++; return c; };
+    const ceil = (x, z) => { let c = FLOOR + 6; while (c < TOP && !a.get(Math.floor(x), c, Math.floor(z))) c++; return c; };
     /* le sol : terre et sable des âmes, quelques bosses de basalte sur les côtés */
     for (let z = -32; z <= 19; z++) for (let x = -24; x <= 24; x++) {
       if (a.get(x, FLOOR, z)) continue;
@@ -65,7 +66,7 @@ window.GROTTE = {
        cerclée d'une croûte de magma --- */
     [[0, -8, 4.6, 2.6], [-10, -19, 2.4, 1.4], [11, -20, 2.6, 1.4], [-13, -3, 1.8, 1.2], [14, -4, 1.9, 1.2], [2, -25, 2.1, 1.3]].forEach(hh => {
       for (let z = Math.floor(hh[1] - hh[2] * 1.4 - 3); z <= hh[1] + hh[2] * 1.4 + 3; z++) for (let x = Math.floor(hh[0] - hh[2] - 3); x <= hh[0] + hh[2] + 3; x++) {
-        const c = ceil(x, z); if (c >= 27) continue;
+        const c = ceil(x, z); if (c >= TOP) continue;
         const d = Math.hypot(x - hh[0], (z - hh[1]) / 1.35) + (nz(x * .45, z * .45) - .5) * 1.4;
         if (d < hh[2]) { a.set(x, c, z, 'lava'); a.set(x, c + 1, z, 'lava'); if (R() < .3) a.emit('drip', [x + .5, c - .02, z + .5], .3, [.6, 0, .6]); }
         else if (d < hh[2] + hh[3]) { a.set(x, c, z, R() < .75 ? 'magma' : 'basalt'); if (R() < .25 && d < hh[2] + .8) a.set(x, c - 1, z, 'magma'); }
@@ -78,7 +79,7 @@ window.GROTTE = {
 
     /* --- piliers de basalte, du sol au plafond, qui cadrent la scène --- */
     [[-15, -11, 1.7], [15, -12, 1.8], [-19, -22, 2], [19, -23, 2], [-13, 0, 1.3], [13, 1, 1.4]].forEach(p => {
-      for (let y = FLOOR; y < 27; y++) {
+      for (let y = FLOOR; y < TOP; y++) {
         const r = p[2] * (1 + .7 * Math.pow(Math.abs(y - 8) / 9, 2)) + (nz(y * .3 + p[0], p[1]) - .5) * .7;
         for (let z = Math.floor(p[1] - r - 1); z <= p[1] + r + 1; z++) for (let x = Math.floor(p[0] - r - 1); x <= p[0] + r + 1; x++)
           if (Math.hypot(x - p[0], z - p[1]) < r && !a.get(x, y, z)) a.set(x, y, z, R() < .82 ? 'basalt' : 'pbasalt');
@@ -165,20 +166,23 @@ window.GROTTE = {
 
     /* --- la vitre : au plan de coupe, le fond du lac. Tout est posé ici, à la fin, pour ne rien changer au tirage au
        hasard du reste du décor (le plan du portail reste identique) --- */
-    const lake = {}, cut = x => { let c = FLOOR + 6; while (c < 27 && !a.get(x, c, CZ)) c++; return c; };
+    const lake = {}, cut = x => { let c = FLOOR + 6; while (c < TOP && !a.get(x, c, CZ)) c++; return c; };
     for (let x = -48; x <= 47; x++) {
       const out = x < -36 || x > 35, c = out ? 0 : cut(x);
       const st = nz(x * .23 + 31, 4.5), lb = Math.max(13 + (st < .36 ? -1 : st > .64 ? 1 : 0), c + 2);
       if (out) for (let y = 0; y < lb; y++) a.set(x, y, CZ, y === 0 ? 'bedrock' : y < FLOOR ? 'soul_soil' : R() < .55 ? 'basalt' : 'blackstone');
       for (let y = c; y < lb; y++) a.set(x, y, CZ, y === lb - 1 ? (R() < .72 ? 'magma' : 'basalt') : y === lb - 2 && R() < .18 ? 'magma' : R() < .55 ? 'basalt' : R() < .8 ? 'blackstone' : 'netherrack');
-      for (let y = lb; y < 27; y++) a.set(x, y, CZ, 'lake');
+      for (let y = lb; y <= TOP; y++) a.set(x, y, CZ, 'lake');   // jusqu'au sommet : un écran haut (plus de 27 blocs) en montre la dernière rangée
       lake[x] = lb;
       // des gouttes de lave perlent sous la croûte, derrière la vitre
-      if (!out && c < 27 && c > FLOOR + 5 && (x % 4 === 0)) a.emit('drip', [x + .5, c - .02, CZ - .5], .22, [.6, 0, .5]);
+      if (!out && c < TOP && c > FLOOR + 5 && (x % 4 === 0)) a.emit('drip', [x + .5, c - .02, CZ - .5], .22, [.6, 0, .5]);
     }
-    a.fill(-48, 0, CZ + 1, 47, 27, 19, null);                // devant la vitre : rien
+    a.fill(-48, 0, CZ + 1, 47, TOP, 19, null);               // devant la vitre : rien
     // sous le monde, la bedrock en coupe : quand la caméra descend le long de la vitre, le bas de l'image reste plein
     a.box(-48, -30, CZ, 48, 0, CZ + 1, 'bedrock', { emit: .11 });
+    // au-dessus du monde, le lac continue (émission -1 : dessiné comme les blocs 'lake') : sur un écran très haut (4K à 100 %),
+    // le haut de l'image monte au-dessus de la rangée TOP et reste de la lave
+    a.box(-48, TOP + 1, CZ, 48, 80, CZ + 1, 'lava_still', { emit: -1 });
     return { lit, cut: { z: CZ, lake } };
   }
 };

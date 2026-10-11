@@ -395,7 +395,7 @@ vec3 fogged(vec3 col, vec3 pos, out float f) { float d = max(0., length(pos - uC
 const LAVAFN = `
 uniform sampler2D uNoise; uniform float uLava, uLavaN; uniform vec2 uLakeW;
 vec4 lavaAt(vec2 w, float fw) {
-  float f0 = mod(floor(uTime * 20.), uLavaN);
+  float f0 = float(int(floor(uTime * 20.)) % int(uLavaN + .5));   // en entiers, comme world.js (mod en flottants saute d'une image sur certains GPU)
   vec3 a = textureLod(uTex, vec3(w, uLava + f0), 0.).rgb;
   vec2 q = mix((floor(w * 16.) + .5) / 16., w, clamp(fw - .9, 0., 1.));
   float h1 = textureLod(uNoise, q * .0125 + uTime * vec2(.0019, .0012), 0.).r, h2 = textureLod(uNoise, q * .046 - uTime * vec2(.0038, .0016), 0.).r;
@@ -422,7 +422,7 @@ void main() {
     return;
   }
   vec4 c;
-  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + mod(floor(uTime * 20.), vTex.y)));
+  if (vTex.y > 1.5) c = texture(uTex, vec3(vUv, vTex.x + float(int(floor(uTime * 20.)) % int(vTex.y + .5))));
   else c = texture(uTex, vec3(vUv, vTex.x));
   if (c.a < .4) discard;
   vec3 li = (uAmb + uC0 * (vL.x * uK.x) + uC1 * (vL.y * uK.y) + uC2 * (vL.z * uK.z) + uC3 * (vL.w * uK.w)) * vS.x;

@@ -3,7 +3,7 @@
    les textures du jeu, la lumière propagée case par case sur quatre canaux de couleur (lanternes, lave, feu, âmes),
    l'occlusion ambiante, des modèles en boîtes au format du jeu, des particules et un halo.
    Le tavernier vient de keeper.js (window.TAVERN_KEEPER, contrat décrit en tête de ce fichier) ; les articles et les
-   prix de config.js (shop.products, shop.inGame). Aucun stockage, aucun appel externe.
+   prix de config.js (shop.products). Aucun stockage, aucun appel externe.
    Essais : ?shot=1 (image figée) &t=6 &mood=idle|angry|threat &since=0.6 &sel=<id> &frame=keeper (gros plan) &y=<px>
    (défilement, téléphone) ; ?fps=1 (coût par image) ; ?nogl=1 (sans 3D). */
 (() => {
@@ -956,17 +956,10 @@ const COIN_ROWS = ['................', '.....rrrrrr.....', '...rrOOOOOOrr...', '
 const COIN_PAL = { r: '#6e1d08', O: '#e2541a', h: '#ff9a52', d: '#b13a10', y: '#ffb347', Y: '#ffe6a6' };
 const ICONS = {};
 function coinIcon() { return ICONS.coin || (ICONS.coin = art(COIN_ROWS, COIN_PAL)); }
-function icon(name, IMG) {
-  if (name === 'coin') return coinIcon();
-  if (ICONS[name]) return ICONS[name];
-  const c = mk(16, 16);
-  if (MC.items[name] !== undefined && IMG.items) c.getContext('2d').drawImage(IMG.items, 0, MC.items[name] * 16, 16, 16, 0, 0, 16, 16);
-  return ICONS[name] = c;
-}
 const copy = c => { const o = mk(c.width, c.height); o.getContext('2d').drawImage(c, 0, 0); return o; };
 
 /* ================= La page ================= */
-const S = CFG.shop || {}, LIST = (S.products || []).filter(p => p && p.id), INGAME = S.inGame || [];
+const S = CFG.shop || {}, LIST = (S.products || []).filter(p => p && p.id);
 const eur = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 const nb = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const stage = $('#stage'), canvas = $('#tavern'), etal = $('#etal'), dealBox = $('#deal'), say = $('#say'), topBar = $('#top');
@@ -1020,8 +1013,8 @@ function safeRect() {
   const W = stage.clientWidth || innerWidth, H = stage.clientHeight || innerHeight;
   if (desk) {
     const sr = stage.getBoundingClientRect(), rr = el => el ? el.getBoundingClientRect() : null;
-    const intro = rr($('.intro')), deal = rr(dealBox), slate = rr($('.slate')), fine = rr($('.fine')), foot = rr($('.foot')), top = rr($('.top'));
-    const l = Math.max(intro ? intro.right : 0, deal ? deal.right : 0) + 24 - sr.left, r = Math.min(slate ? slate.left : W, fine ? fine.left : W) - 24 - sr.left;
+    const intro = rr($('.intro')), deal = rr(dealBox), slate = rr($('.slate')), foot = rr($('.foot')), top = rr($('.top'));
+    const l = Math.max(intro ? intro.right : 0, deal ? deal.right : 0) + 24 - sr.left, r = (slate ? slate.left : W) - 24 - sr.left;
     // en bas, la scène s'arrête à 76 px du bord : le pied de page (une ligne, ~30 px) et, au-dessus, la place des
     // étiquettes qui pendent sous les articles. Cadrée jusqu'au haut du pied, elle y envoyait les prix
     const t = (top ? top.bottom : 60) + 62 - sr.top, b = Math.min(foot ? foot.top : H, sr.bottom - 76) - 16 - sr.top;
@@ -1035,7 +1028,7 @@ function tighten() {
   if (!desk) return;
   const r = s => { const e = $(s); return e ? e.getBoundingClientRect() : null; }, hit = (a, b) => a && b && a.bottom > b.top;
   const foot = r('.foot p');                                       // le texte du pied de page, pas son dégradé
-  if (hit(r('.intro'), r('.deal')) || hit(r('.slate'), r('.fine')) || hit(r('.deal'), foot) || hit(r('.fine'), foot)) root.classList.add('tv-tight');
+  if (hit(r('.intro'), r('.deal')) || hit(r('.deal'), foot)) root.classList.add('tv-tight');
 }
 let restag = true;
 function stagger() {
@@ -1092,15 +1085,6 @@ function deal(id) {
     h('p', { class: 'deal-lore', text: p.lore || '' }),
     h('div', { class: 'deal-buy' }, buy, h('span', { class: 'deal-note', text: url ? 'Paiement chez notre partenaire.' : "Paiement à l'ouverture du serveur." })));
   if (desk) tighten();
-}
-
-/* ---------- l'ardoise : ce qu'on obtient en jeu ---------- */
-function slate() {
-  const ul = $('#slate'); if (!ul) return;
-  ul.textContent = '';
-  INGAME.forEach(g => ul.appendChild(h('li', null, h('span', { class: 's-ic', 'aria-hidden': 'true' }, copy(icon(g.icon || 'name_tag', IMG))),
-    h('span', { class: 's-n' }, h('span', { text: g.name }), g.lore ? h('small', { text: g.lore }) : null),
-    h('span', { class: 's-p' }, nb(g.braises), h('span', { class: 'sr', text: ' Braises' }), copy(coinIcon())))));
 }
 
 /* ---------- humeur du tavernier ---------- */
@@ -1190,7 +1174,7 @@ function start() {
   $$('.px').forEach(pxText);
   root.style.setProperty('--lock', 'url(' + art(['..kkkk..', '.k....k.', '.k....k.', 'kkkkkkkk', 'kyyyyyyk', 'kyyddyyk', 'kyyddyyk', 'kyyyyyyk', 'kkkkkkkk'], { k: '#1c1410', y: '#d9a521', d: '#4a3210' }).toDataURL() + ')');
   if (S.checkoutUrl) { const st = $('#shop-state'); if (st) st.textContent = 'Taverne ouverte. Paiement sécurisé chez notre partenaire.'; }
-  buildEtal(); deal(null); slate();
+  buildEtal(); deal(null);
   if (!QS.has('nogl') && IMG.blocks) {
     try { eng = Engine(canvas, IMG, { still: SHOT }); } catch (e) { eng = null; if (window.console) console.error(e); }
   }
@@ -1225,13 +1209,15 @@ function start() {
   const loop = ms => {
     requestAnimationFrame(loop);
     const t = ms / 1000, raw = t - last;
-    if (raw < .012 || D.hidden) return;                    // inutile de dépasser ~80 images par seconde
+    // inutile de dépasser ~80 images par seconde ; la scène se fige aussi sous une fenêtre ouverte (html.tv-pause,
+    // posé par catalogue.js)
+    if (raw < .012 || D.hidden || root.classList.contains('tv-pause')) return;
     last = t;
     step(t, Math.min(raw, .05));
   };
   requestAnimationFrame(loop);
 }
-Promise.all([loadImg('assets/mc/blocks.png'), loadImg('assets/mc/items.png').catch(() => null), loadImg('assets/mc/chest.png').catch(() => null)])
-  .then(a => { IMG.blocks = a[0]; IMG.items = a[1]; IMG.chest = a[2]; start(); })
+Promise.all([loadImg('assets/mc/blocks.png'), loadImg('assets/mc/chest.png').catch(() => null)])
+  .then(a => { IMG.blocks = a[0]; IMG.chest = a[1]; start(); })
   .catch(e => { if (window.console) console.error(e); start(); });
 })();

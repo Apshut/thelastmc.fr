@@ -21,8 +21,14 @@
        kind  = "pack" (un paquet de Braises) ou "don" (soutien sans contrepartie) ;
        prop  = l'objet 3D : "heap" (tas de pièces), "pouch" (bourse), "sack" (sac), "chest" (coffre), "jar" (tronc, sur le comptoir) ;
        url   = lien de paiement propre à l'article (facultatif, sinon checkoutUrl).
+     categories  : les grosses tuiles de la fenêtre « Liste d'objets » (assets/catalogue.js), dans l'ordre.
+       icon = un objet du jeu ; desc = une phrase ; paliers = true pour les grades (un seul à la fois, le plus haut
+       remplace le précédent). Une catégorie sans objet n'est pas affichée ; un objet sans catégorie connue va dans
+       « Autres ». Sans aucune catégorie, la fenêtre montre une seule liste.
      inGame      : ce qu'on obtient en jeu avec les Braises (EXEMPLES). Jamais de cape, jamais d'avantage en jeu.
-       icon  = un objet du jeu (liste dans tools/site-textures/build.py).
+       icon  = un objet du jeu (liste dans tools/site-textures/build.py) ; cat = id de sa catégorie ;
+       tags  = des synonymes pour la recherche (sans accents).
+       Prix en multiples de 50 : le panier de paquets le moins cher laisse alors peu de Braises en trop.
    - roadmap         : la feuille de route, dessinée par le portail de la grotte (page d'accueil, sous la lave).
                        Le cadre du portail compte 22 blocs ; chaque étape en prend « blocks », dans l'ordre :
                        la base de gauche à droite, puis les deux montants en alternance, puis le haut.
@@ -78,14 +84,33 @@ window.THE_LAST = {
       { id: "soutien", kind: "don", prop: "jar", name: "Tronc de soutien", short: "Soutien", price: 2,
         lore: "Un don pour payer le serveur. Aucune Braise, aucune contrepartie, aucun avantage : juste notre gratitude." }
     ],
+    categories: [
+      { id: "grades", name: "Grades", icon: "gold_ingot", paliers: true,
+        desc: "Des paliers : un seul grade à la fois, le plus haut remplace le précédent. Aucun avantage en jeu." },
+      { id: "pseudo", name: "Pseudo et chat", icon: "writable_book",
+        desc: "La couleur de ton pseudo, sa décoration et tes messages d'arrivée." },
+      { id: "titres", name: "Titres", icon: "name_tag",
+        desc: "Un titre affiché au-dessus de ta tête et dans le chat." },
+      { id: "effets", name: "Traînées et effets", icon: "blaze_powder",
+        desc: "Des particules qui suivent tes pas ou saluent ton arrivée. Purement visuelles." },
+      { id: "compagnons", name: "Compagnons", icon: "strider_spawn_egg",
+        desc: "Ils te suivent partout. Ils ne se battent pas, ne ramassent rien, ne se montent pas." }
+    ],
     inGame: [
-      { id: "couleur", name: "Couleur de pseudo", braises: 250, icon: "magma_cream", lore: "Ton pseudo dans la couleur de ton choix." },
-      { id: "titre", name: "Titre personnalisé", braises: 450, icon: "name_tag", lore: "Un titre au-dessus de ta tête." },
-      { id: "ames", name: "Traînée d'âmes", braises: 700, icon: "soul_lantern", lore: "Des flammes bleues suivent tes pas." },
-      { id: "grade-cendre", name: "Grade Cendre", braises: 1000, icon: "blaze_powder", lore: "Badge et pseudo couleur cendre dans le chat." },
-      { id: "arpenteur", name: "Arpenteur de compagnie", braises: 1200, icon: "strider_spawn_egg", lore: "Il te suit partout. Il ne fait rien d'autre." },
-      { id: "grade-dore", name: "Grade Doré", braises: 2000, icon: "gold_ingot", lore: "Badge doré et message d'arrivée personnalisé." },
-      { id: "grade-netherite", name: "Grade Netherite", braises: 3600, icon: "netherite_ingot", lore: "Tout le grade Doré, et un titre animé." }
+      { id: "couleur", name: "Couleur de pseudo", braises: 250, icon: "magma_cream", cat: "pseudo",
+        lore: "Ton pseudo dans la couleur de ton choix.", tags: ["couleur", "pseudo", "nom", "chat", "teinte"] },
+      { id: "titre", name: "Titre personnalisé", braises: 450, icon: "name_tag", cat: "titres",
+        lore: "Un titre au-dessus de ta tête.", tags: ["titre", "perso", "personnalise", "nom", "tag", "etiquette"] },
+      { id: "ames", name: "Traînée d'âmes", braises: 700, icon: "soul_lantern", cat: "effets",
+        lore: "Des flammes bleues suivent tes pas.", tags: ["trainee", "particules", "ames", "flammes bleues", "effet"] },
+      { id: "grade-cendre", name: "Grade Cendre", braises: 1000, icon: "blaze_powder", cat: "grades",
+        lore: "Badge et pseudo couleur cendre dans le chat.", tags: ["grade", "rang", "cendre", "badge", "vip"] },
+      { id: "arpenteur", name: "Arpenteur de compagnie", braises: 1200, icon: "strider_spawn_egg", cat: "compagnons",
+        lore: "Il te suit partout. Il ne fait rien d'autre.", tags: ["compagnon", "pet", "animal", "arpenteur", "strider"] },
+      { id: "grade-dore", name: "Grade Doré", braises: 2000, icon: "gold_ingot", cat: "grades",
+        lore: "Badge doré et message d'arrivée personnalisé.", tags: ["grade", "rang", "or", "dore", "badge", "vip"] },
+      { id: "grade-netherite", name: "Grade Netherite", braises: 3600, icon: "netherite_ingot", cat: "grades",
+        lore: "Tout le grade Doré, et un titre animé.", tags: ["grade", "rang", "netherite", "badge", "vip", "titre anime"] }
     ]
   }
 };

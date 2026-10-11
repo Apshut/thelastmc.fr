@@ -24,11 +24,14 @@
   <link rel="stylesheet" href="assets/nether.css">
   <link rel="stylesheet" href="assets/tavern.css">
   <link rel="stylesheet" href="assets/compte.css">
+  <link rel="stylesheet" href="assets/catalogue.css">
   <script src="assets/config.js" defer></script>
   <script src="assets/mc/mc.js" defer></script>
   <script src="assets/keeper.js" defer></script>
   <script src="assets/tavern.js" defer></script>
   <script src="assets/compte.js" defer></script>
+  <script src="assets/simulateur-calc.js" defer></script>
+  <script src="assets/catalogue.js" defer></script>
 </head>
 <body class="tavern">
   <a class="skip" href="#etal">Aller aux articles</a>
@@ -64,16 +67,41 @@
       <h2 class="deal-t" id="deal-name">Le comptoir</h2>
     </section>
 
-    <aside class="slate" aria-labelledby="t-slate">
-      <h2 class="px" id="t-slate" data-fs="2">Au comptoir, en jeu</h2>
-      <ul class="slate-list" id="slate"></ul>
-      <p class="slate-note">Exemples de prix, en Braises. Grades et cosmétiques sans aucun avantage en jeu. Pas de cape.</p>
-    </aside>
-
-    <p class="fine">Les Braises n'ont aucune valeur réelle : elles ne sont ni remboursables, ni échangeables contre de
-      l'argent, ni transférables vers un autre compte ou un autre serveur. Tarifs indicatifs. L'historique de tes achats
-      te sera fourni avec le paiement.</p>
+    <div class="tv-side">
+      <aside class="slate" aria-labelledby="t-slate">
+        <h2 class="px" id="t-slate" data-fs="2">Bon à savoir</h2>
+        <p>Les Braises n'ont aucune valeur réelle : elles ne sont ni remboursables, ni échangeables contre de l'argent,
+          ni transférables vers un autre compte ou un autre serveur. Tarifs indicatifs.</p>
+        <p>L'historique de tes achats te sera fourni avec le paiement. Tu pourras aussi le retrouver sur ton profil, ici
+          sur le site : <a href="/compte/achats">Historique d'achat</a>.</p>
+      </aside>
+      <button class="btn cb-open" id="cb-open" type="button" aria-haspopup="dialog" aria-controls="cb">
+        <span class="cb-scale" aria-hidden="true"></span><span>Voir tout ce qu'on obtient en jeu</span>
+      </button>
+    </div>
   </main>
+
+  <!-- la liste d'objets : tout ce qu'on obtient en jeu, et son prix (assets/catalogue.js) -->
+  <dialog class="cb" id="cb" aria-labelledby="cb-t">
+    <header class="cb-head">
+      <h2 class="cb-t" id="cb-t" tabindex="-1">Liste d'objets</h2>
+      <div class="cb-search">
+        <label for="cb-q">Rechercher</label>
+        <input id="cb-q" type="search" placeholder="ex : Titre personnalisé" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      </div>
+      <div class="cb-tools">
+        <button class="cb-sw" id="cb-sw" type="button" role="switch" aria-checked="false"><span class="cb-sw-t" aria-hidden="true"><i></i></span>Détail en paquets</button>
+        <button class="cb-sw" id="cb-bsw" type="button" role="switch" aria-checked="false" aria-controls="cb-plate"><span class="cb-sw-t" aria-hidden="true"><i></i></span>Calculer ton budget</button>
+      </div>
+      <button class="cb-x" id="cb-x" type="button" aria-label="Fermer"><span aria-hidden="true"></span></button>
+    </header>
+    <section class="cb-plate" id="cb-plate" aria-label="Plateau : calcul en paquets" hidden></section>
+    <div class="cb-main" id="cb-main"></div>
+    <div class="cb-scrim" id="cb-scrim" hidden></div>
+    <section class="cb-fiche" id="cb-fiche" aria-labelledby="cb-f-n" hidden></section>
+    <footer class="cb-foot" id="cb-foot"></footer>
+    <p class="sr" id="cb-live" aria-live="polite"></p>
+  </dialog>
 
   <footer class="foot">
     <p class="disc">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>

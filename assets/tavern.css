@@ -66,7 +66,7 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 .deal-buy { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .deal-note { color: var(--fg-3); font-size: 12.5px; }
 
-/* ---------- L'ardoise : ce qu'on obtient en jeu ---------- */
+/* ---------- L'ardoise : ce qu'il faut savoir des Braises ---------- */
 .slate {
   padding: 22px 22px 18px; color: #e9efe9;
   background: #1d2221 radial-gradient(ellipse at 28% 18%, rgb(255 255 255 / .06), transparent 62%);
@@ -74,16 +74,11 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 }
 .slate .px { color: #f2f5ef; --k: 1; }
 .slate .px svg { filter: drop-shadow(calc(var(--fs) * var(--k)) calc(var(--fs) * var(--k)) 0 rgb(0 0 0 / .45)); }
-.slate-list { list-style: none; margin: 12px 0 10px; padding: 0; display: grid; gap: 5px; }
-.slate-list li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding-bottom: 5px; border-bottom: 1px dashed rgb(233 239 233 / .18); font: 500 14px/1.3 "Inter", sans-serif; }
-.s-ic canvas { display: block; width: 24px; height: 24px; image-rendering: pixelated; }
-.s-n small { display: block; color: rgb(233 239 233 / .62); font-size: 12px; }
-.s-p { display: inline-flex; align-items: center; gap: 5px; color: #ffc067; font: 700 14px/1 "Sora", sans-serif; white-space: nowrap; }
-.s-p canvas { width: 16px; height: 16px; image-rendering: pixelated; }
-.slate-note { margin: 0; color: rgb(233 239 233 / .72); font-size: 12px; line-height: 1.45; }
+.slate p { margin: 10px 0 0; color: rgb(233 239 233 / .86); font-size: 13.5px; line-height: 1.5; }
+.slate a { color: #ffc067; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.slate a:hover, .slate a:focus-visible { color: #ffd9a0; }
 
 /* ---------- Mentions ---------- */
-.fine { color: #dccdc2; font-size: 12px; line-height: 1.5; text-shadow: 0 1px 0 #000, 0 0 10px rgb(0 0 0 / .95); }
 .foot { color: var(--fg-3); font-size: 12px; line-height: 1.5; }
 .foot p { margin: 0; }
 .foot nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
@@ -94,7 +89,6 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
 /* ---------- Téléphone et petites fenêtres : la page défile ---------- */
 .intro { padding: 74px 16px 14px; }
 .deal, .slate { margin: 14px 12px 0; }
-.fine { margin: 16px 16px 0; }
 .foot { margin-top: 20px; padding: 18px 16px 28px; border-top: 2px solid rgb(255 255 255 / .08); display: grid; gap: 8px; }
 
 /* ---------- Ordinateur : tout tient dans la fenêtre ----------
@@ -105,11 +99,12 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   html.tv, html.tv body { height: 100%; overflow: hidden; }
   .stage { position: fixed; inset: 0; height: auto; z-index: 0; }
   .say { z-index: 40; }                                       /* par-dessus l'en-tête (30) et les panneaux */
-  .intro, .deal, .slate, .fine { position: fixed; z-index: 5; width: var(--side); margin: 0; }
+  .intro, .deal, .tv-side { position: fixed; z-index: 5; width: var(--side); margin: 0; }
   .intro { left: 24px; top: 70px; padding: 0; }
   .deal { left: 24px; bottom: 58px; }
-  .slate { right: 24px; top: 70px; }
-  .fine { right: 24px; bottom: 58px; }
+  /* à droite : « Bon à savoir », et dessous le bouton de la liste d'objets (catalogue.css) */
+  .tv-side { right: 24px; top: 70px; display: flex; flex-direction: column; gap: 10px; }
+  .tv-side .slate { margin: 0; }
   /* pied de page sur une ligne : il laisse la place aux étiquettes des articles posés au bas de la scène */
   .foot {
     position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; margin: 0; padding: 8px 24px 7px;
@@ -128,19 +123,15 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   .deal-lore { font-size: 13px; line-height: 1.4; margin: 4px 0 8px; }
   .deal-note { display: none; }
   .slate { padding: 16px 16px 12px; }
-  .slate-list { margin: 8px 0 6px; gap: 3px; }
-  .slate-list li { font-size: 13px; padding-bottom: 3px; }
-  .slate-note { font-size: 11.5px; }
-  .fine { font-size: 11px; line-height: 1.4; }
+  .slate p { margin-top: 8px; font-size: 12.5px; line-height: 1.45; }
   .foot { padding: 6px 16px 5px; gap: 2px 14px; font-size: 11px; }
   .foot .disc { font-size: 10.5px; }
 }
 /* filet de sécurité (posé par tavern.js si des panneaux se chevauchent encore) */
-.tv-tight .lede, .tv-tight .slate-note { display: none; }
+.tv-tight .lede { display: none; }
 .tv-tight .deal-lore { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
-@media (min-width: 900px) and (max-height: 780px) and (min-aspect-ratio: 21/20), (min-width: 900px) and (max-width: 1399px) and (min-aspect-ratio: 21/20) { .s-n small { display: none; } }
 @media (min-width: 900px) and (max-height: 780px) and (min-aspect-ratio: 21/20) { .lede { font-size: 14px; } .deal-lore { font-size: 13.5px; } }
-@media (min-width: 900px) and (max-height: 680px) and (min-aspect-ratio: 21/20) { .slate-list li { font-size: 13px; } .slate { padding-top: 18px; padding-bottom: 14px; } .lede { margin-bottom: 8px; } }
+@media (min-width: 900px) and (max-height: 680px) and (min-aspect-ratio: 21/20) { .slate { padding-top: 18px; padding-bottom: 14px; } .lede { margin-bottom: 8px; } }
 
 /* ---------- Sans 3D : les articles en simple grille ---------- */
 .no-gl .stage { height: auto; min-height: 320px; }

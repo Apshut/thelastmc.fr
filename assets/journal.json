@@ -1,6 +1,11 @@
 {
  "entries": [
   {
+   "p": "site",
+   "t": "Dans la taverne, une liste d'objets montre tout ce qu'on obtient en jeu et son prix, avec une recherche, le détail en paquets et un calcul de budget.",
+   "d": "2026-10-11T16:34:44.000Z"
+  },
+  {
    "p": "launcher",
    "t": "Une première version de test du launcher est prête pour un premier testeur.",
    "d": "2026-10-11T10:07:08.000Z"

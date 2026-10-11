@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "La politique de confidentialité et les conditions d'utilisation expliquent le compte sur le site.",
+   "d": "2026-10-11T09:07:29.000Z"
+  },
+  {
+   "p": "site",
    "t": "Un bouton de compte avec ta tête de joueur arrive en haut à droite du site ; la connexion ouvrira avec le launcher.",
    "d": "2026-10-10T22:24:41.000Z"
   },

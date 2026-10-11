@@ -1,22 +1,54 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="v404">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Cette page n'existe pas, ou plus. Remonte à l'accueil du serveur Minecraft The Last.">
+  <meta name="theme-color" content="#0a0608">
+  <!-- Page servie par GitHub Pages pour toute adresse inconnue, à n'importe quelle profondeur : chemins absolus partout. -->
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="/assets/fonts.css">
+  <link rel="stylesheet" href="/assets/nether.css">
+  <link rel="stylesheet" href="/assets/compte.css">
+  <link rel="stylesheet" href="/assets/404.css">
+  <script src="/assets/config.js" defer></script>
+  <script src="/assets/mc/mc.js" defer></script>
+  <script src="/assets/404.js" defer></script>
+  <script src="/assets/compte.js" defer></script>
 </head>
 <body>
-  <main class="hero">
-    <div class="wrap">
-      <span class="eyebrow">Erreur 404</span>
-      <h1>PERDU ?</h1>
-      <p class="tagline">Cette page n'existe pas, ou plus.</p>
-      <div class="actions">
-        <a class="btn btn-primary" href="/">Retour à l'accueil</a>
-      </div>
-    </div>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+
+  <header class="top solid" id="top">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <nav aria-label="Navigation principale">
+      <a class="tbtn" href="/">Accueil</a>
+      <a class="tbtn" href="/boutique">Boutique</a>
+      <a class="tbtn" href="/chantier">Chantier</a>
+      <a class="tbtn" href="/faq">FAQ</a>
+      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    </nav>
+  </header>
+
+  <div class="v-ciel" aria-hidden="true"></div>
+
+  <main class="v-main" id="contenu">
+    <p class="v-sur">Erreur 404</p>
+    <h1 class="px v-titre" data-fs="5">Tu as creusé trop&nbsp;loin.</h1>
+    <p class="v-dit">Cette page n'existe pas, ou plus. Sous la bedrock, il n'y a que le vide.</p>
+    <p class="v-peut" hidden>Tu cherchais peut-être : <a class="v-lien" href="/"></a></p>
+    <p class="v-sorties">
+      <a class="btn btn-main btn-big v-up" href="/">Remonter à l'accueil</a>
+    </p>
   </main>
+
+  <footer class="v-fond">
+    <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+  </footer>
 </body>
 </html>

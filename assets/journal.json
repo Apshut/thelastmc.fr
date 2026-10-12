@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Dans la taverne, la liste d'objets garde une taille raisonnable sur les grands écrans : plus de grand vide sous les catégories.",
+   "d": "2026-10-12T15:21:20.000Z"
+  },
+  {
+   "p": "site",
    "t": "Tout en bas de l'accueil, la jauge de profondeur s'arrête enfin sur la bedrock, et la lave ne dépasse plus sous le pied de page.",
    "d": "2026-10-12T10:36:26.000Z"
   },

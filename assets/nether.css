@@ -32,7 +32,7 @@ a { color: var(--gold); text-underline-offset: 3px; }
 a:hover { color: #ffd9a0; }
 img { max-width: 100%; }
 :focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .skip { position: fixed; left: 12px; top: -80px; z-index: 99; padding: 10px 14px; background: #000; color: #fff; }
 .skip:focus { top: 12px; }
 

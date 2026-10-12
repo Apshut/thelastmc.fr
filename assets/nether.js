@@ -305,11 +305,12 @@ function Depth(f3) {
   const links = $$('.depth a'), secs = links.map(a => $(a.dataset.sec)), names = links.map(a => a.textContent.trim()), top = $('#top'), floor = $('#fond');
   let last = -1;
   return function update() {
-    const mid = innerHeight * .5, pin = pinLen(); let cur = 0;
-    secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= mid) cur = i; });
+    // le fond est trop court pour monter jusqu'au milieu de l'écran : on l'atteint quand on touche le bas de la page
+    const mid = innerHeight * .5, pin = pinLen(), fr = floor.getBoundingClientRect(), low = Math.max(mid, innerHeight - fr.height) + 1; let cur = 0;
+    secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= (s === floor ? low : mid)) cur = i; });
     if (cur !== last) { last = cur; links.forEach((a, i) => { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }); if (cur === secs.length - 1) toast('fond', 'block:bedrock', 'Progrès réalisé !', 'Au fond du Nether'); }
     // coordonnée Y : la mer de lave du Nether est à 31 ; on descend jusqu'à la bedrock (0)
-    const camY = world ? world.camY() : 5, f = floor.getBoundingClientRect().top - mid, sy = SY();
+    const camY = world ? world.camY() : 5, f = fr.top - low, sy = SY();
     const y = sy <= pin ? 31 + camY - 1 : f <= 0 ? 0 : 32 * clamp(f / Math.max(1, f + sy - pin), 0, 1);
     f3(y, cur, names[cur]);
     root.classList.toggle('in-scene', cur <= 1 && aby.getBoundingClientRect().top > innerHeight * .2);

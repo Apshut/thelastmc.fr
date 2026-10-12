@@ -34,7 +34,9 @@
   "launcher|Une première version de test du launcher est prête pour un premier testeur.",
   "site|Dans la taverne, une liste d'objets montre tout ce qu'on obtient en jeu et son prix, avec une recherche, le détail en paquets et un calcul de budget.",
   "site|Une adresse qui n'existe pas mène maintenant sous la bedrock : tu as creusé trop loin, et un bouton te ramène à l'accueil.",
-  "site|Volkar, l'assistant de la FAQ, ne parle plus que de The Last : pour tout autre sujet, il répond toujours la même phrase."
+  "site|Volkar, l'assistant de la FAQ, ne parle plus que de The Last : pour tout autre sujet, il répond toujours la même phrase.",
+  "site|Tout en bas de l'accueil, la jauge de profondeur s'arrête enfin sur la bedrock, et la lave ne dépasse plus sous le pied de page.",
+  "site|Le pied de page de l'accueil est plus compact : le bouton « Remonter à la surface » disparaît."
  ],
  "semaine": "2026-10-12"
 }

@@ -2,6 +2,16 @@
  "entries": [
   {
    "p": "site",
+   "t": "Tout en bas de l'accueil, la jauge de profondeur s'arrête enfin sur la bedrock, et la lave ne dépasse plus sous le pied de page.",
+   "d": "2026-10-12T10:36:26.000Z"
+  },
+  {
+   "p": "site",
+   "t": "Le pied de page de l'accueil est plus compact : le bouton « Remonter à la surface » disparaît.",
+   "d": "2026-10-12T10:36:26.000Z"
+  },
+  {
+   "p": "site",
    "t": "Volkar, l'assistant de la FAQ, ne parle plus que de The Last : pour tout autre sujet, il répond toujours la même phrase.",
    "d": "2026-10-11T22:47:17.000Z"
   },

@@ -271,8 +271,6 @@ dialog::backdrop { background: rgb(6 2 3 / .82); }
 .faq details[open] .flame, .faq summary:hover .flame { animation: none; filter: drop-shadow(0 0 12px rgb(95 227 240 / .95)) brightness(1.15); }
 @keyframes lamp { 50% { filter: drop-shadow(0 0 3px rgb(95 227 240 / .35)) brightness(.86); } }
 
-.up { font-size: 12px; }
-
 /* ---------- La grotte, sous le lac : le portail du chantier (grotte.js, cave.js) ---------- */
 .grotte { position: relative; background: #0c0709; }
 /* la scène reste collée à l'écran pendant qu'on descend : d'abord la vitre (la coupe continue sous la lave), puis la
@@ -375,13 +373,13 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 .g-overlay .g-panel .faq details p { padding: 0 16px 16px; font-size: 14.5px; }
 
 /* ---------- Le fond : une ligne de bedrock, puis les mentions ---------- */
-.fond { position: relative; padding: calc(var(--b) + 34px) 16px 44px; background: #0e0c0c; color: #b9aca6; font-size: 14px; }
+.fond { position: relative; padding: calc(var(--b) + 34px) 16px 18px; background: #0e0c0c; color: #b9aca6; font-size: 14px; }
 .fond::before { content: ""; position: absolute; inset: 0 0 auto; height: var(--b); background: #262626 var(--t-bedrock, none) 0 0 / auto 100% repeat-x; image-rendering: pixelated; box-shadow: 0 8px 18px rgb(0 0 0 / .55); }
 .fond .cols { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px 24px; }
 .fond nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .fond nav a { color: var(--fg-2); text-decoration: none; }
 .fond nav a:hover { color: #fff; }
-.fond .disclaimer { margin: 24px 0; padding-top: 18px; border-top: 2px solid rgb(255 255 255 / .09); font-size: 13px; letter-spacing: 0; text-transform: none; }
+.fond .disclaimer { margin: 24px 0 0; padding-top: 18px; border-top: 2px solid rgb(255 255 255 / .09); font-size: 13px; letter-spacing: 0; text-transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .g-pin { height: auto; }

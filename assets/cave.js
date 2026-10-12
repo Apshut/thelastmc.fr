@@ -68,7 +68,7 @@ window.GROTTE = {
       for (let z = Math.floor(hh[1] - hh[2] * 1.4 - 3); z <= hh[1] + hh[2] * 1.4 + 3; z++) for (let x = Math.floor(hh[0] - hh[2] - 3); x <= hh[0] + hh[2] + 3; x++) {
         const c = ceil(x, z); if (c >= TOP) continue;
         const d = Math.hypot(x - hh[0], (z - hh[1]) / 1.35) + (nz(x * .45, z * .45) - .5) * 1.4;
-        if (d < hh[2]) { a.set(x, c, z, 'lava'); a.set(x, c + 1, z, 'lava'); if (R() < .3) a.emit('drip', [x + .5, c - .02, z + .5], .3, [.6, 0, .6]); }
+        if (d < hh[2]) { a.set(x, c, z, 'lava'); a.set(x, c + 1, z, 'lava'); if (R() < .3) a.emit('drip', [x + .5, c - .02, z + .5], .18, [.6, 0, .6]); }   // .18 : 40 % de gouttes en moins qu'au début
         else if (d < hh[2] + hh[3]) { a.set(x, c, z, R() < .75 ? 'magma' : 'basalt'); if (R() < .25 && d < hh[2] + .8) a.set(x, c - 1, z, 'magma'); }
       }
     });
@@ -123,6 +123,8 @@ window.GROTTE = {
     a.anchor('portail', PX, Y0 + 3.5, PZ + .5);
     /* une plaque d'or au pied du portail */
     a.box(X0 + .6, FLOOR + 2, PZ + 1.1, X1 + .4, FLOOR + 2.1, PZ + 2, 'gilded_blackstone');
+    /* une lueur violette, invisible, au pied du portail : on distingue les blocs d'obsidienne sans éclairer la grotte */
+    a.light(PX - 1, Y0 + 1, PZ + 1, 9, 2); a.light(PX, Y0 + 1, PZ + 1, 9, 2);
 
     /* --- le squelette qui attend l'ouverture, assis sur une dalle, à gauche de l'estrade --- */
     const SX = PX - 8.4, SZ = PZ + 6.6;

@@ -1,65 +1,26 @@
-/* The Last — la FAQ (faq.html) : habillage (police du jeu, briques, lanternes des âmes) et Volkar, l'assistant IA.
+/* The Last — Volkar, l'assistant IA, dans une bulle en bas à droite de la page d'accueil (index.html, volkar.css).
+   Le bouton ouvre un panneau de discussion, non modal sur ordinateur (la page reste utilisable), plein écran sur
+   téléphone. Échap ou la croix le referment ; la conversation reste là tant que la page est ouverte. L'adresse
+   /#volkar et tout lien vers #volkar l'ouvrent.
    Volkar parle à un Worker Cloudflare (faq/worker, adresse dans config.js : faq.endpoint) qui répond en flux SSE :
    sources, texte, cite, fin, erreur (contrat dans faq/README.md). Rien n'est stocké : l'historique vit dans cette page
-   et disparaît quand on la ferme. Aucun appel au Worker tant qu'on ne touche pas au chat (la confidentialité le promet).
-   Le texte du modèle n'est jamais injecté en HTML : on construit les nœuds un par un (textContent). */
+   et disparaît quand on la ferme. Aucun appel au Worker tant qu'on n'a pas ouvert la bulle (la confidentialité le
+   promet). Le texte du modèle n'est jamais injecté en HTML : on construit les nœuds un par un (textContent). */
 (() => {
 'use strict';
 
-const CFG = window.THE_LAST || {}, MC = window.MC || { blocks: {}, items: {}, font: {} }, D = document, root = D.documentElement;
+const CFG = window.THE_LAST || {}, D = document, root = D.documentElement;
 const $ = (s, r) => (r || D).querySelector(s), $$ = (s, r) => Array.from((r || D).querySelectorAll(s));
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PLEIN = matchMedia('(max-width: 560px), (max-height: 520px)');   // même seuil que volkar.css
+const FIN = matchMedia('(pointer: fine)');
 const MAX_Q = 500, MAX_A = 1500, MAX_HIST = 8;
 const DELAI_MS = 25000; // sans le moindre signe du Worker pendant ce temps, on abandonne la réponse
 
-function h(tag, attrs, ...kids) {
-  const e = D.createElement(tag);
-  if (attrs) for (const k in attrs) { if (k === 'class') e.className = attrs[k]; else if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
-  kids.forEach(c => { if (c) e.appendChild(typeof c === 'string' ? D.createTextNode(c) : c); });
-  return e;
-}
-
-/* ---------- police du jeu (mêmes glyphes que l'accueil, voir mc.js) ---------- */
-function pxWord(word) {
-  let d = '', x = 0;
-  for (const ch of word) {
-    const g = MC.font[ch] || MC.font['?']; if (!g) continue;
-    const y0 = 10 - g.a;
-    g.r.forEach((row, j) => { let run = 0; for (let i = 0; i <= row.length; i++) { if (row[i] === '#') run++; else if (run) { d += 'M' + (x + i - run) + ' ' + (y0 + j) + 'h' + run + 'v1h-' + run + 'z'; run = 0; } } });
-    x += g.w + 1;
-  }
-  const w = Math.max(1, x - 1), svg = D.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 ' + w + ' 12'); svg.setAttribute('shape-rendering', 'crispEdges'); svg.setAttribute('aria-hidden', 'true');
-  svg.style.setProperty('--w', w);
-  const p = D.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('fill', 'currentColor'); p.setAttribute('d', d); svg.appendChild(p);
-  return svg;
-}
-function pxText(el) {
-  const txt = el.textContent.trim(); el.textContent = '';
-  if (el.dataset.fs) el.style.setProperty('--fs', el.dataset.fs + 'px');
-  el.appendChild(h('span', { class: 'sr', text: txt }));
-  txt.split(' ').filter(Boolean).forEach(w => el.appendChild(pxWord(w)));
-}
-function pxLabel(el, text) {
-  text = String(text).trim(); el.textContent = '';
-  const box = h('span', { class: 'pxl', 'aria-hidden': 'true' });
-  text.split(' ').filter(Boolean).forEach(w => box.appendChild(pxWord(w)));
-  el.append(h('span', { class: 'sr', text }), box); el.classList.add('pxl-host');
-}
-
-/* ---------- le fond (briques du Nether) et les lanternes des âmes des questions ---------- */
-function textures() {
-  const cut = (src, row, cb) => { const im = new Image(); im.onload = () => { const c = D.createElement('canvas'); c.width = c.height = 16; c.getContext('2d').drawImage(im, 0, row * 16, 16, 16, 0, 0, 16, 16); cb('url(' + c.toDataURL() + ')'); }; im.src = src; };
-  if (MC.blocks.nether_bricks) cut('assets/mc/blocks.png', MC.blocks.nether_bricks[0], u => root.style.setProperty('--fq-bg', u));
-  if (MC.items && MC.items.soul_lantern !== undefined) cut('assets/mc/items.png', MC.items.soul_lantern, u => root.style.setProperty('--soullamp', u));
-}
-
-$$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
-$$('h1.px, h2.px').forEach(pxText);
-textures();
-
-/* ================= Volkar ================= */
-const box = $('#volkar'), log = $('#gm-log'), form = $('#gm-form'), q = $('#gm-q'), send = $('#gm-send'), stop = $('#gm-stop');
+const btn = $('#vk-btn'), box = $('#volkar');
+if (!btn || !box) return;
+const titre = $('#t-gm'), fil = $('#vk-fil'), fermer = $('#vk-close');
+const log = $('#gm-log'), form = $('#gm-form'), q = $('#gm-q'), send = $('#gm-send'), stop = $('#gm-stop');
 const sugg = $('#gm-sugg'), btnNew = $('#gm-new'), compte = $('#gm-compte'), etat = $('#gm-etat'), mention = $('#gm-mention'), pill = $('#gm-pill');
 const DISCORD = (CFG.community && CFG.community.url ? String(CFG.community.url).replace(/^\//, '') : '') || 'discord/';
 const SUGGESTIONS = [
@@ -70,10 +31,18 @@ const SUGGESTIONS = [
   'Tu es une IA ?'
 ];
 
+function h(tag, attrs, ...kids) {
+  const e = D.createElement(tag);
+  if (attrs) for (const k in attrs) { if (k === 'class') e.className = attrs[k]; else if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
+  kids.forEach(c => { if (c) e.appendChild(typeof c === 'string' ? D.createTextNode(c) : c); });
+  return e;
+}
+
 /* L'adresse du Worker : config.js, ou ?api=… pour un essai, mais seulement sur un aperçu local. */
+const QS = new URLSearchParams(location.search);
 const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 function endpoint() {
-  const api = new URLSearchParams(location.search).get('api');
+  const api = QS.get('api');
   if (api && LOCAL && /^https?:\/\/[^\s/]+(\/[^\s]*)?$/i.test(api)) return api.replace(/\/+$/, '');
   const e = CFG.faq && CFG.faq.endpoint ? String(CFG.faq.endpoint).trim() : '';
   return /^https:\/\//i.test(e) || (LOCAL && /^http:\/\//i.test(e)) ? e.replace(/\/+$/, '') : '';
@@ -84,10 +53,11 @@ let hist = [];          // [{role, content, sig?}] : la conversation, en mémoir
 let ctrl = null;        // AbortController de la réponse en cours
 let sante = null;       // promesse de GET /sante, lancée au premier geste
 let bientot = false;
+let ouvert = false;
 
 const annonce = t => { etat.textContent = ''; setTimeout(() => { etat.textContent = t; }, 30); };
-const enBas = () => log.scrollHeight - log.scrollTop - log.clientHeight < 60;
-const descendre = (force) => { if (force || enBas()) log.scrollTop = log.scrollHeight; };
+const enBas = () => fil.scrollHeight - fil.scrollTop - fil.clientHeight < 60;
+const descendre = (force) => { if (force || enBas()) fil.scrollTop = fil.scrollHeight; };
 
 /* ---------- rendu sûr du texte du modèle : paragraphes, listes, **gras**, liens vers le site uniquement ---------- */
 function lienSur(u) {
@@ -170,7 +140,7 @@ function passerBientot() {
   const avaitFocus = form.contains(D.activeElement);
   if (ctrl) ctrl.abort();
   const m = bulle('bot');
-  rendreTexte($('.gm-txt', m), 'Volkar arrive bientôt. En attendant, les questions ci-dessus et le Discord sont là pour t\'aider.');
+  rendreTexte($('.gm-txt', m), 'Volkar arrive bientôt. En attendant, le panneau « Questions » de cette page et le Discord sont là pour t\'aider.');
   // le champ qui avait le focus vient d'être caché : on le pose sur le message, pour ne pas perdre le visiteur au clavier
   if (avaitFocus) { m.tabIndex = -1; m.focus({ preventScroll: true }); }
   annonce('Volkar arrive bientôt.');
@@ -200,6 +170,7 @@ function majCompte() {
 function occupe(on) {
   send.hidden = on; stop.hidden = !on; btnNew.hidden = !on && !hist.length && !log.querySelector('.gm-user');
   $$('.gm-s', sugg).forEach(b => { b.disabled = on; });
+  btn.classList.toggle('vk-ecrit', on && !ouvert);
 }
 
 /* ---------- un échange : POST /question, puis lecture du flux SSE ---------- */
@@ -207,7 +178,7 @@ async function envoyer() {
   const texte = q.value.trim().slice(0, MAX_Q);
   if (!texte || ctrl || bientot) return;
   if (!(await verifier())) return;
-  q.value = ''; majCompte(); q.focus({ preventScroll: true });
+  q.value = ''; majCompte(); if (ouvert) q.focus({ preventScroll: true });
   sugg.hidden = true;
   rendreTexte($('.gm-txt', bulle('user')), texte);
   hist.push({ role: 'user', content: texte });
@@ -220,8 +191,6 @@ async function envoyer() {
   txt.appendChild(h('p', { class: 'gm-pense' }, 'Volkar réfléchit', h('i', { 'aria-hidden': 'true' }, h('b'))));
   annonce('Volkar écrit…');
   ctrl = new AbortController(); occupe(true);
-  box.classList.add('en-cours');
-  form.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
 
   let ecrit = '', sources = [], cites = [], fin = null, err = null, coupe = false, delai = false, minuteur = 0;
   const c = ctrl;
@@ -310,18 +279,97 @@ async function envoyer() {
     annonce(coupe ? 'Réponse arrêtée.' : err ? 'Réponse interrompue : ' + (typeof err.message === 'string' && err.message ? err.message : 'la réponse s\'est coupée en route.') : 'Réponse de Volkar prête.');
   }
   occupe(false); descendre(suivre);
-  if (suivre && !bientot) form.scrollIntoView({ block: 'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
+  if (!ouvert) btn.classList.add('vk-neuf');   // fermé pendant la réponse : un point d'or sur le bouton
 }
 
-/* ---------- branchements ---------- */
 function nouvelle() {
   if (ctrl) ctrl.abort();
   hist = [];
   $$('.gm-msg', log).forEach(m => { if (!m.classList.contains('gm-accueil')) m.remove(); });
-  sugg.hidden = false; btnNew.hidden = true; log.scrollTop = 0; box.classList.remove('en-cours');
+  sugg.hidden = false; btnNew.hidden = true; fil.scrollTop = 0;
   q.value = ''; majCompte(); q.focus();
   annonce('Nouvelle conversation. Rien n\'a été gardé.');
 }
+
+/* ---------- ouvrir, fermer ---------- */
+// plein écran (téléphone) : la page derrière devient inerte et ne défile plus ; le panneau suit le clavier
+const fond = () => Array.from(D.body.children).filter(e => e !== box && e !== etat && e.tagName !== 'SCRIPT');
+function caler() {
+  const vv = window.visualViewport;
+  if (!vv || !ouvert || !PLEIN.matches) { box.style.removeProperty('--vk-h'); box.style.removeProperty('top'); return; }
+  box.style.setProperty('--vk-h', Math.round(vv.height) + 'px');
+  box.style.top = Math.round(vv.offsetTop) + 'px';
+}
+function plein(on) {
+  root.classList.toggle('vk-plein', on);
+  box.setAttribute('aria-modal', on ? 'true' : 'false');
+  fond().forEach(e => { e.inert = on; });
+  caler();
+}
+function ouvrir(focus = true) {
+  btn.classList.remove('vk-ecrit', 'vk-neuf');
+  if (ouvert) { if (focus) poserFocus(); return; }
+  ouvert = true;
+  box.classList.remove('vk-ferme'); box.hidden = false;
+  btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Fermer la conversation avec Volkar');
+  plein(PLEIN.matches);
+  if (log.querySelector('.gm-user')) descendre(true);   // une conversation en cours : on reprend au dernier message
+  if (focus) poserFocus();
+}
+// sur ordinateur, on peut écrire tout de suite ; sur écran tactile, pas de clavier qui surgit : le focus va au titre
+function poserFocus() {
+  if (FIN.matches && !PLEIN.matches && !form.hidden) q.focus({ preventScroll: true });
+  else titre.focus({ preventScroll: true });
+}
+// focus : 'bouton' le rend au bouton ; 'garde' seulement s'il était dans le panneau ; 'laisse' n'y touche pas (clic ailleurs)
+function fermerPanneau(focus = 'bouton') {
+  if (!ouvert) return;
+  ouvert = false;
+  const dedans = box.contains(D.activeElement);
+  btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Demande à Volkar, l\'assistant IA');
+  if (ctrl) btn.classList.add('vk-ecrit');
+  plein(false);
+  if (location.hash === '#volkar') history.replaceState(null, '', location.pathname + location.search);
+  const cacher = () => { if (!ouvert) { box.hidden = true; box.classList.remove('vk-ferme'); } };
+  if (REDUCE) cacher(); else { box.classList.add('vk-ferme'); setTimeout(cacher, 180); }
+  if (focus === 'bouton' || (focus === 'garde' && dedans)) btn.focus({ preventScroll: true });
+}
+
+/* ---------- branchements ---------- */
+btn.hidden = false;
+btn.addEventListener('click', () => { if (ouvert) fermerPanneau(); else ouvrir(); });
+fermer.addEventListener('click', () => fermerPanneau());
+// agrandir / réduire (ordinateur ; sur téléphone le panneau prend déjà tout l'écran) : la taille reste tant que la page est ouverte
+const taille = $('#vk-taille');
+taille.addEventListener('click', () => {
+  const bas = !!log.querySelector('.gm-user') && enBas(), grand = box.classList.toggle('vk-grand');
+  taille.setAttribute('aria-label', grand ? 'Réduire la conversation' : 'Agrandir la conversation');
+  taille.title = grand ? 'Réduire' : 'Agrandir';
+  if (bas) setTimeout(() => descendre(true), REDUCE ? 0 : 240);   // on suivait la fin de la conversation : on la garde en vue
+});
+box.addEventListener('keydown', e => { if (e.key === 'Escape' && !e.isComposing) { e.preventDefault(); fermerPanneau(); } });
+btn.addEventListener('keydown', e => { if (e.key === 'Escape' && ouvert) { e.preventDefault(); fermerPanneau(); } });
+// les liens vers #volkar ouvrent la bulle ; en plein écran, un lien vers un endroit de cette page la referme d'abord
+D.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href]');
+  if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const href = a.getAttribute('href');
+  if (href === '#volkar' || href === '/#volkar') { e.preventDefault(); ouvrir(); return; }
+  if (ouvert && PLEIN.matches && box.contains(a) && /^\/?#[a-z]/i.test(href)) fermerPanneau('garde');
+});
+// un clic ailleurs sur l'écran referme la bulle (sur ordinateur ; en plein écran, il n'y a pas d'ailleurs). Le clic doit
+// commencer ET finir dehors : une sélection de texte tirée hors du panneau ne le ferme pas, un défilement au doigt non plus
+// (pas de « click » après un geste de défilement). Phase de capture : un autre script qui arrête le clic ne nous le cache pas.
+const chezVolkar = t => box.contains(t) || btn.contains(t) || !!(t.closest && t.closest('a[href="#volkar"], a[href="/#volkar"]'));
+let pressionDehors = false;
+D.addEventListener('pointerdown', e => { pressionDehors = ouvert && !chezVolkar(e.target); }, true);
+D.addEventListener('click', e => {
+  if (ouvert && pressionDehors && !chezVolkar(e.target) && !PLEIN.matches) fermerPanneau('laisse');
+  pressionDehors = false;
+}, true);
+addEventListener('hashchange', () => { if (location.hash === '#volkar') ouvrir(); });
+PLEIN.addEventListener('change', () => { if (ouvert) plein(PLEIN.matches); });
+if (window.visualViewport) { visualViewport.addEventListener('resize', caler); visualViewport.addEventListener('scroll', caler); }
 
 if (!API) passerBientot();
 else {
@@ -342,8 +390,9 @@ else {
   q.addEventListener('input', majCompte);
   stop.addEventListener('click', () => { if (ctrl) ctrl.abort(); q.focus(); });
   btnNew.addEventListener('click', nouvelle);
-  log.tabIndex = 0;
+  fil.tabIndex = 0;
   majCompte();
 }
-if (REDUCE) log.style.scrollBehavior = 'auto';
+if (REDUCE) fil.style.scrollBehavior = 'auto';
+if (location.hash === '#volkar') ouvrir(false);
 })();

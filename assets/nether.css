@@ -136,27 +136,12 @@ main { position: relative; overflow-x: clip; }
 .loader .px { justify-content: center; animation: blink 1.2s step-end infinite; }
 .ready .loader, html:not(.js) .loader { opacity: 0; pointer-events: none; }
 .no-gl .loader { display: none; }
-.hero-cap {
-  position: absolute; right: 16px; bottom: 16px; max-width: min(42vw, 520px); margin: 0;
-  padding: 10px 14px 11px; background: rgb(10 4 5 / .74); box-shadow: inset 0 0 0 2px #050304, inset 4px 4px 0 rgb(255 181 71 / .2);
-  transition: opacity .3s;
-}
-.cap-k { display: flex; align-items: center; gap: 10px; margin: 0; color: #ffe9c9; }
-.cap-k i { flex: none; width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: blink 1.6s step-end infinite; }
-.cap-l { margin: 6px 0 0; color: #f3e4d8; font-size: 14.5px; line-height: 1.45; }
 .hero-hint {
   position: absolute; left: calc(50% + 22px); bottom: 16px; padding: 8px 10px; text-decoration: none;
   background: rgb(12 5 6 / .78); box-shadow: inset 0 0 0 2px #050304;
   animation: nudge 1.2s step-end infinite; transition: opacity .3s;
 }
-.scrolled .hero-hint, .scrolled .hero-cap { opacity: 0; pointer-events: none; }
-@media (max-width: 700px), (max-aspect-ratio: 4/5) {
-  .hero-cap { top: 64px; bottom: auto; left: 10px; right: auto; max-width: calc(100% - 20px); padding: 8px 10px; }
-}
-@media (max-width: 700px) {
-  .cap-l { display: none; }
-  .cap-l { font-size: 13px; }
-}
+.scrolled .hero-hint { opacity: 0; pointer-events: none; }
 @keyframes blink { 50% { opacity: .25; } }
 @keyframes nudge { 50% { transform: translateY(5px); } }
 
@@ -352,8 +337,11 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 /* Ordinateur : les panneaux s'ouvrent par-dessus la scène */
 .g-overlay .g-doc { position: absolute; inset: 0; z-index: 3; width: auto; margin: 0; padding: 0; pointer-events: none; }
 .g-overlay .g-head, .g-overlay #g-route, .g-overlay #g-ouv { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
+/* le panneau ouvert est fixe à l'écran : il reste où il s'est ouvert quand on fait défiler (grotte.js le ferme quand on
+   remonte hors de la grotte) ; la scène passe au-dessus du pied de page pour qu'il ne le recouvre pas */
+.g-overlay .g-stage { z-index: 5; }
 .g-overlay .g-panel {
-  position: absolute; right: 60px; top: 84px; width: min(460px, 38vw); max-height: calc(100% - 132px); overflow: auto; margin: 0;
+  position: fixed; right: 60px; top: 84px; overscroll-behavior: contain; width: min(460px, 38vw); max-height: calc(100% - 132px); overflow: auto; margin: 0;
   padding: 22px 22px 18px; pointer-events: auto; background: rgb(18 10 12 / .95); clip-path: var(--notch);
   box-shadow: inset 0 0 0 var(--u) #050304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #4f3a35, inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #0d0808;
   opacity: 0; transform: translateX(14px); transition: opacity .2s, transform .2s; scrollbar-width: thin;

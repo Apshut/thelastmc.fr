@@ -423,7 +423,7 @@ function invitation(titreTag) {
     h('p', { class: 'cpt-plus', text: 'Retrouve tes achats, ta tête de joueur sur le site et, à l’ouverture, tes Braises.' }),
     action,
     h('p', { class: 'cpt-trust' }, picto(P_CADENAS), 'On ne te demandera jamais ton mot de passe.'),
-    h('a', { class: 'cpt-why', href: '/faq', text: 'Pourquoi un compte ?' })
+    h('a', { class: 'cpt-why', href: '/#volkar', text: 'Pourquoi un compte ?' })
   ];
 }
 TheLastCompte.ui = { h, pxLabel, tete3d, verifierImage, signe, enseigne, verifie, invitation, icone };
@@ -483,7 +483,7 @@ function monterPanneau() {
       h('ul', { class: 'cpt-liste' },
         entree('/compte/achats', 'written_book', "Historique d'achat"),
         entree('/compte/parametres', 'name_tag', 'Paramètres'),
-        entree('/faq', 'soul_lantern', 'Aide')),
+        entree('/#volkar', 'soul_lantern', 'Aide')),
       h('hr', { class: 'cpt-sep' }),
       h('div', { class: 'cpt-bas' }, sortie),
       h('p', { class: 'cpt-err', role: 'alert', hidden: '' }));
@@ -495,7 +495,7 @@ function monterPanneau() {
       h('p', { class: 'cpt-wait' }, h('span', { class: 'cpt-wait-i', 'aria-hidden': 'true' }),
         e === 'chargement' ? 'Chargement de ton compte…' : 'Ton compte est momentanément injoignable.'),
       e === 'injoignable' ? h('div', { class: 'cpt-go' }, retry) : null,
-      h('a', { class: 'cpt-why', href: '/faq', text: 'Aide' }));
+      h('a', { class: 'cpt-why', href: '/#volkar', text: 'Aide' }));
   } else {
     corps = h('div', { class: 'cpt-in' }, ...invitation('h2'));
   }

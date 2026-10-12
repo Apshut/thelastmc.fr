@@ -856,21 +856,38 @@ panels.forEach(p => {
   p.prepend(x);
   const hd = $('h3', p); if (hd) hd.tabIndex = -1;
 });
-function toggle(p, from) {
+function toggle(p, from, laisseFocus) {
   if (!overlay) { if (p) p.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); return; }
   const next = p && p !== panel ? p : null, prev = panel;
   if (prev) { prev.classList.remove('open'); prev.hidden = true; }
   panel = next;
   [tagNews, tagFaq].forEach(t => t.setAttribute('aria-expanded', String(!!next && t.getAttribute('aria-controls') === next.id)));
   if (next) {
-    lastTag = from || lastTag; next.hidden = false;
+    lastTag = from || lastTag; next.hidden = false; ouvertA = scrollY;
     requestAnimationFrame(() => next.classList.add('open'));
     const hd = $('h3', next); if (hd && !SHOT) hd.focus({ preventScroll: true });
-  } else if (lastTag && !SHOT) lastTag.focus({ preventScroll: true });
+  } else if (lastTag && !SHOT && !laisseFocus) lastTag.focus({ preventScroll: true });
 }
 tagNews.addEventListener('click', () => toggle(news, tagNews));
 tagFaq.addEventListener('click', () => toggle(faq, tagFaq));
-addEventListener('keydown', e => { if (e.key === 'Escape' && panel) toggle(null); });
+// Échap déjà pris par la bulle de Volkar (volkar.js) : on ne ferme pas le panneau en même temps
+addEventListener('keydown', e => { if (e.key === 'Escape' && panel && !e.defaultPrevented) toggle(null); });
+// un clic ailleurs referme le panneau, sans déplacer le focus. Le clic doit commencer ET finir hors du panneau (une
+// sélection de texte tirée dehors ne le ferme pas) ; les étiquettes s'en chargent elles-mêmes, et la bulle de Volkar
+// est une couche à part (on peut lui parler en gardant les questions sous les yeux).
+const horsPanneau = t => !!panel && !panel.contains(t) && !tagNews.contains(t) && !tagFaq.contains(t) && !(t.closest && t.closest('#volkar, #vk-btn'));
+let pressionHors = false;
+D.addEventListener('pointerdown', e => { pressionHors = horsPanneau(e.target); }, true);
+D.addEventListener('click', e => { if (pressionHors && horsPanneau(e.target)) toggle(null, null, true); pressionHors = false; }, true);
+// faire défiler la page referme le panneau (au-delà de 40 px : un défilement doux qui finit ne compte pas) ; la molette
+// au-dessus du panneau fait défiler le panneau lui-même et ne passe jamais à la page, même arrivée au bout
+let ouvertA = 0;
+addEventListener('scroll', () => { if (panel && Math.abs(scrollY - ouvertA) > 40) toggle(null, null, true); }, { passive: true });
+panels.forEach(p => p.addEventListener('wheel', e => {
+  if (!overlay || p !== panel || e.ctrlKey) return;
+  const haut = p.scrollTop <= 0, bas = p.scrollTop + p.clientHeight >= p.scrollHeight - 1;
+  if ((e.deltaY < 0 && haut) || (e.deltaY > 0 && bas)) e.preventDefault();
+}, { passive: false }));
 
 /* Sur ordinateur, tout le contenu passe dans la scène (panneaux par-dessus, feuille de route lisible au clavier) ;
    sur téléphone ou sans 3D, il reste en dessous, dans le cours de la page. */
@@ -958,11 +975,15 @@ const place = (el, id, keep, dx) => {
 function step(t, dt) {
   if (!eng) return;
   const sr = stage.getBoundingClientRect();
+  // le panneau ouvert est fixe à l'écran (nether.css) ; quand on a quitté la grotte (remonté vers le launcher), il se ferme
+  if (panel && !SHOT && sr.top > innerHeight * .6) toggle(null, null, true);
   if (!SHOT && (sr.bottom < 0 || sr.top > innerHeight)) return;
   const hl = hlNow();
-  const goal = panel ? -.32 : 0;
-  shift = REDUCE ? goal : shift + (goal - shift) * (dt ? 1 - Math.exp(-dt * 7) : 1);
   view = viewNow();
+  // la scène se décale pour laisser le portail visible à côté du panneau, mais seulement sur le plan du portail : pendant la
+  // traversée de la vitre, la coupe 3D doit rester calée sur la lave dessinée dans la page
+  const goal = panel ? -.32 * sstep(.7, .92, view.u) : 0;
+  shift = REDUCE ? goal : shift + (goal - shift) * (dt ? 1 - Math.exp(-dt * 7) : 1);
   eng.frame(REDUCE ? 20 : t, { dt, hl, sx: shift, cam: view.cam, lake: view.lake, scr: view.scr });
   // les étiquettes arrivent avec le plan du portail ; avant, elles ne sont ni visibles ni atteignables
   const tk = REDUCE ? 0 : sstep(.7, .92, view.u), tagsOn = tk > .01;

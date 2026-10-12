@@ -109,7 +109,7 @@ function pageEntrer() {
     const actions = h('div', { class: 'cp-actions' });
     if (CODE && REESSAYABLE.includes(code)) actions.appendChild(bouton('Réessayer', 'btn-main', () => (etape === 'echange' ? oui() : apercu())));
     actions.appendChild(lienBtn('/', "Retour à l'accueil"));
-    corps.push(actions, h('a', { class: 'cpt-why', href: '/faq', text: 'Besoin d’aide ?' }));
+    corps.push(actions, h('a', { class: 'cpt-why', href: '/#volkar', text: 'Besoin d’aide ?' }));
     ecran({ titre: titre(TITRES[code] || 'Connexion impossible'), corps });
   }
 

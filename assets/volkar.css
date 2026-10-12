@@ -1,0 +1,269 @@
+/* The Last — Volkar, l'assistant IA, dans une bulle en bas à droite de la page d'accueil (volkar.js).
+   Le bouton : le médaillon de Volkar, fixe, toujours à portée même quand on descend. Il ouvre un panneau de discussion
+   ancré au-dessus de lui (non modal : la page reste utilisable) ; sur téléphone, le panneau prend tout l'écran.
+   L'habillage du comptoir (pierre noire polie, cadre de fer, fil de métal chaud) reprend celui de l'ancienne page FAQ. */
+.vk {
+  --vk-m: 20px;                                         /* marge au bord de l'écran */
+  --vk-b: 60px;                                         /* diamètre du bouton */
+  --vk-ink: #f4ebe3;
+}
+
+/* ---------- le bouton ---------- */
+.vk-btn {
+  --vk-m: 20px; --vk-b: 60px;
+  position: fixed; z-index: 60; right: var(--vk-m); bottom: var(--vk-m);
+  display: flex; align-items: center; gap: 0; height: var(--vk-b); min-width: var(--vk-b); padding: 0; border: 0;
+  cursor: pointer; color: #fff3e6; background: none; font: 700 14px/1 "Sora", sans-serif; letter-spacing: .02em;
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity .35s ease, transform .35s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+/* il arrive avec la page (après « Ouverture du Nether… ») ; sans 3D, tout de suite */
+.ready .vk-btn, .no-gl .vk-btn { opacity: 1; transform: none; pointer-events: auto; }
+.shot .vk-btn { display: none; }                        /* images d'essai de la scène */
+
+/* le médaillon : la tête de Volkar dans un anneau de fer, une lueur de braise derrière */
+.vk-med {
+  position: relative; z-index: 1; flex: none; display: grid; place-items: center; width: var(--vk-b); height: var(--vk-b); border-radius: 50%;
+  background: radial-gradient(circle, #0a0707 60%, #6b5148 61%, #3a2b28 70%, #120c0c 71%);
+  box-shadow: 0 0 0 2px #050303, 0 0 0 4px rgb(255 181 71 / .55), 0 6px 18px rgb(0 0 0 / .55), 0 0 26px rgb(255 120 40 / .45);
+  transition: box-shadow .2s, transform .2s;
+}
+.vk-med img { display: block; width: calc(var(--vk-b) - 12px); height: calc(var(--vk-b) - 12px); border-radius: 50%; transition: opacity .18s, transform .18s; }
+.vk-btn:hover .vk-med { box-shadow: 0 0 0 2px #050303, 0 0 0 4px #ffd27a, 0 6px 18px rgb(0 0 0 / .55), 0 0 34px rgb(255 140 50 / .75); transform: translateY(-2px); }
+.vk-btn:active .vk-med { transform: translateY(1px); }
+.vk-btn:focus-visible { outline: none; }
+.vk-btn:focus-visible .vk-med { box-shadow: 0 0 0 2px #050303, 0 0 0 5px #fff, 0 0 0 7px #050303; }
+/* la bulle de discussion, en pixels, sur le bord du médaillon : de l'or, comme les liens et l'étiquette « IA » du panneau */
+.vk-bulle { position: absolute; z-index: 2; right: -11px; top: -10px; width: 28px; height: 24px; shape-rendering: crispEdges; overflow: visible; filter: drop-shadow(0 0 6px rgb(255 181 71 / .55)); transition: opacity .18s, transform .18s; }
+.vk-bulle-c { fill: #050303; }
+.vk-bulle-f { fill: var(--gold); }
+.vk-p { fill: #2a1206; }
+.vk-btn:hover .vk-bulle-f { fill: #ffd27a; }
+/* Volkar écrit pendant que le panneau est fermé : les trois points clignotent l'un après l'autre */
+.vk-btn.vk-ecrit .vk-p { animation: vk-pense 1.1s step-end infinite; }
+.vk-btn.vk-ecrit .vk-p:nth-of-type(2) { animation-delay: .18s; }
+.vk-btn.vk-ecrit .vk-p:nth-of-type(3) { animation-delay: .36s; }
+@keyframes vk-pense { 50% { opacity: .15; } }
+/* la croix, quand le panneau est ouvert (le bouton le referme) : posée sur le médaillon, donc toujours centrée */
+.vk-x { position: absolute; z-index: 1; inset: 0; opacity: 0; transform: rotate(-45deg) scale(.6); transition: opacity .18s, transform .18s; pointer-events: none; }
+.vk-x::before, .vk-x::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 4px; margin: -2px 0 0 -11px; background: #ffd9a0; box-shadow: 0 0 8px rgb(255 160 70 / .7); }
+.vk-x::before { transform: rotate(45deg); }
+.vk-x::after { transform: rotate(-45deg); }
+.vk-btn[aria-expanded="true"] .vk-med img { opacity: 0; transform: scale(.6); }
+.vk-btn[aria-expanded="true"] .vk-x { opacity: 1; transform: none; }
+.vk-btn[aria-expanded="true"] .vk-bulle { opacity: 0; transform: scale(.5); }
+
+/* l'intitulé, à gauche du médaillon ; il se replie quand le panneau est ouvert */
+.vk-lbl {
+  display: inline-flex; order: -1; margin-right: -18px; padding: 0 30px 0 16px; height: 44px; align-items: center; white-space: nowrap; flex-wrap: nowrap;
+  background: rgb(14 8 8 / .92); clip-path: var(--notch);
+  box-shadow: inset 0 0 0 var(--u) #060304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #4a3a35, inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #0d0808;
+  transition: opacity .25s, max-width .3s ease, padding .3s ease, margin .3s ease;
+  max-width: 260px; overflow: hidden;
+}
+.vk-btn[aria-expanded="true"] .vk-lbl { max-width: 0; margin-right: 0; padding: 0; opacity: 0; }
+.vk-lbl .px { flex-wrap: nowrap; --k: 1; }
+.vk-btn:hover .vk-lbl .px { color: #ffe9c9; }
+
+/* une réponse est prête pendant que le panneau est fermé : un point d'or */
+.vk-dot { position: absolute; z-index: 2; left: -1px; top: -1px; display: none; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 2px #050303, 0 0 12px var(--gold); }
+.vk-btn.vk-neuf .vk-dot { display: block; }
+
+/* ---------- le panneau ---------- */
+.vk {
+  position: fixed; z-index: 61; right: var(--vk-m); bottom: calc(var(--vk-m) + var(--vk-b) + 14px);
+  display: flex; flex-direction: column;
+  width: min(410px, calc(100vw - 2 * var(--vk-m)));
+  height: min(660px, calc(100vh - var(--vk-m) - var(--vk-b) - 14px - 76px));
+  height: min(660px, calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - 76px));   /* 76 px : sous l'en-tête du site */
+  min-height: 300px;
+  color: var(--vk-ink); font: 15px/1.55 "Inter", system-ui, sans-serif;
+  filter: drop-shadow(0 14px 28px rgb(0 0 0 / .6)) drop-shadow(0 0 30px rgb(255 100 30 / .14));
+  transform-origin: calc(100% - var(--vk-b) / 2) 100%;
+  animation: vk-ouvre .2s ease-out;
+  transition: width .22s ease, height .22s ease;
+}
+/* agrandi (bouton de l'en-tête) : plus large, et toute la hauteur entre l'en-tête du site et le bouton */
+.vk.vk-grand {
+  width: min(780px, calc(100vw - 2 * var(--vk-m)));
+  height: calc(100vh - var(--vk-m) - var(--vk-b) - 14px - 76px);
+  height: calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - 76px);
+}
+.vk-moins { display: none !important; }
+.vk-grand .vk-plus { display: none !important; }
+.vk-grand .vk-moins { display: block !important; }
+.vk-grand .gm-msg { max-width: min(640px, 88%); }
+.vk-grand .gm-txt { font-size: 16px; }
+@keyframes vk-ouvre { from { opacity: 0; transform: translateY(12px) scale(.96); } }
+.vk.vk-ferme { animation: vk-ferme .14s ease-in forwards; }
+@keyframes vk-ferme { to { opacity: 0; transform: translateY(10px) scale(.97); } }
+
+.vk .gm-box { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; background: #110d0e; clip-path: var(--notch); }
+/* le cadre de fer, posé par-dessus les fonds de l'en-tête et de la saisie */
+.vk .gm-box::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  box-shadow: inset 0 0 0 var(--u) #050303, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #3d3133, inset calc(var(--u) * -2) calc(var(--u) * -2) 0 #060404;
+}
+/* le bord haut : un fil de métal chaud, qui respire lentement */
+.vk .gm-box::before {
+  content: ""; position: absolute; z-index: 3; left: calc(var(--u) * 3); right: calc(var(--u) * 3); top: var(--u); height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, rgb(255 107 44 / 0), #ff8a3d 18%, #ffd27a 50%, #ff8a3d 82%, rgb(255 107 44 / 0));
+  box-shadow: 0 0 10px rgb(255 120 40 / .6); opacity: .7; animation: vk-respire 5s ease-in-out infinite;
+}
+@keyframes vk-respire { 50% { opacity: 1; } }
+
+/* l'en-tête : médaillon, nom, « IA », nouvelle conversation, fermer */
+.gm-head {
+  position: relative; flex: none; display: flex; align-items: center; gap: 12px; padding: 14px 12px 12px 16px;
+  background: linear-gradient(#211a1b, #171213); border-bottom: 2px solid #070505;
+}
+.gm-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: linear-gradient(90deg, rgb(255 181 71 / 0), rgb(255 181 71 / .45) 30%, rgb(255 107 44 / .45) 70%, rgb(255 107 44 / 0)); }
+.vk-medal {
+  flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  background: radial-gradient(circle, #0a0707 60%, #4c3c37 61%, #2a201f 70%, #120c0c 71%);
+  box-shadow: 0 0 0 2px #050303, 0 0 18px rgb(255 140 50 / .28);
+}
+.gm-av { display: block; width: 40px; height: 40px; border-radius: 50%; }
+.gm-id { flex: 1 1 auto; min-width: 0; margin: 0; font-weight: 400; line-height: 1.3; }
+.gm-id:focus { outline: none; }
+.gm-id:focus-visible { outline: 2px dashed rgb(255 181 71 / .6); outline-offset: 2px; }
+.gm-nom { color: #fff3e6; font: 700 17px/1.2 "Sora", sans-serif; letter-spacing: .02em; }
+.gm-ia {
+  display: inline-block; margin-left: 4px; padding: 3px 5px 2px; vertical-align: 2px; background: var(--gold); color: #1c0a03;
+  font: 800 10px/1 "Sora", sans-serif; letter-spacing: .12em;
+}
+.gm-role { display: block; margin-top: 2px; color: #c9b8ae; font-size: 13px; line-height: 1.35; }
+.gm-pill {
+  flex: none; display: inline-flex; align-items: center; gap: 7px; margin: 0; padding: 6px 9px; background: #0b0808; color: #ffe9c9;
+  font: 600 10.5px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase; box-shadow: inset 0 0 0 1px #4a3a30;
+}
+.gm-pill i { width: 7px; height: 7px; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: blink 1.6s step-end infinite; }
+/* les deux boutons carrés de l'en-tête */
+.vk-ico {
+  flex: none; position: relative; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; cursor: pointer;
+  color: #e9d6c6; background: #1a1415; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 1px #4a3b35, inset 0 2px 0 rgb(255 255 255 / .04); transition: background .15s, color .15s, box-shadow .15s;
+}
+.vk-ico:hover { background: #26170f; color: #fff; box-shadow: inset 0 0 0 1px #ff8a3d; }
+.vk-ico:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+.vk-ico svg { display: block; width: 20px; height: 20px; shape-rendering: crispEdges; }
+
+/* le fil : la conversation et les suggestions défilent ensemble */
+.vk-fil { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: #4a3a33 transparent; scrollbar-width: thin; }
+.gm-log { display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 14px; }
+.vk-fil:focus-visible { outline: 2px dashed rgb(255 181 71 / .6); outline-offset: -6px; }
+.gm-msg { position: relative; max-width: 92%; padding: 10px 14px 11px; clip-path: var(--notch); overflow-wrap: anywhere; }
+.gm-bot { align-self: flex-start; background: #1c1617; box-shadow: inset 3px 0 0 #ff7a36, inset 0 0 0 1px rgb(255 255 255 / .04); }
+.gm-user { align-self: flex-end; background: #241c15; box-shadow: inset -3px 0 0 var(--gold), inset 0 0 0 1px rgb(255 181 71 / .1); }
+.gm-de { margin: 0 0 5px; color: #ff9d66; font: 700 10.5px/1.2 "Sora", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.gm-user .gm-de { color: #ffcf80; text-align: right; }
+.gm-txt { color: #f2e7de; font-size: 15px; line-height: 1.55; }
+.gm-txt p { margin: 0 0 .6em; white-space: pre-wrap; }
+.gm-txt > :last-child { margin-bottom: 0; }
+.gm-txt ul, .gm-txt ol { margin: 0 0 .6em; padding-left: 1.3em; }
+.gm-txt li { margin: .2em 0; }
+.gm-txt li::marker { color: var(--ember); }
+.gm-txt strong { color: #fff; }
+.gm-txt a { color: var(--gold); }
+.gm-accueil .gm-txt p { white-space: normal; }
+
+/* « Volkar réfléchit… » : trois braises, et le médaillon qui chauffe */
+.gm-pense { display: inline-flex; align-items: center; gap: 10px; color: #dccabd; font-size: 14.5px; }
+.gm-pense i { display: inline-flex; gap: 4px; }
+.gm-pense i::before, .gm-pense i::after, .gm-pense b { content: ""; width: 6px; height: 6px; background: var(--ember); box-shadow: 0 0 8px var(--ember); animation: vk-braise 1.1s step-end infinite; }
+.gm-pense i::after { animation-delay: .36s; }
+.gm-pense b { animation-delay: .18s; }
+@keyframes vk-braise { 50% { opacity: .25; } }
+.vk:has(.gm-pense) .vk-medal { animation: vk-souffle 1.6s ease-in-out infinite; }
+@keyframes vk-souffle { 50% { box-shadow: 0 0 0 2px #050303, 0 0 30px rgb(255 120 40 / .7); } }
+
+/* sous chaque réponse : les sources, puis le rappel IA */
+.gm-src { margin: 11px 0 0; padding-top: 9px; border-top: 1px dashed rgb(255 181 71 / .26); }
+.gm-src p { margin: 0 0 7px; color: #c3b2a8; font: 600 10.5px/1.2 "Sora", sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.gm-src ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.gm-src a {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 5px 10px; background: #15100f;
+  color: #ffd08a; font-size: 13.5px; line-height: 1.3; text-decoration: none; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .32);
+}
+.gm-src a:hover { background: #22170f; color: #fff; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .7); }
+.gm-src a b { color: var(--ember); font: 700 11px/1 "Sora", sans-serif; }
+.gm-note { margin: 8px 0 0; color: #a99a92; font-size: 12px; }
+.gm-coupe { margin: 8px 0 0; color: #e0b98f; font-size: 13px; font-style: italic; }
+.gm-esc { margin: 11px 0 0; padding: 10px 12px; background: #141011; box-shadow: inset 0 0 0 1px rgb(255 181 71 / .25); color: #e3d6cc; font-size: 14px; }
+.gm-esc p { margin: 0 0 4px; }
+.gm-esc p:first-child { color: #ffd08a; font-weight: 600; }
+.gm-esc a { color: var(--gold); }
+.gm-err { background: #261111; box-shadow: inset 3px 0 0 #ff4d2e, inset 0 0 0 1px rgb(255 77 46 / .28); }
+.gm-err .gm-de { color: #ff7b5c; }
+.gm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.vk .btn:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+
+/* suggestions : des étiquettes de fer, qui chauffent au survol */
+.gm-sugg { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 16px 16px; }
+.gm-s {
+  min-height: 38px; padding: 7px 12px; border: 0; cursor: pointer; text-align: left; color: #f1dcc4; background: #1a1415;
+  font: 500 14px/1.3 "Inter", system-ui, sans-serif; clip-path: var(--notch);
+  box-shadow: inset 0 0 0 1px #4a3b35, inset 0 2px 0 rgb(255 255 255 / .04); transition: background .15s, color .15s, box-shadow .15s, transform .08s;
+}
+.gm-s:hover { background: #26170f; color: #fff; box-shadow: inset 0 0 0 1px #ff8a3d, inset 0 -2px 0 rgb(255 107 44 / .35); }
+.gm-s:active { transform: translateY(1px); }
+.gm-s:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+
+/* la saisie : un creux dans la pierre ; Envoyer : un métal chauffé au rouge */
+.gm-form { flex: none; padding: 12px 14px 8px; border-top: 2px solid #070505; background: #0e0a0b; }
+.gm-form textarea {
+  display: block; width: 100%; min-height: 48px; max-height: 30vh; padding: 10px 12px; resize: none; border: 0;
+  color: var(--vk-ink); background: #080606; font: 16px/1.45 "Inter", system-ui, sans-serif;
+  box-shadow: inset 0 0 0 2px #3a2f2c, inset 3px 3px 0 2px #030202;
+}
+.gm-form textarea::placeholder { color: #8f7e76; }
+.gm-form textarea:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.gm-bar { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.gm-aide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.gm-compte { color: #a99a92; font: 600 11.5px/1 "Sora", sans-serif; font-variant-numeric: tabular-nums; }
+.gm-compte.proche { color: var(--gold); }
+.gm-compte.plein { color: var(--ember); }
+.gm-send, .gm-stop { margin-left: auto; min-width: 112px; padding-top: 10px; padding-bottom: 10px; }
+.gm-send {
+  --hi: #ffe2a6; --lo: #7e2306;
+  background: linear-gradient(#ffcf73 0%, #ff9b3d 26%, #f0641c 64%, #b63c0e 100%); color: #1c0802;
+  transition: filter .15s, transform .08s;
+}
+.gm-send:hover { color: #1c0802; filter: brightness(1.1) saturate(1.1); }
+.gm-stop { --c: #2a2324; --hi: #4d4142; --lo: #0f0b0b; }
+.gm-mention { flex: none; margin: 0; padding: 2px 16px 12px; background: #0e0a0b; color: #a99a92; font-size: 12px; line-height: 1.5; }
+.gm-mention a { color: #ffcf80; }
+
+.vk.bientot .gm-av { filter: saturate(.55) brightness(.85); }
+
+/* ---------- téléphone : le panneau prend tout l'écran (et la page derrière ne bouge plus) ---------- */
+@media (max-width: 560px), (max-height: 520px) {
+  .vk-btn { --vk-m: 16px; --vk-b: 56px; }
+  .vk {
+    --vk-m: 0px; inset: 0 auto auto 0; right: auto; bottom: auto; z-index: 80;
+    width: 100%; height: 100vh; height: var(--vk-h, 100dvh); min-height: 0; filter: none;
+    animation-name: vk-monte;
+  }
+  @keyframes vk-monte { from { opacity: 0; transform: translateY(24px); } }
+  .vk .gm-box { clip-path: none; }
+  .vk .gm-box::after { box-shadow: none; }
+  .gm-head { padding: 10px 8px 10px 12px; padding-top: max(10px, env(safe-area-inset-top)); }
+  .gm-form { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .vk-plein .vk-btn { visibility: hidden; }            /* le panneau a sa propre croix */
+  .vk.vk-grand { width: 100%; height: 100vh; height: var(--vk-h, 100dvh); }
+  .vk-taille { display: none; }                        /* déjà tout l'écran */
+  .vk-lbl { display: none; }                           /* l'intitulé couvrirait « Suis la ligne » */
+}
+.vk-plein, .vk-plein body { overflow: hidden; overscroll-behavior: none; }
+
+@media (pointer: coarse) {
+  .gm-s, .gm-src a { min-height: 44px; }
+  .vk-ico { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vk, .vk.vk-ferme, .vk-btn.vk-ecrit .vk-p, .gm-pense i::before, .gm-pense i::after, .gm-pense b, .gm-pill i,
+  .vk:has(.gm-pense) .vk-medal, .vk .gm-box::before { animation: none; }
+  .vk, .vk-btn, .vk-med, .vk-med img, .vk-x, .vk-lbl, .vk-bulle { transition: none; }
+  .vk-fil { scroll-behavior: auto; }
+}

@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="assets/fonts.css">
   <link rel="stylesheet" href="assets/nether.css">
   <link rel="stylesheet" href="assets/compte.css">
+  <link rel="stylesheet" href="assets/volkar.css">
   <script src="assets/config.js" defer></script>
   <script src="assets/mc/mc.js" defer></script>
   <script src="assets/castle.js" defer></script>
@@ -33,6 +34,7 @@
   <script src="assets/cave.js" defer></script>
   <script src="assets/grotte.js" defer></script>
   <script src="assets/compte.js" defer></script>
+  <script src="assets/volkar.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#launcher">Aller au téléchargement</a>
@@ -43,7 +45,6 @@
       <a class="tbtn tbtn-main" href="#launcher">Télécharger</a>
       <a class="tbtn" href="/boutique">Boutique</a>
       <a class="tbtn" href="/chantier">Chantier</a>
-      <a class="tbtn" href="/faq">FAQ</a>
       <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
     </nav>
   </header>
@@ -66,10 +67,6 @@
       <h1 class="sr">The Last — serveur Minecraft: Java Edition</h1>
       <div class="hero-ui">
         <p class="loader" aria-hidden="true"><span class="px" data-fs="3">Ouverture du Nether...</span></p>
-        <div class="hero-cap">
-          <p class="cap-k"><i aria-hidden="true"></i><span class="px" data-fs="2">Serveur Minecraft moddé · ouverture prochaine</span></p>
-          <p class="cap-l">Contenu fait maison, aventure, construction et progression. Pas un énième PvP faction.</p>
-        </div>
         <a class="hero-hint" id="hint" href="#launcher"><span class="px" data-fs="2">Suis la ligne ↓</span></a>
       </div>
     </section>
@@ -185,7 +182,7 @@
                 le launcher sera proposé ici, et uniquement ici.</p>
             </details>
           </div>
-          <p class="j-tout"><a class="btn btn-sm" href="/faq">Une autre question&nbsp;? Demande à Volkar</a></p>
+          <p class="j-tout"><a class="btn btn-sm" href="#volkar">Une autre question&nbsp;? Demande à Volkar</a></p>
         </section>
       </div>
     </section>
@@ -214,6 +211,72 @@
 
   <!-- La canne à pêche : ligne, flotteur, hameçon -->
   <div id="rig" aria-hidden="true"><i class="rig-line"></i><i class="rig-bob"></i></div>
+
+  <!-- Volkar, l'assistant IA : une bulle en bas à droite (cette page seulement). Rien n'est envoyé à aucun service tant
+       qu'on n'ouvre pas la bulle ; l'adresse /#volkar l'ouvre directement (voir volkar.js). -->
+  <button class="vk-btn" id="vk-btn" type="button" aria-expanded="false" aria-controls="volkar" aria-label="Demande à Volkar, l'assistant IA" hidden>
+    <span class="vk-lbl" aria-hidden="true"><span class="px" data-fs="2">Demande à Volkar</span></span>
+    <span class="vk-med" aria-hidden="true">
+      <img src="assets/gromaur-128.png" alt="" width="48" height="48">
+      <span class="vk-x"></span>
+      <!-- la bulle de discussion, en pixels ; ses trois points clignotent quand Volkar écrit, panneau fermé -->
+      <svg class="vk-bulle" viewBox="0 0 14 12"><path class="vk-bulle-c" d="M3 0h8v1h-8zM1 1h2v1h-2zM11 1h2v1h-2zM0 2h1v6h-1zM13 2h1v6h-1zM1 8h1v1h-1zM11 8h2v1h-2zM1 9h1v1h-1zM3 9h8v1h-8zM0 10h1v1h-1zM2 10h1v1h-1zM0 11h2v1h-2z"/><path class="vk-bulle-f" d="M3 1h8v1h-8zM1 2h12v6h-12zM2 8h9v1h-9zM2 9h1v1h-1zM1 10h1v1h-1z"/><rect class="vk-p" x="2" y="4" width="2" height="2"/><rect class="vk-p" x="6" y="4" width="2" height="2"/><rect class="vk-p" x="10" y="4" width="2" height="2"/></svg>
+      <span class="vk-dot"></span>
+    </span>
+  </button>
+  <section class="vk" id="volkar" role="dialog" aria-labelledby="t-gm" hidden>
+    <div class="gm-box">
+      <div class="gm-head">
+        <span class="vk-medal"><img class="gm-av" src="assets/gromaur-128.png" alt="" width="40" height="40"></span>
+        <h2 class="gm-id" id="t-gm" tabindex="-1"><span class="gm-nom">Volkar</span> <span class="gm-ia" title="Intelligence artificielle">IA</span>
+          <span class="gm-role">Le tavernier, assistant IA de The Last</span></h2>
+        <p class="gm-pill" id="gm-pill" hidden><i aria-hidden="true"></i>Bientôt</p>
+        <button class="vk-ico" id="gm-new" type="button" aria-label="Nouvelle conversation" title="Nouvelle conversation" hidden>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h10v1H1zM1 8h10v1H1zM0 2h1v6H0zM11 2h1v6h-1zM2 9h3v1H2zM2 10h1v1H2zM5 3h2v4H5zM3 4h6v2H3z"/></svg>
+        </button>
+        <button class="vk-ico vk-taille" id="vk-taille" type="button" aria-label="Agrandir la conversation" title="Agrandir">
+          <svg class="vk-plus" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h4v1H2v3H1zM7 1h4v4h-1V2H7zM1 7h1v3h3v1H1zM10 7h1v4H7v-1h3z"/></svg>
+          <svg class="vk-moins" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M4 1h1v4H1V4h3zM7 1h1v3h3v1H7zM1 7h4v4H4V8H1zM7 7h4v1H8v3H7z"/></svg>
+        </button>
+        <button class="vk-ico" id="vk-close" type="button" aria-label="Fermer la conversation" title="Fermer">
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h2v1h1v1h1v1h2V3h1V2h1V1h2v2h-1v1h-1v1h-1v2h1v1h1v1h1v2H9v-1H8V9H7V8H5v1H4v1H3v1H1V9h1V8h1V7h1V5H3V4H2V3H1z"/></svg>
+        </button>
+      </div>
+
+      <div class="vk-fil" id="vk-fil">
+        <div class="gm-log" id="gm-log" role="log" aria-label="Conversation avec Volkar">
+          <div class="gm-msg gm-bot gm-accueil">
+            <p class="gm-de"><span class="sr">Volkar, IA&nbsp;:</span><span aria-hidden="true">Volkar · IA</span></p>
+            <div class="gm-txt">
+              <p>Salut, voyageur&nbsp;! Moi, c'est Volkar, le tavernier. Attention&nbsp;: je suis une
+                <strong>intelligence artificielle</strong>. Je ne connais que ce que l'équipe m'a appris sur The Last,
+                et je peux me tromper.</p>
+              <p class="gm-invite">Pose ta question ou choisis-en une ci-dessous. Si je ne sais pas, je te dirai où trouver un humain
+                (forum #aide ou ticket privé sur <a href="discord/">le Discord</a>).</p>
+            </div>
+          </div>
+        </div>
+        <div class="gm-sugg" id="gm-sugg" role="group" aria-label="Questions à poser à Volkar" hidden></div>
+      </div>
+
+      <form class="gm-form" id="gm-form" hidden>
+        <label class="sr" for="gm-q">Ta question à Volkar</label>
+        <textarea id="gm-q" name="q" rows="2" maxlength="500" enterkeyhint="send" autocomplete="off" spellcheck="true"
+          placeholder="Pose ta question à Volkar…" aria-describedby="gm-aide gm-mention"></textarea>
+        <div class="gm-bar">
+          <span class="gm-aide" id="gm-aide">Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 500 caractères au plus.</span>
+          <span class="gm-compte" id="gm-compte" aria-hidden="true">0 / 500</span>
+          <button class="btn btn-main gm-send" id="gm-send" type="submit">Envoyer</button>
+          <button class="btn gm-stop" id="gm-stop" type="button" aria-label="Arrêter la réponse" hidden>Arrêter</button>
+        </div>
+      </form>
+
+      <p class="gm-mention" id="gm-mention">Volkar est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
+        font foi. N'écris aucune donnée personnelle. Tes questions sont envoyées à Cloudflare et Anthropic (États-Unis)
+        pour générer la réponse, sans être enregistrées par nous. <a href="/confidentialite#volkar">Détails</a></p>
+    </div>
+  </section>
+  <p class="sr" id="gm-etat" role="status"></p>
 
 </body>
 </html>

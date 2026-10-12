@@ -67,7 +67,7 @@ const PAGES = [
   ['/', 'Accueil', ['accueil', 'index', 'home']],
   ['/boutique', 'Boutique', ['boutique', 'shop', 'taverne']],
   ['/chantier', 'Chantier', ['chantier', 'journal']],
-  ['/faq', 'FAQ', ['faq', 'aide']],
+  ['/#volkar', 'Demande à Volkar', ['faq', 'aide', 'volkar']],
   ['/en', 'English', ['en', 'english']],
   ['/confidentialite', 'Confidentialité', ['confidentialite', 'vie-privee']],
   ['/cgu', "Conditions d'utilisation", ['cgu', 'cgv', 'conditions']],

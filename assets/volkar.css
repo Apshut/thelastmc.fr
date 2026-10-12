@@ -1,7 +1,7 @@
 /* The Last — Volkar, l'assistant IA, dans une bulle en bas à droite de la page d'accueil (volkar.js).
    Le bouton : le médaillon de Volkar, fixe, toujours à portée même quand on descend. Il ouvre un panneau de discussion
    ancré au-dessus de lui (non modal : la page reste utilisable) ; sur téléphone, le panneau prend tout l'écran.
-   L'habillage du comptoir (pierre noire polie, cadre de fer, fil de métal chaud) reprend celui de l'ancienne page FAQ. */
+   L'habillage : le comptoir de Volkar, en pierre noire polie, avec un cadre de fer et un fil de métal chaud. */
 .vk {
   --vk-m: 20px;                                         /* marge au bord de l'écran */
   --vk-b: 60px;                                         /* diamètre du bouton */

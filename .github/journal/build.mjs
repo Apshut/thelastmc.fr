@@ -13,6 +13,7 @@
    Les entrées d'avant cette convention (ou sans ligne anglaise) reçoivent leur texte anglais de en.json (« projet|phrase » → anglais),
    qui l'emporte sur tout autre en (pour pouvoir corriger une traduction déjà publiée).
    Le Discord (discord.mjs) ne lit que le français (t) : le champ « en » ne le concerne pas.
+   Une ligne ne doit pas dépasser 160 caractères (elle est coupée) ; une phrase française déjà publiée se corrige dans fr.json.
    Les commits sans cette ligne n'apparaissent pas : rien d'autre ne sort des dépôts (ni code, ni message technique).
 
    Sources : les dépôts de SOURCES, lus par l'API GitHub avec le jeton JOURNAL_TOKEN (lecture seule du contenu), ou un dépôt
@@ -63,6 +64,11 @@ else {
   if (!token) { console.log('JOURNAL_TOKEN absent : journal inchangé (secret à ajouter dans Settings > Secrets and variables > Actions).'); process.exit(0); }
   for (const repo of SOURCES) await fromGitHub(repo, token, entries);
 }
+// une phrase française déjà publiée se corrige dans fr.json (« projet|phrase publiée » → phrase corrigée), par exemple une
+// ligne coupée à 160 caractères ; appliquée avant le dédoublonnage, la correction remplace l'entrée partout (et Discord la
+// poste comme une nouvelle entrée : supprimer d'abord l'ancien message)
+let FRJ = {}; try { FRJ = JSON.parse(readFileSync(join(HERE, 'fr.json'), 'utf8')); } catch { /* pas de corrections */ }
+for (const e of entries) { const c = FRJ[e.p + '|' + e.t]; if (typeof c === 'string') e.t = c; }
 // une même phrase n'apparaît qu'une fois (la plus récente) ; les plus récentes d'abord. Le champ en d'un doublon n'est pas perdu.
 const tri = entries.sort((a, b) => b.d.localeCompare(a.d)), gardees = new Map();
 for (const e of tri) {

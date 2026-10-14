@@ -44,7 +44,8 @@
   "site|Le panneau de ton compte ne disparaît plus d'un coup : il se balance et remonte quand tu le fermes, comme à son arrivée.",
   "site|Le site existe maintenant en anglais : l'interrupteur FR | EN en haut à droite change la langue de tout le site.",
   "site|Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s",
-  "site|Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s'affiche plus que dans ta langue."
+  "site|Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s'affiche plus que dans ta langue.",
+  "site|Le panneau de ton compte se referme maintenant aussi vite qu'il s'ouvre."
  ],
  "semaine": "2026-10-12"
 }

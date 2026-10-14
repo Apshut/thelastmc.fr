@@ -122,6 +122,7 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   .deal-q { margin: 8px 0 2px; } .deal-q b { font-size: 18px; } .deal-p { font-size: 17px; }
   .deal-lore { font-size: 13px; line-height: 1.4; margin: 4px 0 8px; }
   .deal-note { display: none; }
+  .deal-note.eclaire { display: inline; }                    /* un clic sur « Bientôt » la montre quand même (boutons.js) */
   .slate { padding: 16px 16px 12px; }
   .slate p { margin-top: 8px; font-size: 12.5px; line-height: 1.45; }
   .foot { padding: 6px 16px 5px; gap: 2px 14px; font-size: 11px; }

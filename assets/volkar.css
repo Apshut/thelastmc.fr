@@ -196,8 +196,8 @@
 .gm-esc a { color: var(--gold); }
 .gm-err { background: #261111; box-shadow: inset 3px 0 0 #ff4d2e, inset 0 0 0 1px rgb(255 77 46 / .28); }
 .gm-err .gm-de { color: #ff7b5c; }
-.gm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.vk .btn:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+.gm-actions { display: flex; flex-wrap: wrap; gap: var(--bt-ecart, 14px); margin-top: 12px; }   /* de la place pour les crochets des deux plaques */
+.gm-actions .btn-sm { padding: 8px 14px; }       /* la paire d'actions d'erreur : deux plaques compactes (nether.css) */
 
 /* suggestions : des étiquettes de fer, qui chauffent au survol */
 .gm-sugg { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 16px 16px; }
@@ -210,7 +210,7 @@
 .gm-s:active { transform: translateY(1px); }
 .gm-s:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
 
-/* la saisie : un creux dans la pierre ; Envoyer : un métal chauffé au rouge */
+/* la saisie : un creux dans la pierre ; Envoyer : un lingot calme (.btn-calme, nether.css), Arrêter : une plaque */
 .gm-form { flex: none; padding: 12px 14px 8px; border-top: 2px solid #070505; background: #0e0a0b; }
 .gm-form textarea {
   display: block; width: 100%; min-height: 48px; max-height: 30vh; padding: 10px 12px; resize: none; border: 0;
@@ -225,13 +225,6 @@
 .gm-compte.proche { color: var(--gold); }
 .gm-compte.plein { color: var(--ember); }
 .gm-send, .gm-stop { margin-left: auto; min-width: 112px; padding-top: 10px; padding-bottom: 10px; }
-.gm-send {
-  --hi: #ffe2a6; --lo: #7e2306;
-  background: linear-gradient(#ffcf73 0%, #ff9b3d 26%, #f0641c 64%, #b63c0e 100%); color: #1c0802;
-  transition: filter .15s, transform .08s;
-}
-.gm-send:hover { color: #1c0802; filter: brightness(1.1) saturate(1.1); }
-.gm-stop { --c: #2a2324; --hi: #4d4142; --lo: #0f0b0b; }
 .gm-mention { flex: none; margin: 0; padding: 2px 16px 12px; background: #0e0a0b; color: #a99a92; font-size: 12px; line-height: 1.5; }
 .gm-mention a { color: #ffcf80; }
 

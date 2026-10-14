@@ -26,9 +26,9 @@
   <script>document.documentElement.className = "js chargement";</script>
   <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="assets/fonts.css?v=6f64086d">
-  <link rel="stylesheet" href="assets/nether.css?v=6d85ea23">
-  <link rel="stylesheet" href="assets/compte.css?v=449f1123">
-  <link rel="stylesheet" href="assets/volkar.css?v=820af637">
+  <link rel="stylesheet" href="assets/nether.css?v=34e4b79a">
+  <link rel="stylesheet" href="assets/compte.css?v=093f0ec3">
+  <link rel="stylesheet" href="assets/volkar.css?v=01245c70">
   <script src="assets/i18n.js?v=b5d8b9e4" defer></script>
   <script src="assets/lang/en-commun.js?v=c6219999" defer></script>
   <script src="assets/lang/en-compte.js?v=7e290d62" defer></script>
@@ -38,23 +38,26 @@
   <script src="assets/mc/mc.js?v=b24b6f44" defer></script>
   <script src="assets/castle.js?v=f66888e2" defer></script>
   <script src="assets/world.js?v=00dd9ec0" defer></script>
-  <script src="assets/nether.js?v=2c16f1a0" defer></script>
+  <script src="assets/nether.js?v=63d32214" defer></script>
   <script src="assets/cave.js?v=bc5095a6" defer></script>
   <script src="assets/grotte.js?v=9d92cfa8" defer></script>
-  <script src="assets/compte.js?v=2331bb55" defer></script>
-  <script src="assets/volkar.js?v=7aec5776" defer></script>
+  <script src="assets/boutons.js?v=8939f1ba" defer></script>
+  <script src="assets/compte.js?v=b5aee10c" defer></script>
+  <script src="assets/volkar.js?v=498f0b9f" defer></script>
 </head>
 <body>
   <a class="skip" href="#launcher" data-i18n="accueil.skip">Aller au téléchargement</a>
 
   <header class="top" id="top">
     <a class="brand" href="#lac"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
-      <a class="tbtn tbtn-main" href="#launcher" data-i18n="nav.download">Télécharger</a>
-      <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
-      <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
-      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
-    </nav>
+    <div class="top-barre">
+      <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+        <a class="tbtn tbtn-main" href="#launcher" data-i18n="nav.download">Télécharger</a>
+        <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
+        <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
+        <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
+      </nav>
+    </div>
   </header>
 
   <nav class="depth" aria-label="Profondeur" data-i18n-attr="aria-label:accueil.depth.aria">
@@ -88,7 +91,7 @@
           <p class="lead" data-i18n="accueil.lead">Minecraft, Java, NeoForge, les mods et les réglages du serveur&nbsp;: il installe tout
             et garde tout à jour. Toi, tu cliques sur «&nbsp;Jouer&nbsp;».</p>
           <div class="dl">
-            <button class="btn btn-big btn-locked" id="dl" type="button" disabled data-i18n="accueil.dl.soon">Bientôt disponible</button>
+            <button class="btn btn-big btn-locked" id="dl" type="button" aria-disabled="true" aria-describedby="dl-meta" data-i18n="accueil.dl.soon"><i class="btn-braise" aria-hidden="true"></i>Bientôt disponible</button>
             <p class="dl-meta" id="dl-meta" data-i18n="accueil.dl.meta">Windows 10 / 11 · gratuit · compte Microsoft avec Minecraft: Java Edition</p>
           </div>
           <ul class="tips" id="tips">
@@ -276,7 +279,7 @@
         <div class="gm-bar">
           <span class="gm-aide" id="gm-aide" data-i18n="accueil.vk.help">Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 500 caractères au plus.</span>
           <span class="gm-compte" id="gm-compte" aria-hidden="true">0 / 500</span>
-          <button class="btn btn-main gm-send" id="gm-send" type="submit" data-i18n="accueil.vk.send">Envoyer</button>
+          <button class="btn btn-main btn-calme gm-send" id="gm-send" type="submit" data-i18n="accueil.vk.send">Envoyer</button>
           <button class="btn gm-stop" id="gm-stop" type="button" aria-label="Arrêter la réponse" data-i18n-attr="aria-label:accueil.vk.stop-aria" data-i18n="accueil.vk.stop" hidden>Arrêter</button>
         </div>
       </form>

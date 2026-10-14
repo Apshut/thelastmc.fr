@@ -49,10 +49,6 @@
 
 .v-sorties { display: flex; justify-content: center; margin: 34px 0 0; }
 .v-sorties .btn { min-height: 44px; }
-.v-up .pxl { --fs: 2.5px; }
-/* focus clavier : le contour passe à l'intérieur de l'encoche, pour que clip-path ne le coupe pas */
-.v-sorties .btn:focus-visible, .v404 .top .tbtn:focus-visible { outline: 2px solid #fff; outline-offset: calc(var(--u) * -2); }
-.v-sorties .btn-main:focus-visible { outline: 3px solid #1c0a03; }
 
 /* ---------- la mention, seule ligne du pied de page ---------- */
 .v-fond { position: relative; z-index: 2; padding: 18px 16px 24px; text-align: center; }

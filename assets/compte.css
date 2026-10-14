@@ -1,27 +1,26 @@
-/* The Last — le bouton de compte et son panneau (assets/compte.js), dans <header class="top"> de chaque page.
-   S'appuie sur nether.css (--u, --notch, .btn, .pxl, .sr). Le cadre du bouton imite .tbtn sans en porter la classe :
-   les scripts de page réécrivent chaque « .top .tbtn » en police du jeu, et videraient la tête. */
+/* The Last — le bouton de compte et son panneau (assets/compte.js), au bout de la barre de l'en-tête (.top-barre) de
+   chaque page. S'appuie sur nether.css (--u, --notch, .btn, .pxl, .sr, les crochets --svg-crochets-*). Le bouton se
+   comporte comme un lien de la barre sans en porter la classe (les scripts de page réécrivent chaque « .top .tbtn » en
+   police du jeu, et videraient la tête) : la tête posée dans la barre, sans boîte, et des crochets-viseurs au survol. */
 
-.cpt { position: relative; flex: none; margin-left: -4px; --cpt-soul: #6fe6f2; --cpt-chain-r: 19px; --cpt-b: 42px; --cpt-s: 22px; }
+/* --cpt-b : la hauteur de la cible, --cpt-w sa largeur (la même, sauf sur les plus petits écrans) ;
+   --cpt-chain-r : la chaîne de droite du panneau tombe au milieu du bouton */
+.cpt { position: relative; flex: none; --cpt-soul: #6fe6f2; --cpt-b: 36px; --cpt-w: var(--cpt-b); --cpt-s: 22px; --cpt-chain-r: calc(var(--cpt-w) / 2 - 2px); }
 
 /* ---------- le bouton : une cible nue, le cadre carré dedans ---------- */
 .cpt-btn {
-  display: grid; place-items: center; flex: none; width: var(--cpt-b); height: var(--cpt-b); padding: 0; margin: 0;
-  border: 0; background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  position: relative; display: grid; place-items: center; flex: none; width: var(--cpt-w); height: var(--cpt-b); padding: 0; margin: 0;
+  background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  border: 0 solid transparent; border-image: none 6 / 6px / 4px stretch; transition: border-image-outset 80ms steps(2);
 }
-.cpt-frame {
-  --c: #2c1f1e; --hi: #57403b; --lo: #140c0c;
-  display: grid; place-items: center; width: var(--cpt-b); height: var(--cpt-b); background: var(--c);
-  box-shadow: inset 0 0 0 var(--u) #060304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 var(--hi),
-    inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--lo);
-  clip-path: var(--notch); pointer-events: none;
-  transition: filter .12s, transform .08s;
-}
-.cpt-btn:hover .cpt-frame { filter: brightness(1.18); }
+.cpt-frame { position: relative; display: grid; place-items: center; width: var(--cpt-w); height: var(--cpt-b); pointer-events: none; }
+.cpt-btn:hover { border-image-source: var(--svg-crochets-or); border-image-outset: 0px; }
 .cpt-btn:active .cpt-frame { transform: translateY(2px); }
-.cpt-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-.cpt-btn.est-connecte .cpt-frame { --c: #46342a; --hi: #86644a; --lo: #1e130e; }   /* plus clair : la tête, souvent sombre, s'en détache */
-.cpt.ouvert .cpt-frame { --c: #172628; --hi: #3d7d84; --lo: #081113; }
+/* le focus clavier : l'anneau cyan commun (nether.css) ; panneau ouvert : des crochets cyan ; connecté : une pastille cyan */
+.cpt.ouvert .cpt-btn { border-image-source: var(--svg-crochets-cyan); border-image-outset: 0px; }
+.cpt-btn.est-connecte .cpt-frame::after {
+  content: ""; position: absolute; right: 4px; top: 4px; width: 4px; height: 4px; background: var(--soul); box-shadow: 0 0 0 2px #060304;
+}
 .cpt-btn .cpt-head { --s: var(--cpt-s); }
 
 /* ---------- la tête : un cube CSS, fixe, de trois quarts ---------- */
@@ -112,7 +111,6 @@
 .cpt-wait-i { flex: none; width: 8px; height: 8px; background: var(--gold); box-shadow: 0 0 10px var(--gold); animation: blink 1.6s step-end infinite; }
 .cpt-go { margin: 0 0 14px; }
 .cpt-main { display: flex; width: 100%; }
-.cpt-main:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
 .cpt-how { margin: 0; padding: 12px 14px; color: #dccfc5; font-size: 13.5px; line-height: 1.5; background: rgb(5 3 4 / .6); box-shadow: inset 0 0 0 2px rgb(111 230 242 / .22); }
 .cpt-how b { color: #f6efe8; font-weight: 600; }
 .cpt-dl { margin: 8px 0 0; color: #cbbcb3; font-size: 13px; }
@@ -153,27 +151,18 @@
 .cpt-sortie { color: #d8c7bb; }
 .cpt-err { margin: 8px 0 0; color: #ffb3a0; font-size: 13px; line-height: 1.45; }
 
-/* ---------- la barre sur téléphone : le logo laisse sa place (Accueil, ou le haut de page, mène au même endroit) ---------- */
+/* ---------- la barre sur téléphone : le logo laisse sa place (Accueil, ou le haut de page, mène au même endroit) ----------
+   Le panneau passe en position fixe, à 8 px des bords ; la chaîne suit le milieu du bouton, qui finit à --tp du bord
+   (la marge de l'en-tête, nether.css). Les tailles de la barre elle-même sont dans nether.css. */
 @media (max-width: 480px) {
   .top.a-compte .brand { display: none; }
-  .cpt { margin-left: -2px; --cpt-chain-r: 18px; --cpt-b: 36px; --cpt-s: 19px; }
+  .cpt { --cpt-chain-r: calc(var(--tp, 10px) - 10px + var(--cpt-w) / 2); --cpt-s: 19px; }
   .cpt-panel { position: fixed; top: 48px; left: 8px; right: 8px; width: auto; }
   .cpt-in { padding: 18px 16px 14px; }
   .cpt-liste, .cpt-bas { margin-left: -6px; margin-right: -6px; }
 }
-/* sous 420 px, six boutons ne tiennent plus à 1,5 px : la barre passe à la police de 1,25 px (celle de nether.css sous 360 px) */
-@media (max-width: 420px) {
-  .top.a-compte nav { gap: 4px; }
-  .top.a-compte .tbtn { padding-left: 6px; padding-right: 6px; }
-  .top.a-compte .tbtn .pxl { --fs: 1.25px; }
-  .cpt { --cpt-b: 34px; --cpt-s: 18px; }
-}
-@media (max-width: 360px) {
-  .top.a-compte { padding: 0 8px; gap: 8px; }
-  .top.a-compte .tbtn { padding-left: 5px; padding-right: 5px; }
-  .cpt { margin-left: -2px; --cpt-chain-r: 17px; }
-  .cpt-panel { top: 47px; }
-}
+@media (max-width: 420px) { .cpt { --cpt-s: 18px; } }
+@media (max-width: 360px) { .cpt-panel { top: 47px; } }
 /* écran tactile : les boutons de la barre font 44 px de haut (nether.css) ; le cadre reste carré, 44 x 44, et c'est la cible */
 @media (pointer: coarse) {
   .cpt { --cpt-b: 44px; --cpt-s: 23px; }
@@ -183,9 +172,10 @@
   .cpt-main { min-height: 44px; }
 }
 @media (pointer: coarse) and (max-width: 480px) { .cpt-panel { top: 54px; } }
+@media (pointer: coarse) and (max-width: 345px) { .cpt { --cpt-w: 36px; } }      /* 36 × 44 : la barre tient à 320 px */
 
 @media (prefers-reduced-motion: reduce) {
   .cpt-panel.balance .cpt-sign, .cpt-panel.retour .cpt-sign, .cpt-lueur, .cpt-wait-i { animation: none; }
-  .cpt-eye, .cpt-frame { transition: none; }
+  .cpt-eye, .cpt-btn { transition: none; }
   .cpt-btn:active .cpt-frame { transform: none; }
 }

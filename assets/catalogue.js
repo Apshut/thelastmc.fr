@@ -251,8 +251,8 @@ function render(focusHead) {
       scroll.appendChild(h('div', { class: 'cb-empty' },
         h('p', { text: T.t('taverne.no-match', 'Aucun objet ne correspond à « {q} ». Essaie : titre, couleur, compagnon.', { q: qq }) }),
         h('p', { class: 'cb-empty-b' },
-          h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); qIn.focus(); } } }, T.t('taverne.clear', 'Effacer la recherche')),
-          FLAT ? null : h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); backToCats(); } } }, T.t('taverne.see-cats', 'Voir les catégories')))));
+          pxEl('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); qIn.focus(); } } }, T.t('taverne.clear', 'Effacer la recherche')),   // police du jeu, comme les autres petits boutons
+          FLAT ? null : pxEl('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); backToCats(); } } }, T.t('taverne.see-cats', 'Voir les catégories')))));
     }
     announce(res.length ? T.t(res.length > 1 ? 'taverne.found-n' : 'taverne.found-1', res.length > 1 ? '{items} trouvés' : '{items} trouvé', { items: nObjets(res.length) }) : T.t('taverne.found-0', 'Aucun objet trouvé'));
   } else if (ex || view === 'cat') {

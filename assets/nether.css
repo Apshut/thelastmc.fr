@@ -47,27 +47,229 @@ img { max-width: 100%; }
 @media (max-width: 700px) { .px { --k: .75; } }
 @media (max-width: 420px) { .px { --k: .625; } }
 
-/* ---------- Boutons et panneaux ---------- */
+/* ---------- Boutons : « Lueur de braise » ----------
+   Un seul objet brille : le primaire (.btn-main), un lingot chauffé en trois bandes. Le reste s'efface : le secondaire
+   (.btn) est une plaque sombre que quatre crochets-viseurs encadrent, le petit lien (a.btn-sm) est un texte souligné de
+   braise, et le verrouillé (.btn-locked) est le même lingot, refroidi.
+   Mécanique :
+   - aucun clip-path sur l'élément focusable : la face est peinte dans ::after (encoche de 2 px, pixels de coin noirs),
+     derrière le libellé (isolation), et l'anneau de focus n'est jamais rogné ;
+   - les crochets et l'anneau de lueur sont le border-image du bouton : après la base, on ne change plus que les
+     longhands (border-image-source, -outset), jamais le raccourci « border », qui les effacerait ;
+   - ::before porte le halo du lingot, le cadenas du verrouillé ou la flèche du petit lien ;
+   - focus clavier partout : anneau cyan de 2 px cerné de noir (le cyan est réservé au clavier) ;
+   - seuls transform et opacity s'animent ; le balayage et les braises ne jouent qu'au survol (braises : assets/boutons.js).
+   Les dessins en pixels de 2 px sont des SVG en data: URI : cette feuille est versionnée (?v=), un fichier à part ne le
+   serait pas. */
+:root {
+  --bt-noir: #060304;
+  /* écart minimal entre deux boutons voisins : les crochets débordent de 6 px (8 au survol et au focus), l'anneau du
+     lingot de 4 px ; à 14 px, deux voisins ne se touchent jamais */
+  --bt-ecart: 14px;
+  /* encoche d'un pixel de 2 px ; avec les pixels de coin noirs de --bt-coins, un coin arrondi « pixel » net */
+  --bt-encoche: polygon(2px 0, calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px, 100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 2px) 100%, 2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px), 0 2px, 2px 2px);
+  --bt-coins: linear-gradient(#060304 0 0) 2px 2px / 2px 2px no-repeat, linear-gradient(#060304 0 0) right 2px top 2px / 2px 2px no-repeat,
+    linear-gradient(#060304 0 0) left 2px bottom 2px / 2px 2px no-repeat, linear-gradient(#060304 0 0) right 2px bottom 2px / 2px 2px no-repeat,
+    linear-gradient(#060304 0 0) 0 0 / 100% 2px no-repeat, linear-gradient(#060304 0 0) 0 100% / 100% 2px no-repeat,
+    linear-gradient(#060304 0 0) 0 0 / 2px 100% no-repeat, linear-gradient(#060304 0 0) 100% 0 / 2px 100% no-repeat;
+  /* les dessins (pixels de 2 px) */
+  --svg-barre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Cpath fill='%23060304' d='M6 0h12v2h-12zM4 2h4v2h-4zM16 2h4v2h-4zM2 4h4v2h-4zM18 4h4v2h-4zM0 6h4v2h-4zM20 6h4v2h-4zM0 8h2v2h-2zM22 8h2v2h-2zM0 10h2v2h-2zM22 10h2v2h-2zM0 12h2v2h-2zM22 12h2v2h-2zM0 14h2v2h-2zM22 14h2v2h-2zM0 16h4v2h-4zM20 16h4v2h-4zM2 18h4v2h-4zM18 18h4v2h-4zM4 20h4v2h-4zM16 20h4v2h-4zM6 22h12v2h-12z'/%3E%3Cpath fill='%237a5420' d='M8 2h8v2h-8z'/%3E%3Cpath fill='%23ffb547' d='M6 4h2v2h-2zM16 4h2v2h-2zM4 6h2v2h-2zM18 6h2v2h-2zM2 8h2v2h-2zM20 8h2v2h-2z'/%3E%3Cpath fill='%230b0709' fill-opacity='.92' d='M8 4h8v2h-8zM6 6h12v2h-12zM4 8h16v2h-16zM2 10h20v2h-20zM2 12h20v2h-20zM2 14h20v2h-20zM4 16h16v2h-16zM6 18h12v2h-12zM8 20h8v2h-8z'/%3E%3C/svg%3E");
+  --svg-losange: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' shape-rendering='crispEdges'%3E%3Cpath fill='%23ffb547' d='M4 0h2v2h-2zM2 2h2v2h-2z'/%3E%3Cpath fill='%23ffd27a' d='M4 2h2v2h-2z'/%3E%3Cpath fill='%23ff6b2c' d='M6 2h2v2h-2zM0 4h2v2h-2zM6 4h2v2h-2zM2 6h4v2h-4z'/%3E%3Cpath fill='%23ffa13a' d='M2 4h4v2h-4z'/%3E%3Cpath fill='%23b8380c' d='M8 4h2v2h-2zM6 6h2v2h-2zM4 8h2v2h-2z'/%3E%3C/svg%3E");
+  --svg-anneau-braise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Cpath fill='%23ff6b2c' fill-opacity='.6' d='M2 0h8v2h-8zM0 2h2v2h-2zM10 2h2v2h-2zM0 4h2v2h-2zM10 4h2v2h-2zM0 6h2v2h-2zM10 6h2v2h-2zM0 8h2v2h-2zM10 8h2v2h-2zM2 10h8v2h-8z'/%3E%3C/svg%3E");
+  --svg-anneau-or: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Cpath fill='%23ffb547' d='M2 0h8v2h-8zM0 2h2v2h-2zM10 2h2v2h-2zM0 4h2v2h-2zM10 4h2v2h-2zM0 6h2v2h-2zM10 6h2v2h-2zM0 8h2v2h-2zM10 8h2v2h-2zM2 10h8v2h-8z'/%3E%3C/svg%3E");
+  --svg-joint-sombre: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='2' shape-rendering='crispEdges'%3E%3Cpath fill='%234f1f0e' d='M0 0h2v2h-2zM2 0h2v2h-2zM4 0h2v2h-2zM6 0h2v2h-2zM8 0h2v2h-2zM14 0h2v2h-2zM16 0h2v2h-2zM18 0h2v2h-2zM20 0h2v2h-2zM30 0h2v2h-2zM32 0h2v2h-2zM34 0h2v2h-2zM36 0h2v2h-2zM38 0h2v2h-2zM48 0h2v2h-2zM50 0h2v2h-2zM52 0h2v2h-2zM54 0h2v2h-2zM56 0h2v2h-2zM58 0h2v2h-2zM66 0h2v2h-2zM68 0h2v2h-2zM70 0h2v2h-2zM74 0h2v2h-2zM76 0h2v2h-2zM78 0h2v2h-2zM80 0h2v2h-2zM86 0h2v2h-2zM88 0h2v2h-2zM90 0h2v2h-2zM92 0h2v2h-2zM94 0h2v2h-2z'/%3E%3Cpath fill='%236a2a12' d='M10 0h2v2h-2zM12 0h2v2h-2zM40 0h2v2h-2zM42 0h2v2h-2zM44 0h2v2h-2zM46 0h2v2h-2zM82 0h2v2h-2zM84 0h2v2h-2z'/%3E%3Cpath fill='%232e1410' d='M22 0h2v2h-2zM24 0h2v2h-2zM26 0h2v2h-2zM28 0h2v2h-2zM60 0h2v2h-2zM62 0h2v2h-2zM64 0h2v2h-2z'/%3E%3C/svg%3E");
+  --svg-joint-vif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='2' shape-rendering='crispEdges'%3E%3Cpath fill='%23ff6b2c' d='M0 0h2v2h-2zM2 0h2v2h-2zM4 0h2v2h-2zM6 0h2v2h-2zM8 0h2v2h-2zM14 0h2v2h-2zM16 0h2v2h-2zM18 0h2v2h-2zM20 0h2v2h-2zM30 0h2v2h-2zM32 0h2v2h-2zM34 0h2v2h-2zM36 0h2v2h-2zM38 0h2v2h-2zM48 0h2v2h-2zM50 0h2v2h-2zM52 0h2v2h-2zM54 0h2v2h-2zM56 0h2v2h-2zM58 0h2v2h-2zM66 0h2v2h-2zM68 0h2v2h-2zM70 0h2v2h-2zM74 0h2v2h-2zM76 0h2v2h-2zM78 0h2v2h-2zM80 0h2v2h-2zM86 0h2v2h-2zM88 0h2v2h-2zM90 0h2v2h-2zM92 0h2v2h-2zM94 0h2v2h-2z'/%3E%3Cpath fill='%23ffc46a' d='M10 0h2v2h-2zM12 0h2v2h-2zM40 0h2v2h-2zM42 0h2v2h-2zM44 0h2v2h-2zM46 0h2v2h-2zM82 0h2v2h-2zM84 0h2v2h-2z'/%3E%3Cpath fill='%238a3214' d='M22 0h2v2h-2zM24 0h2v2h-2zM26 0h2v2h-2zM28 0h2v2h-2zM60 0h2v2h-2zM62 0h2v2h-2zM64 0h2v2h-2z'/%3E%3C/svg%3E");
+  --svg-crochets-or: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%23ffb547' d='M0 0h6v2H2v4H0zM8 0h6v6h-2V2H8zM0 8h2v4h4v2H0zM12 8h2v6H8v-2h4z'/%3E%3C/svg%3E");
+  --svg-crochets-terne: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%237a5420' d='M0 0h6v2H2v4H0zM8 0h6v6h-2V2H8zM0 8h2v4h4v2H0zM12 8h2v6H8v-2h4z'/%3E%3C/svg%3E");
+  --svg-crochets-cyan: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' shape-rendering='crispEdges'%3E%3Cpath fill='%236fe6f2' d='M0 0h6v2H2v4H0zM8 0h6v6h-2V2H8zM0 8h2v4h4v2H0zM12 8h2v6H8v-2h4z'/%3E%3C/svg%3E");
+  --svg-eclat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='64' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff5dc' fill-opacity='.6' d='M62 0h10v2h-10z M76 0h4v2h-4z M60 2h10v2h-10z M74 2h4v2h-4z M58 4h10v2h-10z M72 4h4v2h-4z M56 6h10v2h-10z M70 6h4v2h-4z M54 8h10v2h-10z M68 8h4v2h-4z M52 10h10v2h-10z M66 10h4v2h-4z M50 12h10v2h-10z M64 12h4v2h-4z M48 14h10v2h-10z M62 14h4v2h-4z M46 16h10v2h-10z M60 16h4v2h-4z M44 18h10v2h-10z M58 18h4v2h-4z M42 20h10v2h-10z M56 20h4v2h-4z M40 22h10v2h-10z M54 22h4v2h-4z M38 24h10v2h-10z M52 24h4v2h-4z M36 26h10v2h-10z M50 26h4v2h-4z M34 28h10v2h-10z M48 28h4v2h-4z M32 30h10v2h-10z M46 30h4v2h-4z M30 32h10v2h-10z M44 32h4v2h-4z M28 34h10v2h-10z M42 34h4v2h-4z M26 36h10v2h-10z M40 36h4v2h-4z M24 38h10v2h-10z M38 38h4v2h-4z M22 40h10v2h-10z M36 40h4v2h-4z M20 42h10v2h-10z M34 42h4v2h-4z M18 44h10v2h-10z M32 44h4v2h-4z M16 46h10v2h-10z M30 46h4v2h-4z M14 48h10v2h-10z M28 48h4v2h-4z M12 50h10v2h-10z M26 50h4v2h-4z M10 52h10v2h-10z M24 52h4v2h-4z M8 54h10v2h-10z M22 54h4v2h-4z M6 56h10v2h-10z M20 56h4v2h-4z M4 58h10v2h-10z M18 58h4v2h-4z M2 60h10v2h-10z M16 60h4v2h-4z M0 62h10v2h-10z M14 62h4v2h-4z'/%3E%3C/svg%3E");
+  --svg-fleche: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 1 7 5' width='14' height='10' shape-rendering='crispEdges'%3E%3Cpath d='M4 1h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM0 3h1v1h-1zM1 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM6 3h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM4 5h1v1h-1z'/%3E%3C/svg%3E");
+}
+@property --eclat-x { syntax: '<length-percentage>'; inherits: false; initial-value: -84px; }
+
+/* le socle commun */
 .btn, .tbtn {
-  --c: #2c1f1e; --hi: #57403b; --lo: #140c0c;
+  position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  border: 0; cursor: pointer; text-decoration: none; text-align: center;
-  color: var(--fg); background: var(--c);
+  cursor: pointer; text-decoration: none; text-align: center;
+  color: #ffd9a0; background: none;
   font: 600 13px/1.2 "Sora", sans-serif; letter-spacing: .08em; text-transform: uppercase;
   padding: 12px 16px;
-  box-shadow: inset 0 0 0 var(--u) #060304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 var(--hi),
-    inset calc(var(--u) * -2) calc(var(--u) * -2) 0 var(--lo);
-  clip-path: var(--notch);
-  transition: filter .12s, transform .08s;
+  border: 0 solid transparent; border-image: none 6 / 6px / 6px stretch;
+  transition: transform 40ms steps(1), color 80ms steps(1), border-image-outset 80ms steps(2);
 }
-.btn:hover, .tbtn:hover { color: var(--fg); filter: brightness(1.18); }
 .btn:active, .tbtn:active { transform: translateY(2px); }
-.btn-main, .tbtn-main { --c: #e7591d; --hi: #ffa066; --lo: #9c300c; color: #1c0a03; font-weight: 700; }
-.btn-main:hover, .tbtn-main:hover { color: #1c0a03; }
-.btn-big { padding: 18px 26px; font-size: 15px; }
-.btn-sm { padding: 10px 12px; font-size: 12px; }
-.btn[disabled] { --c: #3a2d2b; --hi: #584541; --lo: #1f1514; color: #c4b5ad; cursor: not-allowed; filter: none; transform: none; }
+.btn:focus-visible, .tbtn:focus-visible, .lang-sw a:focus-visible, .cpt-btn:focus-visible {
+  outline: 2px solid var(--soul); outline-offset: 2px; box-shadow: 0 0 0 2px var(--bt-noir);
+}
+/* la face, peinte derrière le libellé : contour noir, liseré (--hi en haut, --lo en bas, --hl sur les côtés), --fill */
+.btn::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; clip-path: var(--bt-encoche);
+  background: var(--bt-coins),
+    linear-gradient(var(--hi) 0 0) 0 2px / 100% 2px no-repeat, linear-gradient(var(--lo) 0 0) left 0 bottom 2px / 100% 2px no-repeat,
+    linear-gradient(var(--hl) 0 0) 2px 0 / 2px 100% no-repeat, linear-gradient(var(--hl) 0 0) right 2px top 0 / 2px 100% no-repeat,
+    var(--fill);
+}
 
+/* secondaire : la plaque sombre au liseré d'or ; les crochets ternes s'allument et se resserrent au survol */
+.btn {
+  --fill: #140c0d; --hi: #b07a2c; --lo: #b07a2c; --hl: #b07a2c;
+  border-image-source: var(--svg-crochets-terne);
+}
+.btn:hover { color: #fff4e6; --fill: #2b1c15; --hi: #ffb547; --lo: #ffb547; --hl: #ffb547; border-image-source: var(--svg-crochets-or); border-image-outset: 2px; }
+.btn:active { --fill: #0c0708; --hi: #7a5420; --lo: #7a5420; --hl: #7a5420; }
+/* au clavier, la plaque garde ses crochets, qui passent au cyan ; le lingot et le verrouillé n'ont que l'anneau */
+.btn:not(.btn-main, .btn-big, .btn-locked):focus-visible { border-image-source: var(--svg-crochets-cyan); border-image-outset: 8px; }
+.btn.pxl-host { padding: 10px 18px; }
+.btn .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .6)); }
+
+/* primaire : le lingot chauffé (or, orange, braise), libellé sombre ; un anneau de braise de 2 px, séparé du contour
+   par 2 px de vide (border-image), et un halo doux fixe derrière (::before, seule son opacité bouge) */
+.btn-main {
+  --fill: linear-gradient(#ffd27a 0 12px, #ffa13a 12px calc(100% - 12px), #ff6b2c calc(100% - 12px));
+  --hi: #fff0c2; --lo: #c2410f; --hl: transparent;
+  color: #1c0a03; font-weight: 700;
+  border-image: var(--svg-anneau-braise) 4 / 4px / 4px stretch;
+}
+.btn-main::after {
+  background: var(--bt-coins),
+    var(--svg-eclat) left var(--eclat-x) center / auto no-repeat,
+    linear-gradient(var(--hi) 0 0) 0 2px / 100% 2px no-repeat, linear-gradient(var(--lo) 0 0) left 0 bottom 2px / 100% 2px no-repeat,
+    var(--fill);
+}
+.btn-main::before {
+  content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  box-shadow: 0 0 26px 4px rgb(255 107 44 / .5);
+  opacity: .35; transition: opacity 150ms;
+}
+/* survol : l'anneau passe à l'or, le halo s'allume, un reflet en escalier balaie le lingot (8 pas) */
+.btn-main:hover {
+  color: #1c0a03; --fill: linear-gradient(#ffe09a 0 12px, #ffad48 12px calc(100% - 12px), #ff7a3a calc(100% - 12px)); --hi: #fff6dc; --lo: #c2410f; --hl: transparent;
+  border-image-source: var(--svg-anneau-or); border-image-outset: 4px;
+}
+.btn-main:hover::before { opacity: 1; }
+.btn-main:hover::after { animation: eclat 450ms steps(8) both; }
+@keyframes eclat { from { --eclat-x: -84px; } to { --eclat-x: calc(100% + 84px); } }
+/* appui : chaque bande descend d'un cran, seul le biseau s'inverse (sombre en haut), et le lingot s'enfonce de 2 px */
+.btn-main:active {
+  --fill: linear-gradient(#ffb547 0 12px, #f08a2c 12px calc(100% - 12px), #ea5f22 calc(100% - 12px)); --hi: #b8380c; --lo: #ffd27a; --hl: transparent;
+  border-image-source: var(--svg-anneau-braise);
+}
+.btn-main:active::before { opacity: .3; transition-duration: 40ms; }
+/* au clavier, l'anneau cyan recouvre exactement la place de l'anneau de lueur : un seul cadre */
+.btn-main:focus-visible { border-image-source: var(--svg-anneau-braise); border-image-outset: 4px; }
+.btn-main .pxl svg { filter: none; }
+.btn-main.pxl-host { padding: 10px 20px; }
+
+/* grand : 56 px de haut, police du jeu à 2 px (le libellé tient dans la bande du milieu) */
+.btn-big, .btn-big.pxl-host { padding: 10px 36px; min-height: 56px; font-size: 15px; }
+.btn-big .pxl { --fs: 2px; }
+.btn-main.btn-big { --fill: linear-gradient(#ffd27a 0 16px, #ffa13a 16px calc(100% - 16px), #ff6b2c calc(100% - 16px)); }
+.btn-main.btn-big:hover { --fill: linear-gradient(#ffe09a 0 16px, #ffad48 16px calc(100% - 16px), #ff7a3a calc(100% - 16px)); }
+.btn-main.btn-big:active { --fill: linear-gradient(#ffb547 0 16px, #f08a2c 16px calc(100% - 16px), #ea5f22 calc(100% - 16px)); }
+.btn-main.btn-big::before { box-shadow: 0 0 34px 6px rgb(255 107 44 / .55); }
+/* le jour de l'ouverture : deux filets d'or partent du grand lingot jusqu'au bord de la carte */
+.dl:has(> .btn-main.btn-big) { position: relative; }
+.dl:has(> .btn-main.btn-big)::before {
+  content: ""; position: absolute; z-index: 0; left: -40px; right: -40px; top: 27px; height: 2px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, #ffb547 0 2px, transparent 2px 4px) left / 14px 2px no-repeat,
+    repeating-linear-gradient(90deg, #ffb547 0 2px, transparent 2px 4px) right / 14px 2px no-repeat,
+    linear-gradient(#b07a2c 0 0) center / calc(100% - 28px) 2px no-repeat;
+}
+.dl > .btn-main.btn-big { z-index: 1; }
+
+/* lingot calme (« Envoyer » de Volkar) : ni anneau, ni halo, ni braises ; la page n'a qu'un objet qui brille */
+.btn-main.btn-calme, .btn-main.btn-calme:hover, .btn-main.btn-calme:active, .btn-main.btn-calme:focus-visible { border-image-source: none; }
+.btn-main.btn-calme::before { content: none; }
+
+/* petit : les boutons restent des plaques compactes ; un lien isolé devient un texte d'or souligné de braise, avec une
+   flèche pixel (pas dans une paire d'actions, comme celles de Volkar, qui restent deux plaques) */
+.btn-sm, .btn-sm.pxl-host { padding: 10px 12px; font-size: 12px; }
+/* le libellé pixel passe à la ligne (un svg par mot) : la boîte .pxl s'efface (display: contents), chaque mot devient
+   un élément du lien ; la flèche est collée au dernier mot (.fin, posé par nether.js), ils passent à la ligne ensemble.
+   Les lignes se posent sur le soulignement. Sans script (texte Sora), la flèche est le ::before du lien. */
+a.btn-sm:not(.gm-actions > a) {
+  color: #ffb547; border-image-source: none; flex-wrap: wrap; justify-content: flex-start; align-content: flex-end;
+  gap: 4px 8px; max-width: 100%; padding: 6px 2px 8px; min-height: 32px;
+}
+a.btn-sm:not(.gm-actions > a) .pxl { display: contents; }
+@media (pointer: coarse) { a.btn-sm:not(.gm-actions > a) { min-height: 44px; } }
+a.btn-sm:not(.gm-actions > a)::after { inset: auto 0 0 0; height: 2px; clip-path: none; background: #ff6b2c; z-index: 0; }
+a.btn-sm:not(.gm-actions > a, .pxl-host)::before, a.btn-sm:not(.gm-actions > a) .fin::after {
+  content: ""; order: 2; flex: none; width: 14px; height: 10px; background: currentColor;
+  -webkit-mask: var(--svg-fleche) 0 0 / 14px 10px no-repeat; mask: var(--svg-fleche) 0 0 / 14px 10px no-repeat;
+  transition: transform 80ms steps(2);
+}
+a.btn-sm:not(.gm-actions > a):hover { color: #fff4e6; border-image-source: none; }
+a.btn-sm:not(.gm-actions > a):hover::after { background: #ffb547; }
+a.btn-sm:not(.gm-actions > a) .fin { display: inline-flex; align-items: center; gap: 8px; }
+a.btn-sm:not(.gm-actions > a):hover::before, a.btn-sm:not(.gm-actions > a):hover .fin::after { transform: translateX(4px); }
+a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
+
+/* verrouillé : le même lingot, refroidi. Trois bandes de croûte éteinte ; seuls les joints entre les bandes couvent encore
+   (une veine de braise de 2 px, coupée par endroits). --bande : hauteur des bandes du haut et du bas. */
+.btn-locked {
+  --bande: 12px;
+  --fill: linear-gradient(#2a1d1b 0 var(--bande), #211716 var(--bande) calc(100% - var(--bande)), #1a1012 calc(100% - var(--bande)));
+  --hi: #43302b; --lo: #0d0708;
+  color: #d9c9be; cursor: not-allowed; border-image-source: none;
+}
+.btn-big.btn-locked { --bande: 16px; }
+/* petit format : 2 px de plus en haut et en bas, pour que la veine du bas passe sous l'ombre du cadenas, pas dedans */
+.btn-locked.pxl-host:not(.btn-big) { padding-top: 12px; padding-bottom: 12px; }
+.btn-locked::before { content: ""; width: 16px; height: 18px; flex: none; background: var(--lock) center / 100% 100% no-repeat; image-rendering: pixelated; filter: drop-shadow(2px 2px 0 rgb(0 0 0 / .6)); }
+.btn-locked::after {
+  z-index: -2;
+  background: var(--bt-coins),
+    linear-gradient(var(--hi) 0 0) 0 2px / 100% 2px no-repeat, linear-gradient(var(--lo) 0 0) left 0 bottom 2px / 100% 2px no-repeat,
+    var(--svg-joint-sombre) 4px calc(var(--bande) - 2px) / 96px 2px repeat-x,
+    var(--svg-joint-sombre) -42px calc(100% - var(--bande) + 2px) / 96px 2px repeat-x,
+    var(--fill);
+}
+.btn-locked:hover, .btn-locked:active {
+  --fill: linear-gradient(#2e201d 0 var(--bande), #251a18 var(--bande) calc(100% - var(--bande)), #1c1113 calc(100% - var(--bande))); --hi: #4a3530; --lo: #0d0708;
+  color: #f0e2d6; border-image-source: none; transform: none;
+}
+.btn-locked .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .7)); }
+/* les joints vifs, par-dessus (<i class="btn-braise"> dans le bouton) : ils respirent ; sans eux, le lingot reste éteint */
+.btn-braise {
+  position: absolute; inset: 0 4px; z-index: -1; pointer-events: none;
+  background: var(--svg-joint-vif) 0 calc(var(--bande, 16px) - 2px) / 96px 2px repeat-x,
+    var(--svg-joint-vif) -46px calc(100% - var(--bande, 16px) + 2px) / 96px 2px repeat-x;
+  opacity: .5;
+}
+@media (prefers-reduced-motion: no-preference) { .btn-braise { animation: braise-respire 2.6s ease-in-out infinite alternate; } }
+@keyframes braise-respire { from { opacity: .35; } to { opacity: .7; } }
+.btn-locked:hover .btn-braise, .btn-locked:active .btn-braise { animation: none; opacity: .95; }
+/* au clic (assets/boutons.js) : une secousse de 2 px, et l'explication (aria-describedby) s'éclaire */
+.btn-locked.secoue { animation: secoue 160ms steps(2) 1; }
+@keyframes secoue { 0%, 100% { translate: 0; } 25% { translate: -2px 0; } 75% { translate: 2px 0; } }
+:root .eclaire { color: #ffd27a; transition: color 120ms steps(2); }
+
+/* désactivé (les autres boutons) : éteint, sans crochets ni lueur */
+.btn[disabled]:not(.btn-locked), .btn[aria-disabled="true"]:not(.btn-locked) {
+  --fill: linear-gradient(#211718 0 12px, #1d1415 12px calc(100% - 12px), #181011 calc(100% - 12px)); --hi: #2c2021; --lo: #120c0d; --hl: #2c2021;
+  color: #9e908a; border-image-source: none; transform: none;
+}
+.btn-main[disabled]::before, .btn-main[aria-disabled="true"]::before { opacity: 0; }
+
+/* les braises qui montent au survol du lingot (assets/boutons.js) : des pixels durs, un cœur clair et sa traînée */
+.etincelle {
+  position: absolute; z-index: -1; width: 2px; height: 2px; pointer-events: none; background: #ffd27a;
+  box-shadow: 0 2px 0 #ff6b2c;
+  animation: etincelle 700ms steps(10) forwards;
+}
+@keyframes etincelle { from { transform: translateY(0); opacity: 1; } 70% { opacity: .9; } to { transform: translateY(var(--h, -30px)) translateX(var(--d, 0)); opacity: 0; } }
+
+/* mouvement réduit : couleur, lueur et biseau, sans déplacement (les animations, elles, sont coupées plus bas pour tout) */
+@media (prefers-reduced-motion: reduce) {
+  .btn:active, .tbtn:active { transform: none; }
+  a.btn-sm:not(.gm-actions > a):hover::before, a.btn-sm:not(.gm-actions > a):hover .fin::after { transform: none; }
+  .etincelle { display: none; }
+}
+
+/* ---------- Panneaux ---------- */
 .panel {
   background: #191113;
   box-shadow: inset 0 0 0 var(--u) #050304, inset calc(var(--u) * 2) calc(var(--u) * 2) 0 #4f3a35,
@@ -89,7 +291,15 @@ img { max-width: 100%; }
 /* ---------- En-tête ---------- */
 .top {
   position: fixed; z-index: 30; inset: 0 0 auto 0; height: 60px;
-  display: flex; align-items: center; gap: 12px; padding: 0 14px; pointer-events: none;
+  display: flex; align-items: center; gap: 12px; padding: 0 var(--tp); pointer-events: none;
+  --tp: 14px;     /* marges de l'en-tête (compte.css s'en sert pour placer la chaîne du panneau) */
+  --g: 16px;      /* écart entre deux éléments de la barre (un losange au milieu) */
+  --bh: 44px;     /* hauteur de la barre */
+  --bpl: 10px;    /* air à gauche, avant le premier lien */
+  --bpr: 12px;    /* air à droite, après le dernier élément ; la barre déborde d'autant sur la marge de l'en-tête et
+                     finit à 2 px du bord de l'écran (4 px sous 360 px) */
+  --tf: 2px;      /* taille d'un pixel de la police du jeu dans la barre */
+  --lp: 8px;      /* marge de FR et de EN */
 }
 .top::before { content: ""; position: absolute; inset: 0 0 -26px; z-index: -1; background: linear-gradient(rgb(8 4 6 / .8), rgb(8 4 6 / 0)); }
 .top.solid::before { background: linear-gradient(rgb(8 4 6 / .97) 55%, rgb(8 4 6 / 0)); }
@@ -101,19 +311,94 @@ img { max-width: 100%; }
 }
 .brand:hover { color: #fff; }
 .top.solid .brand, html:not(.js) .brand { opacity: 1; transform: none; }
-.top nav { display: flex; gap: 8px; margin-left: auto; }
-.top .tbtn { padding: 10px 13px; font-size: 12px; }
-/* téléphones : quatre boutons tiennent sur la ligne (police du jeu à 1,5 px par pixel, marges serrées) */
-@media (max-width: 480px) { .top { padding: 0 10px; } .top nav { gap: 5px; } .top .tbtn { padding-left: 8px; padding-right: 8px; } .top .tbtn .pxl { --fs: 1.5px; } }
-@media (max-width: 360px) { .top nav { gap: 4px; } .top .tbtn { padding-left: 6px; padding-right: 6px; } .top .tbtn .pxl { --fs: 1.25px; } }
-/* l'interrupteur de langue FR | EN (assets/i18n.js) : la langue active en or, enfoncée */
-.top .lang-sw { padding: 0; gap: 0; }
-.lang-sw a { display: inline-flex; align-items: center; align-self: stretch; padding: 9px 11px; color: #8f817c; text-decoration: none; }
-.lang-sw a:hover { color: var(--fg); }
-.lang-sw a[aria-current] { color: #ffd27a; background: #120b0c; box-shadow: inset 0 calc(var(--u) * 2) 0 #060304; }
-.lang-sw i { flex: none; width: 2px; align-self: stretch; background: #060304; }
-@media (max-width: 480px) { .lang-sw a { padding-left: 7px; padding-right: 7px; } }
-@media (max-width: 360px) { .lang-sw a { padding-left: 5px; padding-right: 5px; } }
+/* la barre : une seule barre pixel (.top-barre) porte le menu et, quand compte.js est là, le bouton de compte. Ses deux
+   bouts sont en escalier aux marches dorées, son liseré haut en or terni (border-image en 9 tranches). Les liens sont du
+   texte du jeu, séparés par des losanges de braise ; quatre crochets-viseurs se referment sur le lien visé. */
+.top-barre {
+  position: relative; isolation: isolate; flex: none; display: flex; align-items: center; gap: var(--g);
+  margin: 0 calc(-1 * var(--bpr)) 0 auto; padding: 0 var(--bpr) 0 var(--bpl);
+}
+.top-barre::before {
+  content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: calc(50% - var(--bh) / 2); height: var(--bh); pointer-events: none;
+  box-sizing: border-box; border: 10px solid transparent; border-image: var(--svg-barre) 10 fill / 10px / 0 stretch;
+}
+.top nav { display: flex; align-items: center; gap: var(--g); }
+.top .tbtn {
+  padding: 6px 10px; min-height: 36px; font-size: 12px; color: #d8c8be;
+  border-image-source: none; border-image-outset: 4px;
+}
+.top .tbtn .pxl { --fs: var(--tf); }
+.top .tbtn .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .8)); }
+.top .tbtn:hover { color: #fff4e6; border-image-source: var(--svg-crochets-or); border-image-outset: 0px; }
+/* le losange de braise entre deux éléments : 1-3-5-3-1 pixels de 2 px (10 × 10), éclairé en haut à gauche */
+.top nav > .tbtn + .tbtn::before, .top-barre > nav ~ .cpt::after {
+  content: ""; position: absolute; top: calc(50% - 5px); left: calc(var(--g) / -2 - 5px); width: 10px; height: 10px;
+  background: var(--svg-losange) 0 0 / 10px 10px no-repeat; pointer-events: none;
+}
+/* la page courante : texte d'or, crochets ternes permanents, chevron de braise dessous */
+.top .tbtn[aria-current="page"] { color: #ffd27a; border-image-source: var(--svg-crochets-terne); border-image-outset: 0px; }
+.top .tbtn[aria-current="page"]:hover { color: #fff4e6; border-image-source: var(--svg-crochets-or); }
+.top .tbtn[aria-current="page"]::after {
+  content: ""; position: absolute; left: calc(50% - 3px); bottom: -2px; width: 6px; height: 4px; z-index: 1; pointer-events: none;
+  background: linear-gradient(#ff6b2c 0 0) 2px 0 / 2px 2px no-repeat, linear-gradient(#ff6b2c 0 0) 0 2px / 2px 2px no-repeat,
+    linear-gradient(#ff6b2c 0 0) 4px 2px / 2px 2px no-repeat;
+}
+/* le jour de l'ouverture, « Télécharger » dans l'en-tête de l'accueil : un petit lingot, sans halo */
+.top .tbtn-main {
+  --fill: linear-gradient(#ffd27a 0 10px, #ffa13a 10px calc(100% - 10px), #ff6b2c calc(100% - 10px)); --hi: #fff0c2; --lo: #c2410f;
+  color: #1c0a03;
+}
+.top .tbtn-main::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; clip-path: var(--bt-encoche); pointer-events: none;
+  background: var(--bt-coins), linear-gradient(var(--hi) 0 0) 0 2px / 100% 2px no-repeat,
+    linear-gradient(var(--lo) 0 0) left 0 bottom 2px / 100% 2px no-repeat, var(--fill);
+}
+.top .tbtn-main .pxl svg { filter: none; }
+.top .tbtn-main:hover { color: #1c0a03; border-image-source: none; --fill: linear-gradient(#ffe09a 0 10px, #ffad48 10px calc(100% - 10px), #ff7a3a calc(100% - 10px)); }
+
+/* FR | EN : la langue active en or, soulignée d'un trait d'or */
+.top .tbtn.lang-sw, .top .tbtn.lang-sw:hover { padding: 0; gap: 0; border-image-source: none; }
+.lang-sw a {
+  position: relative; display: inline-flex; align-items: center; align-self: stretch; padding: 0 var(--lp, 8px);
+  color: #c4b5ad; text-decoration: none;
+  border: 0 solid transparent; border-image: none 6 / 6px / 0 stretch; transition: color 80ms steps(1);
+}
+.lang-sw a:hover { color: #fff4e6; border-image-source: var(--svg-crochets-or); }
+.lang-sw a:focus-visible { outline-offset: 0px; box-shadow: none; }
+.lang-sw a[aria-current] { color: #ffd27a; }
+.lang-sw a[aria-current]::after {
+  content: ""; position: absolute; left: var(--lp, 8px); right: var(--lp, 8px); height: 2px; background: #ffb547; pointer-events: none;
+  top: calc(50% + 5 * var(--tf, 2px)); top: round(calc(50% + 5 * var(--tf, 2px)), 1px);   /* une rangée sous les lettres */
+}
+.lang-sw i { flex: none; width: 2px; height: 12px; align-self: center; background: #4a3631; }
+
+/* au doigt : la barre et ses cibles font 44 px de haut au moins */
+@media (pointer: coarse) {
+  .top { --bh: 48px; }
+  .top .tbtn { min-height: 44px; }
+}
+/* téléphones : tout tient sur une ligne, compte compris, jusqu'à 320 px de large, au doigt comme à la souris (l'accueil a
+   le libellé le plus long : « Le launcher »). On resserre par paliers les écarts, les marges des liens et les bouts de la
+   barre ; la police reste à 1,25 px au moins, FR et EN gardent 25 px de large, et les cibles 44 px de haut au doigt.
+   Sous 640 px, la barre à 2 px ne tient plus à côté du logo : police à 1,5 px, et le losange passe à 1 px par pixel
+   (5 × 5), toujours 1-3-5-3-1. Sous 480 px, le logo laisse sa place (compte.css). */
+@media (max-width: 640px) {
+  .top { --tp: 10px; --g: 10px; --bpr: 8px; --tf: 1.5px; --lp: 6px; }
+  .top .tbtn { padding-left: 6px; padding-right: 6px; }
+  .top nav > .tbtn + .tbtn::before, .top-barre > nav ~ .cpt::after {
+    width: 5px; height: 5px; top: calc(50% - 2.5px); left: calc(var(--g) / -2 - 2.5px); background-size: 5px 5px;
+  }
+}
+@media (max-width: 420px) { .top.a-compte { --tf: 1.25px; } }
+@media (max-width: 390px) {
+  .top { --g: 8px; --bpl: 8px; }
+  .top .tbtn { padding-left: 4px; padding-right: 4px; }
+}
+@media (max-width: 360px) { .top { --tp: 8px; --g: 6px; --bpl: 6px; --bpr: 4px; --tf: 1.25px; } }
+@media (max-width: 345px) {
+  .top { --tp: 6px; --bpl: 4px; }
+  .top .tbtn { padding-left: 2px; padding-right: 2px; }
+}
 /* le temps de traduire la page en anglais (le script de <head>), rien ne s'affiche */
 .lang-wait body { visibility: hidden; }
 
@@ -397,23 +682,18 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 }
 
 /* ---------- Petits écrans ---------- */
+/* le nom du logo part dès 720 px : la barre de l'en-tête, plus large que l'ancien menu, le tassait juste au-dessus de 700 */
+@media (max-width: 720px) { .brand span { display: none; } }
 @media (max-width: 700px) {
-  .brand span { display: none; }
   .stratum { padding-left: 12px; padding-right: 26px; }
   .s-lava { padding-left: 12px; padding-right: 12px; }
 }
-@media (pointer: coarse) { .top .tbtn { min-height: 44px; } }
 
 /* ---------- Police du jeu sur les petites étiquettes ---------- */
 .pxl { display: inline-flex; align-items: center; gap: 0 calc(var(--fs, 2px) * 4); --fs: 2px; }
 .pxl svg { display: block; flex: none; width: calc(var(--fs) * var(--w)); height: calc(var(--fs) * 12); filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .45)); }
-.btn-main .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(255 220 180 / .35)); }
-.btn.pxl-host, .tbtn.pxl-host { padding-top: 9px; padding-bottom: 9px; }
 
-/* ---------- Téléchargement verrouillé, compte à rebours, lien communauté ---------- */
-.btn-locked { --c: #241a1a; --hi: #3c2c2a; --lo: #120b0b; color: #e8d8cc; cursor: not-allowed; }
-.btn-locked::before { content: ""; width: 16px; height: 18px; flex: none; background: var(--lock) center / 100% 100% no-repeat; image-rendering: pixelated; }
-.btn[disabled].btn-locked { --c: #241a1a; --hi: #3c2c2a; --lo: #120b0b; color: #e8d8cc; }
+/* ---------- Compte à rebours, lien communauté (le bouton verrouillé : plus haut, avec les boutons) ---------- */
 .countdown { margin: 10px 0 0; color: var(--gold); font: 700 14px/1.3 "Sora", sans-serif; }
 .community { margin-top: 12px; }
 

@@ -1,5 +1,5 @@
 /* The Last — le compte sur le site : le client de l'API (window.TheLastCompte, compte/SPEC.md §5) et le bouton de
-   compte, à droite de « EN » dans <header class="top"> (direction « vivante », choisie le 10/10/2026).
+   compte, à droite de « EN », au bout de la barre de <header class="top"> (direction « vivante », choisie le 10/10/2026).
    À inclure après config.js et mc.js :  <script src="/assets/compte.js" defer></script>  (+ assets/compte.css).
 
    Le bouton montre une tête en 3D (un cube CSS), fixe, de trois quarts. Elle ne suit pas la souris. Elle fait un petit
@@ -446,8 +446,10 @@ const cadre = h('span', { class: 'cpt-frame', 'aria-hidden': 'true' });   // le 
 btn.appendChild(cadre);
 const panel = h('div', { class: 'cpt-panel', id: 'cpt-panneau', hidden: '' });
 wrap.append(btn, panel);
-const nav = header.querySelector('nav');
-if (nav && nav.nextSibling) header.insertBefore(wrap, nav.nextSibling); else header.appendChild(wrap);
+// au bout de la barre de l'en-tête, après le menu (nether.css : .top-barre) ; une page sans barre : juste après le menu
+const barre = header.querySelector('.top-barre'), nav = header.querySelector('nav');
+if (barre) barre.appendChild(wrap);
+else if (nav && nav.nextSibling) header.insertBefore(wrap, nav.nextSibling); else header.appendChild(wrap);
 header.classList.add('a-compte');
 
 let teteBtn = null, teteOk = null;          // teteOk : l'URL de tête vérifiée (ou null = tête neutre)

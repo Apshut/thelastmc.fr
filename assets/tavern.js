@@ -984,7 +984,9 @@ function buildEtal() {
     b.addEventListener('pointerenter', () => hover(it.id, true));
     b.addEventListener('pointerleave', () => hover(it.id, false));
     b.addEventListener('focus', () => hover(it.id, true));
-    b.addEventListener('blur', () => hover(it.id, false));
+    // Tab vers le bouton du panneau : on garde l'article affiché, sinon le panneau se reconstruit sous le focus qui y
+    // arrive et le focus tombe sur <body> (le panneau le relâche quand le focus en sort, plus bas)
+    b.addEventListener('blur', e => { if (!(e.relatedTarget && dealBox.contains(e.relatedTarget))) hover(it.id, false); });
     b.addEventListener('click', () => pick(it.id));
     it.btn = b; etal.appendChild(b);
   });
@@ -1091,12 +1093,14 @@ function deal(id) {
   }
   const url = checkout(p);
   const buy = url ? pxLabel(h('a', { class: 'btn btn-main', href: url, rel: 'noopener' }), p.kind === 'don' ? T.t('taverne.give', 'Donner') : T.t('taverne.buy', 'Acheter'))
-    : pxLabel(h('button', { class: 'btn btn-locked', type: 'button', disabled: '' }), T.t('taverne.soon', 'Bientôt'));
+    : pxLabel(h('button', { class: 'btn btn-locked', type: 'button', 'aria-disabled': 'true', 'aria-describedby': 'deal-note' }), T.t('taverne.soon', 'Bientôt'));
+  // pas encore en vente : le lingot éteint reste atteignable au clavier, et un clic éclaire la note qui dit pourquoi (boutons.js)
+  if (!url) buy.prepend(h('i', { class: 'btn-braise', 'aria-hidden': 'true' }));
   dealBox.append(
     h('div', { class: 'deal-head' }, h('span', { class: 'deal-ic', 'aria-hidden': 'true' }, copy(coinIcon())), h('h2', { class: 'deal-t', id: 'deal-name', text: T.pick(p, 'name') })),
     h('p', { class: 'deal-q' }, p.kind === 'don' ? h('b', { text: T.t('taverne.no-return', 'Sans contrepartie') }) : h('b', { text: nb(p.braises) + ' Braises' }), h('span', { class: 'deal-p', text: eur.format(p.price) + (p.kind === 'don' ? ' ' + T.t('taverne.or-more', 'ou plus') : '') })),
     h('p', { class: 'deal-lore', text: T.pick(p, 'lore') || '' }),
-    h('div', { class: 'deal-buy' }, buy, h('span', { class: 'deal-note', text: url ? T.t('taverne.pay-partner', 'Paiement chez notre partenaire.') : T.t('taverne.pay-later', "Paiement à l'ouverture du serveur.") })));
+    h('div', { class: 'deal-buy' }, buy, h('span', { class: 'deal-note', id: 'deal-note', text: url ? T.t('taverne.pay-partner', 'Paiement chez notre partenaire.') : T.t('taverne.pay-later', "Paiement à l'ouverture du serveur.") })));
   if (desk) tighten();
 }
 
@@ -1110,6 +1114,13 @@ function hover(id, on) {
   if (on) { if (hoverId !== id && isDon(id) && mood === 'idle' && !FORCED && !SHOT) speak('don', now0); hoverId = id; } else if (hoverId === id) hoverId = null;
   deal(hoverId || selId);
 }
+// le focus quitte le panneau de l'article (vers l'étal, la page ou ailleurs) : l'article gardé par le blur ci-dessus est relâché
+dealBox.addEventListener('focusout', e => {
+  if (!hoverId || (e.relatedTarget && dealBox.contains(e.relatedTarget))) return;
+  const held = items.find(x => x.id === hoverId);
+  if (held && held.btn && held.btn.matches(':hover')) return;          // la souris est encore dessus : son pointerleave s'en chargera
+  hover(hoverId, false);
+});
 function pick(id) {
   selId = selId === id ? null : id;
   items.forEach(it => it.btn && it.btn.setAttribute('aria-pressed', it.id === selId ? 'true' : 'false'));

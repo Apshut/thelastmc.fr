@@ -9,7 +9,6 @@
   text-transform: none; letter-spacing: .01em; font-size: 14px; text-align: left; line-height: 1.3;
 }
 .cb-scale { flex: none; width: 24px; height: 24px; background: var(--cb-scale, none) center / 100% 100% no-repeat; image-rendering: pixelated; }
-.cb-open:focus-visible { clip-path: none; outline: 3px solid var(--gold); outline-offset: 2px; }
 @media (min-width: 900px) and (min-height: 600px) and (min-aspect-ratio: 21/20) {
   .cb-open { margin: 0; width: 100%; }
 }
@@ -29,9 +28,8 @@ html.cb-lock, html.cb-lock body { overflow: hidden; }
 .cb::backdrop { background: rgb(6 2 3 / .74); }
 @keyframes cb-in { from { opacity: 0; transform: translateY(10px); } }
 .cb-head, .cb-plate, .cb-main, .cb-foot { grid-column: 1; }   /* sinon la fiche, posée en (3, 1), pousse la liste dans une 2e colonne */
-.cb :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.cb :focus-visible:not(:where(.btn)) { outline: 3px solid var(--gold); outline-offset: 2px; }   /* les .btn gardent le focus cyan commun ; :where garde la spécificité d'avant */
 .cb [tabindex="-1"]:focus { outline: none; }                  /* titres qui reçoivent le focus par le script */
-.cb .btn:focus-visible { clip-path: none; }
 .cb button { font-family: "Sora", sans-serif; }
 
 /* texte en police du jeu (svg par mot) */
@@ -211,7 +209,8 @@ canvas.cb-ic { image-rendering: pixelated; }
 
 .cb-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 40px auto; max-width: 46ch; text-align: center; color: var(--ink2); font-size: 15px; line-height: 1.5; }
 .cb-empty p { margin: 0; }
-.cb-empty-b { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.cb-empty-b { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--bt-ecart, 14px); }   /* de la place pour les crochets (nether.css) */
+.cb-empty-b .cb-px { color: inherit; }                          /* le libellé pixel prend la couleur du bouton (survol compris) */
 
 /* ---------- La fiche d'un objet ---------- */
 .cb-scrim { grid-row: 3; grid-column: 1; z-index: 3; background: rgb(6 2 3 / .62); }

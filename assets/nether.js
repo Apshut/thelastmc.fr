@@ -36,6 +36,7 @@ const setVar = (k, c) => root.style.setProperty(k, dataUrl(c));
 function pxWord(word) {
   let d = '', x = 0;
   for (const ch of word) {
+    if (ch === '\u00a0') { x += 3; continue; }   // espace insécable : un blanc de la largeur d'une espace, dans le même mot (« question ? » ne se coupe pas)
     const g = MC.font[ch] || MC.font['?']; if (!g) continue;
     const y0 = 10 - g.a;
     g.r.forEach((row, j) => { let run = 0; for (let i = 0; i <= row.length; i++) { if (row[i] === '#') run++; else if (run) { d += 'M' + (x + i - run) + ' ' + (y0 + j) + 'h' + run + 'v1h-' + run + 'z'; run = 0; } } });
@@ -259,13 +260,15 @@ function Download() {
     if (extra && meta) meta.textContent = extra + ' · ' + meta.textContent;
   } else {
     pxLabel(btn, T.t('accueil.dl.soon', 'Bientôt disponible'));
+    btn.prepend(h('i', { class: 'btn-braise', 'aria-hidden': 'true' }));   // les joints du lingot éteint, qui couvent encore (nether.css)
     if (head) { head.classList.remove('tbtn-main'); pxLabel(head, T.t('nav.launcher', 'Le launcher')); }       // ne promet pas un téléchargement qui n'existe pas encore
     const d = L.opening ? new Date(L.opening) : null, now = new Date();      // en jours de calendrier, comme le panneau de la grotte (grotte.js)
     const days = d && !isNaN(d) ? Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5) : -1;
-    if (days >= 0 && meta) meta.before(h('p', { class: 'countdown', text: days === 0 ? T.t('accueil.cd.today', "Ouverture prévue aujourd'hui") : days === 1 ? T.t('accueil.cd.tomorrow', 'Ouverture prévue demain') : T.t('accueil.cd.later', 'Ouverture prévue le {date} · dans {n} jours', { date: d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' }), n: days }) }));
+    if (days >= 0 && meta) { meta.before(h('p', { class: 'countdown', id: 'dl-cd', text: days === 0 ? T.t('accueil.cd.today', "Ouverture prévue aujourd'hui") : days === 1 ? T.t('accueil.cd.tomorrow', 'Ouverture prévue demain') : T.t('accueil.cd.later', 'Ouverture prévue le {date} · dans {n} jours', { date: d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' }), n: days }) })); btn.setAttribute('aria-describedby', 'dl-cd dl-meta'); }   // le bouton verrouillé dit quand il s'ouvrira
   }
   if (Cm.url) {
-    const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, target: '_blank', rel: 'noopener' }), T.pick(Cm, 'label') || T.t('accueil.community', 'Rejoindre la communauté'));
+    // un seul objet brille : le jour de l'ouverture, le lingot est « Télécharger » et la communauté passe en secondaire
+    const mkLink = () => pxLabel(h('a', { class: L.url ? 'btn community' : 'btn btn-main community', href: Cm.url, target: '_blank', rel: 'noopener' }), T.pick(Cm, 'label') || T.t('accueil.community', 'Rejoindre la communauté'));
     if (meta) meta.after(mkLink());
   }
 }
@@ -339,6 +342,11 @@ function start() {
   toast = Toasts();
   align = Catch();
   $$('.top .tbtn').forEach(b => { if (b.classList.contains('lang-sw')) $$('a', b).forEach(a => pxLabel(a, a.textContent)); else pxLabel(b, b.textContent); });   // FR | EN : chaque moitié
+  $$('a.btn-sm').forEach(a => {                                         // les petits liens ; l'espace insécable reste dans son mot (pxWord)
+    pxLabel(a, a.textContent.replace(/[ \t\r\n]+/g, ' '));
+    const box = $('.pxl', a), last = box && box.lastElementChild;      // la flèche colle au dernier mot (.fin::after, nether.css)
+    if (last) box.append(h('span', { class: 'fin' }, last));
+  });
   Tips(); Download(); Journal();
   depth = Depth(F3()); depth();
   if (QS.has('toast')) toast('demo', 'fishing_rod', T.t('accueil.toast.adv', 'Progrès réalisé !'), T.t('accueil.toast.catch', 'Belle prise'));

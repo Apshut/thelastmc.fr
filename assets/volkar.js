@@ -39,6 +39,13 @@ function h(tag, attrs, ...kids) {
   kids.forEach(c => { if (c) e.appendChild(typeof c === 'string' ? D.createTextNode(c) : c); });
   return e;
 }
+/* libellé de bouton en police du jeu, comme le reste du site : le dessin de compte.js (chargé avant), sinon le texte */
+function px(el, texte) {
+  const ui = window.TheLastCompte && window.TheLastCompte.ui;
+  if (ui && ui.pxLabel) ui.pxLabel(el, texte); else el.textContent = texte;
+  return el;
+}
+px(send, send.textContent); px(stop, stop.textContent);
 
 /* L'adresse du Worker : config.js, ou ?api=… pour un essai, mais seulement sur un aperçu local. */
 const QS = new URLSearchParams(location.search);
@@ -129,11 +136,11 @@ function erreur(texte, question) {
   rendreTexte($('.gm-txt', m), texte);
   const act = h('div', { class: 'gm-actions' });
   if (question) {
-    const re = h('button', { class: 'btn btn-sm', type: 'button', text: T.t('volkar.retry', 'Réessayer') });
+    const re = px(h('button', { class: 'btn btn-sm', type: 'button' }), T.t('volkar.retry', 'Réessayer'));
     re.addEventListener('click', () => { if (!ctrl) { q.value = question; majCompte(); envoyer(); } });
     act.appendChild(re);
   }
-  act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, target: '_blank', rel: 'noopener', text: T.t('volkar.to-discord', 'Aller sur le Discord') }));
+  act.appendChild(px(h('a', { class: 'btn btn-sm', href: DISCORD, target: '_blank', rel: 'noopener' }), T.t('volkar.to-discord', 'Aller sur le Discord')));
   m.appendChild(act); descendre(true);
   annonce(T.t('volkar.a-erreur', 'Volkar n\'a pas pu répondre.'));
 }

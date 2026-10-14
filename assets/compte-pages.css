@@ -29,12 +29,12 @@
 .cp-invite .cp-carte { max-width: 460px; }
 .cp-invite .cp-carte .cpt-wait, .cp-invite .cp-carte .cpt-how { margin-bottom: 14px; }
 .cp-message { margin: 0 0 14px; padding: 12px 14px; color: #c9f7c9; font-weight: 600; background: rgb(5 3 4 / .6); box-shadow: inset 0 0 0 2px rgb(85 255 85 / .3); max-width: 460px; }
-.cp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; }
+.cp-actions { display: flex; flex-wrap: wrap; gap: var(--bt-ecart, 14px); margin: 14px 0 0; }   /* de la place pour les crochets (nether.css) */
 .cp-carte > .cp-actions:first-child { margin-top: 0; }
 .cp-note { color: #b9a69b; font-size: 13.5px; }
-.cp-danger { --c: #5a1a14; --hi: #a3402f; --lo: #2a0a07; color: #ffe3dc; }
-.cp-danger:hover { color: #fff; }
-.btn:focus-visible { outline: none; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #050304; }
+/* le bouton qui retire quelque chose : une plaque (nether.css) teintée de rouge */
+.cp-danger { --fill: #3a120e; --hi: #a3402f; --lo: #a3402f; --hl: #a3402f; color: #ffe3dc; }
+.cp-danger:hover { --fill: #5a1a14; --hi: #ff7a5c; --lo: #ff7a5c; --hl: #ff7a5c; color: #fff; }
 .btn[disabled] { cursor: progress; }
 @media (pointer: coarse) { .cp-carte .btn, .cp-e-in .btn { min-height: 44px; } }
 
@@ -119,7 +119,7 @@
 .cp-e-n.sans-px { font: 700 28px/1.2 "Sora", sans-serif; }
 .cp-e-q { margin: 0 0 20px; color: #fff; font-size: 18px; font-weight: 600; }
 .cp-e-msg { margin: 0 0 12px; color: #f2e6dc; font-size: 15.5px; line-height: 1.55; }
-.cp-e-b { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cp-e-b { display: grid; grid-template-columns: 1fr 1fr; gap: var(--bt-ecart, 14px); }
 .cp-e-b .btn { width: 100%; padding-left: 10px; padding-right: 10px; }
 .cp-e-note { margin: 16px 0 0; color: #b9a69b; font-size: 13px; line-height: 1.5; }
 .cp-e-in .cp-actions { justify-content: center; margin-top: 18px; }

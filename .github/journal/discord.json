@@ -40,7 +40,8 @@
   "site|Dans la taverne, la liste d'objets garde une taille raisonnable sur les grands écrans : plus de grand vide sous les catégories.",
   "site|La page FAQ disparaît : Volkar, le tavernier IA, t'attend maintenant dans une bulle en bas à droite de l'accueil.",
   "site|Dans la grotte, les panneaux se ferment d'un clic ailleurs ou quand tu fais défiler, et le pied du portail est un peu mieux éclairé.",
-  "site|Les liens vers le Discord s'ouvrent maintenant dans un nouvel onglet, et dans la grotte, ouvrir une question referme celle qui était ouverte."
+  "site|Les liens vers le Discord s'ouvrent maintenant dans un nouvel onglet, et dans la grotte, ouvrir une question referme celle qui était ouverte.",
+  "site|Le panneau de ton compte ne disparaît plus d'un coup : il se balance et remonte quand tu le fermes, comme à son arrivée."
  ],
  "semaine": "2026-10-12"
 }

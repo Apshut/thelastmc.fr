@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Le panneau de ton compte ne disparaît plus d'un coup : il se balance et remonte quand tu le fermes, comme à son arrivée.",
+   "d": "2026-10-14T13:05:30.000Z"
+  },
+  {
+   "p": "site",
    "t": "Les liens vers le Discord s'ouvrent maintenant dans un nouvel onglet, et dans la grotte, ouvrir une question referme celle qui était ouverte.",
    "d": "2026-10-14T12:53:46.000Z"
   },

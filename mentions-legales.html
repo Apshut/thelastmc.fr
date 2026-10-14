@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr" data-i18n-static>
+<html lang="fr" class="chantier-page" data-i18n-static>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,26 +12,35 @@
   <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/mentions-legales">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-  <link rel="stylesheet" href="assets/style.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/nether.css">
+  <link rel="stylesheet" href="assets/chantier.css">
+  <link rel="stylesheet" href="assets/compte.css">
+  <link rel="stylesheet" href="assets/legal.css">
   <script src="assets/i18n.js" defer></script>
+  <script src="assets/config.js" defer></script>
+  <script src="assets/mc/mc.js" defer></script>
+  <script src="assets/doc.js" defer></script>
+  <script src="assets/compte.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
-      <nav class="nav" aria-label="Navigation principale">
-        <a href="./">Accueil</a>
-        <a href="./#launcher">Le launcher</a>
-        <a href="/confidentialite">Confidentialité</a>
-        <span class="lang-sw" role="group" aria-label="Langue"><a href="/mentions-legales" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><a href="/legal-notice" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
-      </nav>
-    </div>
+  <header class="top solid" id="top">
+    <a class="brand" href="/"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <nav aria-label="Navigation principale">
+      <a class="tbtn" href="/">Accueil</a>
+      <a class="tbtn" href="/boutique">Boutique</a>
+      <a class="tbtn" href="/chantier">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue"><a href="/mentions-legales" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="/legal-notice" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
+    </nav>
   </header>
 
-  <main class="doc">
-    <div class="wrap">
-      <h1>Mentions légales</h1>
+  <main class="lg-main lg">
+    <div class="lg-tete">
+      <h1 class="px" data-fs="5">Mentions légales</h1>
       <p class="updated">Dernière mise à jour : 12 octobre 2026</p>
+    </div>
+    <div class="lg-texte">
 
       <h2>Éditeur du site</h2>
       <p>Le site <strong>thelastmc.fr</strong> est édité à titre non professionnel par un particulier,
@@ -65,21 +74,14 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="cols">
-        <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
-        <nav aria-label="Liens légaux">
-          <a href="/confidentialite">Confidentialité</a>
-          <a href="/cgu">Conditions d'utilisation</a>
-          <a href="/mentions-legales">Mentions légales</a>
-        </nav>
-      </div>
-      <div class="disclaimer">
-        <p>Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
-        <p lang="en">Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
-      </div>
-    </div>
+  <footer class="ch-foot">
+    <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+    <nav aria-label="Liens légaux">
+      <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
+      <a href="/confidentialite">Confidentialité</a>
+      <a href="/cgu">Conditions d'utilisation</a>
+      <a href="/mentions-legales">Mentions légales</a>
+    </nav>
   </footer>
 </body>
 </html>

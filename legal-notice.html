@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-i18n-static>
+<html lang="en" class="chantier-page" data-i18n-static>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,26 +12,36 @@
   <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/mentions-legales">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-  <link rel="stylesheet" href="assets/style.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/nether.css">
+  <link rel="stylesheet" href="assets/chantier.css">
+  <link rel="stylesheet" href="assets/compte.css">
+  <link rel="stylesheet" href="assets/legal.css">
   <script src="assets/i18n.js" defer></script>
+  <script src="assets/lang/en-compte.js" defer></script>
+  <script src="assets/config.js" defer></script>
+  <script src="assets/mc/mc.js" defer></script>
+  <script src="assets/doc.js" defer></script>
+  <script src="assets/compte.js" defer></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="/?lang=en"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="/?lang=en">Home</a>
-        <a href="/?lang=en#launcher">The launcher</a>
-        <a href="/privacy">Privacy</a>
-        <span class="lang-sw" role="group" aria-label="Language"><a href="/mentions-legales" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français">FR</a><a href="/legal-notice" data-lang="en" lang="en" hreflang="en" aria-label="English" aria-current="true">EN</a></span>
-      </nav>
-    </div>
+  <header class="top solid" id="top">
+    <a class="brand" href="/?lang=en"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
+    <nav aria-label="Main navigation">
+      <a class="tbtn" href="/?lang=en">Home</a>
+      <a class="tbtn" href="/boutique?lang=en">Shop</a>
+      <a class="tbtn" href="/chantier?lang=en">Devlog</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Language"><a href="/mentions-legales" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français">FR</a><i aria-hidden="true"></i><a href="/legal-notice" data-lang="en" lang="en" hreflang="en" aria-label="English" aria-current="true">EN</a></span>
+    </nav>
   </header>
 
-  <main class="doc">
-    <div class="wrap">
-      <h1>Legal notice</h1>
+  <main class="lg-main lg">
+    <div class="lg-tete">
+      <h1 class="px" data-fs="5">Legal notice</h1>
       <p class="updated">Last updated: October 12, 2026</p>
+    </div>
+    <div class="lg-texte">
       <p class="tr-note">This English version is a translation provided for information only. Only the
         <a href="/mentions-legales" lang="fr" hreflang="fr">French version</a> is legally binding.</p>
 
@@ -67,20 +77,14 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <div class="cols">
-        <div>© 2026 The Last — contact: <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
-        <nav aria-label="Legal links">
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms of use</a>
-          <a href="/legal-notice">Legal notice</a>
-        </nav>
-      </div>
-      <div class="disclaimer">
-        <p>Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
-      </div>
-    </div>
+  <footer class="ch-foot">
+    <p>Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+    <nav aria-label="Legal links">
+      <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms of use</a>
+      <a href="/legal-notice">Legal notice</a>
+    </nav>
   </footer>
 </body>
 </html>

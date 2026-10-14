@@ -2,212 +2,260 @@
  "entries": [
   {
    "p": "site",
+   "t": "Le site existe maintenant en anglais : l'interrupteur FR | EN en haut à droite change la langue de tout le site.",
+   "en": "The website is now available in English: the FR | EN switch at the top right changes the language of the whole site.",
+   "d": "2026-10-14T14:24:58.000Z"
+  },
+  {
+   "p": "site",
    "t": "Le panneau de ton compte ne disparaît plus d'un coup : il se balance et remonte quand tu le fermes, comme à son arrivée.",
+   "en": "Your account panel no longer vanishes in one go: when you close it, it swings back up, just like when it arrived.",
    "d": "2026-10-14T13:05:30.000Z"
   },
   {
    "p": "site",
    "t": "Les liens vers le Discord s'ouvrent maintenant dans un nouvel onglet, et dans la grotte, ouvrir une question referme celle qui était ouverte.",
+   "en": "Discord links now open in a new tab, and in the cave, opening a question closes the one that was open.",
    "d": "2026-10-14T12:53:46.000Z"
   },
   {
    "p": "site",
    "t": "La page FAQ disparaît : Volkar, le tavernier IA, t'attend maintenant dans une bulle en bas à droite de l'accueil.",
+   "en": "The FAQ page is gone: Volkar, the AI tavernkeeper, now waits for you in a bubble at the bottom right of the home page.",
    "d": "2026-10-12T17:29:09.000Z"
   },
   {
    "p": "site",
    "t": "Dans la grotte, les panneaux se ferment d'un clic ailleurs ou quand tu fais défiler, et le pied du portail est un peu mieux éclairé.",
+   "en": "In the cave, panels close when you click elsewhere or scroll, and the foot of the portal is a little better lit.",
    "d": "2026-10-12T17:29:09.000Z"
   },
   {
    "p": "site",
    "t": "Dans la taverne, la liste d'objets garde une taille raisonnable sur les grands écrans : plus de grand vide sous les catégories.",
+   "en": "In the Tavern, the item list now keeps a sensible size on big screens: no more empty space under the categories.",
    "d": "2026-10-12T15:21:20.000Z"
   },
   {
    "p": "site",
    "t": "Tout en bas de l'accueil, la jauge de profondeur s'arrête enfin sur la bedrock, et la lave ne dépasse plus sous le pied de page.",
+   "en": "At the very bottom of the home page, the depth gauge finally stops at bedrock, and the lava no longer pokes out below the footer.",
    "d": "2026-10-12T10:36:26.000Z"
   },
   {
    "p": "site",
    "t": "Le pied de page de l'accueil est plus compact : le bouton « Remonter à la surface » disparaît.",
+   "en": "The home page footer is more compact: the \"Back to the surface\" button is gone.",
    "d": "2026-10-12T10:36:26.000Z"
   },
   {
    "p": "site",
    "t": "Volkar, l'assistant de la FAQ, ne parle plus que de The Last : pour tout autre sujet, il répond toujours la même phrase.",
+   "en": "Volkar, the FAQ assistant, now only talks about The Last: for any other topic, he always gives the same answer.",
    "d": "2026-10-11T22:47:17.000Z"
   },
   {
    "p": "site",
    "t": "Une adresse qui n'existe pas mène maintenant sous la bedrock : tu as creusé trop loin, et un bouton te ramène à l'accueil.",
+   "en": "An address that doesn't exist now leads below bedrock: you dug too deep, and a button takes you back to the home page.",
    "d": "2026-10-11T21:16:56.000Z"
   },
   {
    "p": "site",
    "t": "Dans la taverne, une liste d'objets montre tout ce qu'on obtient en jeu et son prix, avec une recherche, le détail en paquets et un calcul de budget.",
+   "en": "In the Tavern, an item list shows everything you can get in game and its price, with a search, a breakdown by pack and a budget calculator.",
    "d": "2026-10-11T16:34:44.000Z"
   },
   {
    "p": "launcher",
    "t": "Une première version de test du launcher est prête pour un premier testeur.",
+   "en": "A first test version of the launcher is ready for a first tester.",
    "d": "2026-10-11T10:07:08.000Z"
   },
   {
    "p": "site",
    "t": "La politique de confidentialité et les conditions d'utilisation expliquent le compte sur le site.",
+   "en": "The privacy policy and the terms of use now explain the account on the website.",
    "d": "2026-10-11T09:07:29.000Z"
   },
   {
    "p": "site",
    "t": "Un bouton de compte avec ta tête de joueur arrive en haut à droite du site ; la connexion ouvrira avec le launcher.",
+   "en": "An account button showing your player head is coming to the top right of the site; sign-in will open with the launcher.",
    "d": "2026-10-10T22:24:41.000Z"
   },
   {
    "p": "site",
    "t": "La FAQ a un sommaire dans la marge de gauche, sous une lanterne d'âme qui s'allume quand on lit.",
+   "en": "The FAQ now has a table of contents in the left margin, under a Soul Lantern that lights up as you read.",
    "d": "2026-10-10T18:59:04.000Z"
   },
   {
    "p": "site",
    "t": "Le tavernier et l'assistant de la FAQ s'appellent désormais Volkar.",
+   "en": "The tavernkeeper and the FAQ assistant are now both called Volkar.",
    "d": "2026-10-10T17:56:14.000Z"
   },
   {
    "p": "site",
    "t": "La page FAQ a sa forge : une enclume en 3D en toile de fond, et des questions numérotées, plus lisibles.",
+   "en": "The FAQ page gets its own forge: a 3D anvil in the background, and numbered questions that are easier to read.",
    "d": "2026-10-09T22:49:19.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur indique aussi le 3114 si quelqu'un dit aller très mal.",
+   "en": "Gromaur also gives the 3114 number if someone says they are feeling very low.",
    "d": "2026-10-09T18:47:24.000Z"
   },
   {
    "p": "site",
    "t": "La date d'ouverture sera annoncée sur la page d'accueil et dans #annonces sur le Discord, nulle part ailleurs.",
+   "en": "The opening date will be announced on the home page and in the #annonces (announcements) channel on Discord, nowhere else.",
    "d": "2026-10-09T18:00:51.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur indique le 3018 si quelqu'un parle de harcèlement.",
+   "en": "Gromaur gives the 3018 number if someone talks about harassment.",
    "d": "2026-10-09T18:00:51.000Z"
   },
   {
    "p": "site",
    "t": "Nouvelle page FAQ : les questions qu'on nous pose le plus, et Gromaur, un assistant IA qui répond à tes questions sur The Last.",
+   "en": "New FAQ page: the questions we get asked most, and Gromaur, an AI assistant who answers your questions about The Last.",
    "d": "2026-10-09T17:47:26.000Z"
   },
   {
    "p": "site",
    "t": "Les nouvelles du chantier arrivent aussi dans #journal-du-chantier, sur le Discord.",
+   "en": "Devlog news also lands in the #journal-du-chantier (devlog) channel on Discord.",
    "d": "2026-10-09T16:10:40.000Z"
   },
   {
    "p": "site",
    "t": "Le bouton « Rejoindre le Discord » est arrivé : le Discord officiel de The Last est ouvert.",
+   "en": "The \"Join the Discord\" button has arrived: the official The Last Discord is open.",
    "d": "2026-10-09T13:36:13.000Z"
   },
   {
    "p": "launcher",
    "t": "Le launcher affichera « Joue à The Last » sur ton profil Discord, et son lien d'aide mène au Discord.",
+   "en": "The launcher will show \"Playing The Last\" on your Discord profile, and its help link leads to the Discord.",
    "d": "2026-10-09T13:36:13.000Z"
   },
   {
    "p": "launcher",
    "t": "Réglage de la mémoire plus lisible, et le lien Boutique mène à la taverne",
+   "en": "The memory setting is easier to read, and the Shop link now leads to the Tavern",
    "d": "2026-10-09T09:43:41.000Z"
   },
   {
    "p": "launcher",
    "t": "Accès à la connexion Minecraft obtenu : on se connecte et on lance le jeu avec son vrai compte",
+   "en": "Minecraft sign-in access granted: you can now sign in and launch the game with your real account",
    "d": "2026-10-09T09:26:49.000Z"
   },
   {
    "p": "site",
    "t": "La lave continue sous la même vitre jusqu'à la grotte : le fond du lac arrive en coupe, puis on entre dans la grotte",
+   "en": "The lava keeps going behind the same glass down to the cave: the lake bed appears in cross-section, then you enter the cave",
    "d": "2026-10-08T21:16:38.000Z"
   },
   {
    "p": "site",
    "t": "Sous la lave, une grotte : le portail du chantier montre où en est le projet",
+   "en": "Under the lava, a cave: the devlog portal shows how far along the project is",
    "d": "2026-10-08T19:43:06.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur ricane en silence en se frottant les mains",
+   "en": "Gromaur chuckles silently, rubbing his hands together",
    "d": "2026-10-07T20:25:02.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur se frotte les jointures l'une contre l'autre",
+   "en": "Gromaur rubs his knuckles against each other",
    "d": "2026-10-07T19:45:25.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur se frotte les mains quand on survole un paquet de Braises",
+   "en": "Gromaur rubs his hands together when you hover over a pack of Braises",
    "d": "2026-10-07T19:12:30.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur a une nouvelle réplique sur Herobrine",
+   "en": "Gromaur has a new line about Herobrine",
    "d": "2026-10-07T18:13:55.000Z"
   },
   {
    "p": "site",
    "t": "Nouvelle page Chantier : tout l'historique, mois par mois, avec un filtre par projet",
+   "en": "New Devlog page: the full history, month by month, with a filter by project",
    "d": "2026-10-07T17:08:58.000Z"
   },
   {
    "p": "site",
    "t": "Nouveau : le journal du chantier sur la page d'accueil",
+   "en": "New: the devlog on the home page",
    "d": "2026-10-07T16:24:11.000Z"
   },
   {
    "p": "site",
    "t": "Le magma devient une croûte de lave refroidie",
+   "en": "The magma is now a cooled lava crust",
    "d": "2026-10-07T15:20:49.000Z"
   },
   {
    "p": "site",
    "t": "Les prix de la boutique restent lisibles sur tous les écrans",
+   "en": "Shop prices stay readable on every screen",
    "d": "2026-10-07T13:58:22.000Z"
   },
   {
    "p": "site",
    "t": "Gromaur bouge plus naturellement : bras, regard et colère sans à-coups",
+   "en": "Gromaur moves more naturally: his arms, his gaze and his anger are now smooth",
    "d": "2026-10-07T11:41:18.000Z"
   },
   {
    "p": "site",
    "t": "Ouverture de la taverne : la boutique des Braises, tenue par Gromaur",
+   "en": "The Tavern is open: the Braises shop, run by Gromaur",
    "d": "2026-10-06T22:50:34.000Z"
   },
   {
    "p": "launcher",
    "t": "Connexion Microsoft prête, en attente de validation par Mojang",
+   "en": "Microsoft sign-in is ready and waiting for Mojang's approval",
    "d": "2026-10-06T19:11:39.000Z"
   },
   {
    "p": "site",
    "t": "Nouvelle page d'accueil : une scène du Nether en temps réel",
+   "en": "New home page: a live Nether scene",
    "d": "2026-10-05T23:35:47.000Z"
   },
   {
    "p": "site",
    "t": "Ouverture du site thelastmc.fr",
+   "en": "The website thelastmc.fr opens",
    "d": "2026-10-05T15:24:14.000Z"
   },
   {
    "p": "launcher",
    "t": "Plus de 70 corrections après une revue complète du code",
+   "en": "More than 70 fixes after a full code review",
    "d": "2026-10-05T13:19:30.000Z"
   },
   {
    "p": "launcher",
    "t": "Premier launcher complet : connexion Microsoft, installation du jeu et des mods, réparation automatique",
+   "en": "The first complete launcher: Microsoft sign-in, game and mod installation, and automatic repair",
    "d": "2026-10-05T08:53:57.000Z"
   }
  ]

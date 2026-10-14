@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s",
+   "en": "The privacy, terms of use and legal notice pages now match the rest of the website, and the Mojang notice at the bottom of the page only shows in your language.",
+   "d": "2026-10-14T14:57:03.000Z"
+  },
+  {
+   "p": "site",
    "t": "Le site existe maintenant en anglais : l'interrupteur FR | EN en haut à droite change la langue de tout le site.",
    "en": "The website is now available in English: the FR | EN switch at the top right changes the language of the whole site.",
    "d": "2026-10-14T14:24:58.000Z"

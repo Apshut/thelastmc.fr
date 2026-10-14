@@ -215,6 +215,9 @@ button.slot { cursor: pointer; }
 }
 .tip strong { display: block; color: var(--gold); font: 600 15px/1.4 "Sora", sans-serif; }
 .tip span { color: #c5bcd6; font-size: 14.5px; }
+/* toutes les bulles empilées, invisibles : donne la hauteur de la plus longue au squelette d'à côté (nether.js) */
+.tip-ghost { position: absolute; left: 0; top: 0; visibility: hidden; display: grid; }
+.tip-ghost > div { grid-area: 1 / 1; }
 @media (max-width: 420px) { .slot { width: 46px; height: 46px; } .slot canvas { width: 32px; height: 32px; } .catch .panel { padding: 34px 16px 20px; } }
 
 /* ---------- Le chantier : une couleur par projet ---------- */

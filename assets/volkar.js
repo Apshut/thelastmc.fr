@@ -79,7 +79,11 @@ function enLigne(parent, txt) {
   while ((m = re.exec(txt))) {
     if (m.index > i) parent.appendChild(D.createTextNode(txt.slice(i, m.index)));
     if (m[1] !== undefined) parent.appendChild(h('strong', { text: m[1] }));
-    else { const href = lienSur(m[3]); parent.appendChild(href ? h('a', { href, text: m[2] }) : D.createTextNode(m[2])); }
+    else {
+      const href = lienSur(m[3]), a = href && h('a', { href, text: m[2] });
+      if (a && /^\/discord(\/|$)/.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }     // le Discord s'ouvre à côté : la conversation reste là
+      parent.appendChild(a || D.createTextNode(m[2]));
+    }
     i = re.lastIndex;
   }
   if (i < txt.length) parent.appendChild(D.createTextNode(txt.slice(i)));
@@ -114,7 +118,7 @@ function bulle(role, extra) {
 function escalade(parent) {
   parent.appendChild(h('div', { class: 'gm-esc' },
     h('p', { text: 'Besoin d\'un humain ?' }),
-    h('p', null, 'Une question générale : le forum #aide du ', h('a', { href: DISCORD, text: 'Discord' }),
+    h('p', null, 'Une question générale : le forum #aide du ', h('a', { href: DISCORD, target: '_blank', rel: 'noopener', text: 'Discord' }),
       '. Un souci de compte, de paiement, un signalement : un ticket privé (#ticket-privé). Sinon : ',
       h('a', { href: 'mailto:contact@thelastmc.fr', text: 'contact@thelastmc.fr' }), '.')));
 }
@@ -127,7 +131,7 @@ function erreur(texte, question) {
     re.addEventListener('click', () => { if (!ctrl) { q.value = question; majCompte(); envoyer(); } });
     act.appendChild(re);
   }
-  act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, text: 'Aller sur le Discord' }));
+  act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, target: '_blank', rel: 'noopener', text: 'Aller sur le Discord' }));
   m.appendChild(act); descendre(true);
   annonce('Volkar n\'a pas pu répondre.');
 }

@@ -213,9 +213,14 @@ function Catch() {
     const left = nat + shift + cw / 2 + 28 - sr.left, width = sr.width - left - (innerWidth > 700 ? 56 : 12);
     box.hidden = width < 170;
     if (box.hidden) return;
+    // la bulle sous la barre d'objets change de hauteur selon l'objet survolé : le squelette se règle sur la plus haute
+    // (sa copie invisible, Tips), sinon il grandirait et rétrécirait avec l'encart
+    const tip = $('#tip'), ghost = $('.tip-ghost');
+    if (tip && ghost) ghost.style.width = tip.offsetWidth + 'px';
+    const ch = card.offsetHeight + (tip && ghost ? ghost.offsetHeight - tip.offsetHeight : 0);
     box.style.left = left + 'px'; box.style.width = width + 'px';
-    box.style.top = card.offsetTop + 'px'; box.style.height = card.offsetHeight + 'px';
-    if (cv) { const d = Math.min(window.devicePixelRatio || 1, 2), hgt = Math.min(card.offsetHeight * 1.05, width * 1.5); cv.width = Math.round(width * d); cv.height = Math.round(hgt * d); cv.style.height = hgt + 'px'; }
+    box.style.top = card.offsetTop + 'px'; box.style.height = ch + 'px';
+    if (cv) { const d = Math.min(window.devicePixelRatio || 1, 2), hgt = Math.min(ch * 1.05, width * 1.5); cv.width = Math.round(width * d); cv.height = Math.round(hgt * d); cv.style.height = hgt + 'px'; }
   };
   align.frame = (t, force) => { if (fig && box && !box.hidden && (vis || force)) fig.frame(REDUCE ? 20 : t); };
   return align;
@@ -238,7 +243,10 @@ function Tips() {
     b.addEventListener('keydown', e => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { e.preventDefault(); const j = (i + d + lis.length) % lis.length; sel(j); btns[j].focus(); } });
     btns.push(b); bar.appendChild(b);
   });
-  ul.hidden = true; ul.after(bar, out); sel(0);
+  // toutes les bulles empilées, invisibles : la copie a la hauteur de la plus longue, et le squelette d'à côté s'y règle (Catch)
+  const ghost = h('div', { class: 'tip tip-ghost', 'aria-hidden': 'true' });
+  lis.forEach(li => { const g = h('div'); Array.from(li.children).forEach(c => g.appendChild(c.cloneNode(true))); const st = $('strong', g); if (st) pxLabel(st, st.textContent); ghost.appendChild(g); });
+  ul.hidden = true; ul.after(bar, out, ghost); sel(0);
 }
 
 function Download() {
@@ -256,7 +264,7 @@ function Download() {
     if (days >= 0 && meta) meta.before(h('p', { class: 'countdown', text: 'Ouverture prévue ' + (days === 0 ? "aujourd'hui" : days === 1 ? 'demain' : 'le ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · dans ' + days + ' jours') }));
   }
   if (Cm.url) {
-    const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, rel: 'noopener' }), Cm.label || 'Rejoindre la communauté');
+    const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, target: '_blank', rel: 'noopener' }), Cm.label || 'Rejoindre la communauté');
     if (meta) meta.after(mkLink());
   }
 }

@@ -856,6 +856,8 @@ panels.forEach(p => {
   p.prepend(x);
   const hd = $('h3', p); if (hd) hd.tabIndex = -1;
 });
+// une seule réponse ouverte à la fois : <details name="faq"> s'en charge déjà dans les navigateurs récents, ceci pour les autres
+if (faq) faq.addEventListener('toggle', e => { if (e.target.open) faq.querySelectorAll('details[open]').forEach(d => { if (d !== e.target) d.open = false; }); }, true);
 function toggle(p, from, laisseFocus) {
   if (!overlay) { if (p) p.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); return; }
   const next = p && p !== panel ? p : null, prev = panel;

@@ -2,6 +2,11 @@
  "entries": [
   {
    "p": "site",
+   "t": "Les liens vers le Discord s'ouvrent maintenant dans un nouvel onglet, et dans la grotte, ouvrir une question referme celle qui était ouverte.",
+   "d": "2026-10-14T12:53:46.000Z"
+  },
+  {
+   "p": "site",
    "t": "La page FAQ disparaît : Volkar, le tavernier IA, t'attend maintenant dans une bulle en bas à droite de l'accueil.",
    "d": "2026-10-12T17:29:09.000Z"
   },

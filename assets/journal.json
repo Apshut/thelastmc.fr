@@ -2,7 +2,7 @@
  "entries": [
   {
    "p": "site",
-   "t": "Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s",
+   "t": "Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s'affiche plus que dans ta langue.",
    "en": "The privacy, terms of use and legal notice pages now match the rest of the website, and the Mojang notice at the bottom of the page only shows in your language.",
    "d": "2026-10-14T14:57:03.000Z"
   },

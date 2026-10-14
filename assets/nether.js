@@ -331,7 +331,7 @@ function Depth(f3) {
 /* ================= Démarrage ================= */
 $$('.px').forEach(pxText);
 const rig = Rig();
-let depth = () => {}, align = () => {};
+let depth = () => {}, align = () => {}, premiere = null;
 
 function start() {
   strata(); sprites();
@@ -342,7 +342,10 @@ function start() {
   Tips(); Download(); Journal();
   depth = Depth(F3()); depth();
   if (QS.has('toast')) toast('demo', 'fishing_rod', T.t('accueil.toast.adv', 'Progrès réalisé !'), T.t('accueil.toast.catch', 'Belle prise'));
-  root.classList.add('ready');
+  // la fin du chargement attend la première image de la scène (le temps de compiler ses shaders) : jusque-là, seul
+  // « Ouverture du Nether... » s'affiche (classe chargement, nether.css), puis tout apparaît d'un coup
+  const pret = () => { root.classList.add('ready'); root.classList.remove('chargement'); };
+  if (SHOT || QS.has('fps') || !world) pret(); else premiere = pret;
   if (SHOT) {                                            // mode capture : une image figée, pour les essais automatiques
     const shoot = () => {                               // le navigateur sans tête change la taille de la fenêtre après coup : on refait tout
       $('#monde').style.marginTop = '0px';
@@ -373,6 +376,7 @@ function start() {
     if (raw < .012 || D.hidden) return;                  // inutile de dépasser ~80 images par seconde sur les écrans rapides
     last = t;
     drawScene(t); align(); if (align.frame) align.frame(t); rig.frame(t, raw); depth();
+    if (premiere) { requestAnimationFrame(premiere); premiere = null; }   // l'image dessinée s'affiche, puis le reste
     if (window.GROTTE_STEP) window.GROTTE_STEP(t, raw);
   };
   requestAnimationFrame(loop);
@@ -380,5 +384,5 @@ function start() {
 Promise.all([loadImg('assets/mc/blocks.png'), loadImg('assets/mc/items.png'), loadImg('assets/mc/piglin.png'), loadImg('assets/mc/strider.png'), loadImg('assets/mc/ghast.png').catch(() => null), loadImg('assets/mc/strider_saddle.png').catch(() => null),
     loadImg('assets/mc/skeleton.png').catch(() => null)])
   .then(a => { IM.blocks = a[0]; IM.items = a[1]; IM.piglin = a[2]; IM.strider = a[3]; IM.ghast = a[4]; IM.saddle = a[5]; IM.skeleton = a[6]; start(); })
-  .catch(e => { root.classList.add('no-gl'); if (window.console) console.error(e); Download(); Journal(); $('#launcher').classList.add('hooked'); });
+  .catch(e => { root.classList.add('no-gl'); root.classList.remove('chargement'); if (window.console) console.error(e); Download(); Journal(); $('#launcher').classList.add('hooked'); });
 })();

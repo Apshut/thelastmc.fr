@@ -146,6 +146,11 @@ main { position: relative; overflow-x: clip; }
 .loader .px { justify-content: center; animation: blink 1.2s step-end infinite; }
 .ready .loader, html:not(.js) .loader { opacity: 0; pointer-events: none; }
 .no-gl .loader { display: none; }
+/* le chargement : seul « Ouverture du Nether... » s'affiche, au milieu de l'écran, jusqu'à ce que la scène ait dessiné sa
+   première image (nether.js retire la classe chargement) ; filet de sécurité : tout s'affiche au bout de 12 s */
+.chargement body { visibility: hidden; animation: fin-chargement 0s 12s forwards; }
+.chargement:not(.lang-wait) .loader { visibility: visible; position: fixed; }
+@keyframes fin-chargement { to { visibility: visible; } }
 .hero-hint {
   position: absolute; left: calc(50% + 22px); bottom: 16px; padding: 8px 10px; text-decoration: none;
   background: rgb(12 5 6 / .78); box-shadow: inset 0 0 0 2px #050304;

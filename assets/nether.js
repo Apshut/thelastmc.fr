@@ -4,6 +4,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };          // les langues (assets/i18n.js)
 const CFG = window.THE_LAST || {}, MC = window.MC || { blocks: {}, items: {}, font: {} };
 const D = document, root = D.documentElement;
 const $ = (s, r) => (r || D).querySelector(s);
@@ -73,7 +74,7 @@ function art(rows, pal) {
 const IM = {};
 const loadImg = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ko(new Error('image ' + src)); i.src = src; });
 const TC = {};
-function T(name, frame) {
+function Tex(name, frame) {
   const key = name + ':' + (frame || 0); if (TC[key]) return TC[key];
   const m = MC.blocks[name], c = mk(16, 16);
   if (m && IM.blocks) c.getContext('2d').drawImage(IM.blocks, 0, (m[0] + (frame || 0)) * 16, 16, 16, 0, 0, 16, 16);
@@ -85,12 +86,12 @@ function put(g, im, x, y, rot) {
 }
 function tile(w, hh, seed, choose, spin) {
   const c = mk(w * 16, hh * 16), g = c.getContext('2d'), R = rng(seed); g.imageSmoothingEnabled = false;
-  for (let y = 0; y < hh; y++) for (let x = 0; x < w; x++) put(g, T(choose(R())), x * 16, y * 16, spin ? R() * 4 | 0 : 0);
+  for (let y = 0; y < hh; y++) for (let x = 0; x < w; x++) put(g, Tex(choose(R())), x * 16, y * 16, spin ? R() * 4 | 0 : 0);
   return c;
 }
 function strata() {
   setVar('--t-bedrock', tile(8, 1, 33, () => 'bedrock', true));      // la ligne de bedrock en haut du pied de page
-  setVar('--lava', T('lava_still'));
+  setVar('--lava', Tex('lava_still'));
   { const S = 64, c = mk(S, S), g = c.getContext('2d'), R = rng(77), n = 8, lat = [];
     for (let k = 0; k < n * n; k++) lat.push(R());
     for (let y = 0; y < S; y += 2) for (let x = 0; x < S; x += 2) {          // bruit lisse, raccord sur ses bords, par carrés de 2 texels
@@ -98,7 +99,7 @@ function strata() {
       const v = (lat[y0 * n + x0] * (1 - sx) + lat[y0 * n + x1] * sx) * (1 - sy) + (lat[y1 * n + x0] * (1 - sx) + lat[y1 * n + x1] * sx) * sy;
       g.fillStyle = 'rgba(0,0,0,' + clamp(.4 + (v - .22) * 4, .4, 1).toFixed(2) + ')'; g.fillRect(x, y, 2, 2); }
     setVar('--lavamask', c); }
-  $$('.depth a').forEach(a => { if (MC.blocks[a.dataset.tex]) a.style.backgroundImage = dataUrl(T(a.dataset.tex)); });
+  $$('.depth a').forEach(a => { if (MC.blocks[a.dataset.tex]) a.style.backgroundImage = dataUrl(Tex(a.dataset.tex)); });
 }
 
 /* ================= Icônes : objets du jeu, blocs vus en trois quarts ================= */
@@ -116,14 +117,14 @@ function icon(name) {
   if (ICONS[name]) return ICONS[name];
   let c;
   if (name.indexOf('+') > 0) { c = mk(16, 16); name.split('+').forEach(n => c.getContext('2d').drawImage(icon(n), 0, 0, 16, 16)); }
-  else if (name.indexOf('block:') === 0 && MC.blocks[name.slice(6)]) c = iso(T(name.slice(6)));
+  else if (name.indexOf('block:') === 0 && MC.blocks[name.slice(6)]) c = iso(Tex(name.slice(6)));
   else if (MC.items[name] !== undefined && IM.items) { c = mk(16, 16); c.getContext('2d').drawImage(IM.items, 0, MC.items[name] * 16, 16, 16, 0, 0, 16, 16); }
-  else c = iso(T('gold_block'));
+  else c = iso(Tex('gold_block'));
   return ICONS[name] = c;
 }
 function sprites() {
   setVar('--soullamp', icon('soul_lantern'));
-  setVar('--oak', T('oak_planks'));
+  setVar('--oak', Tex('oak_planks'));
   setVar('--lock', art(['..kkkk..', '.k....k.', '.k....k.', 'kkkkkkkk', 'kyyyyyyk', 'kyyddyyk', 'kyyddyyk', 'kyyyyyyk', 'kkkkkkkk'], { k: '#1c1410', y: '#d9a521', d: '#4a3210' }));
 }
 
@@ -168,7 +169,7 @@ function Rig() {
     const want = REDUCE ? catchY : clamp(vh * .62, Math.min(surf, vh * 1.2), catchY);
     y = y === null || dt === undefined ? want : y + (want - y) * (1 - Math.exp(-dt * 11));
     if (Math.abs(want - y) < .6) y = want;
-    if (!hooked && y >= catchY - 3 && ry < vh * 1.05) { hooked = true; card.classList.add('hooked'); if (!struck && !SHOT) { struck = true; world.strike(); toast('prise', 'fishing_rod', 'Progrès réalisé !', 'Belle prise'); } }
+    if (!hooked && y >= catchY - 3 && ry < vh * 1.05) { hooked = true; card.classList.add('hooked'); if (!struck && !SHOT) { struck = true; world.strike(); toast('prise', 'fishing_rod', T.t('accueil.toast.adv', 'Progrès réalisé !'), T.t('accueil.toast.catch', 'Belle prise')); } }
     else if (hooked && !REDUCE && want < catchY - 70) { hooked = false; card.classList.remove('hooked'); }
     const ax = tp ? tp.x : bx, ay = tp ? tp.y : -200;
     // bout de la ligne = haut de la bouée ; à la surface, la bouée flotte à moitié immergée et danse un peu
@@ -229,7 +230,7 @@ function Catch() {
 /* ================= Interface ================= */
 function Tips() {
   const ul = $('#tips'); if (!ul) return;
-  const lis = $$('li', ul), bar = h('div', { class: 'hotbar', role: 'tablist', 'aria-label': 'Ce que fait le launcher' }), out = h('div', { class: 'tip', role: 'tabpanel', id: 'tip', 'aria-live': 'polite' });
+  const lis = $$('li', ul), bar = h('div', { class: 'hotbar', role: 'tablist', 'aria-label': T.t('accueil.tips.aria', 'Ce que fait le launcher') }), out = h('div', { class: 'tip', role: 'tabpanel', id: 'tip', 'aria-live': 'polite' });
   let cur = -1; const btns = [];
   const sel = i => {
     if (i === cur) return; cur = i;
@@ -253,36 +254,36 @@ function Download() {
   const L = CFG.launcher || {}, Cm = CFG.community || {}, btn = $('#dl'), meta = $('#dl-meta'), head = $('.top a[href="#launcher"]');
   if (!btn) return;
   if (L.url) {
-    const a = h('a', { class: 'btn btn-main btn-big', id: 'dl', href: L.url, download: '' }); btn.replaceWith(pxLabel(a, 'Télécharger pour Windows'));
-    const extra = [L.version && 'version ' + L.version, L.size].filter(Boolean).join(' · ');
+    const a = h('a', { class: 'btn btn-main btn-big', id: 'dl', href: L.url, download: '' }); btn.replaceWith(pxLabel(a, T.t('accueil.dl.get', 'Télécharger pour Windows')));
+    const extra = [L.version && T.t('accueil.dl.version', 'version {v}', { v: L.version }), L.size].filter(Boolean).join(' · ');
     if (extra && meta) meta.textContent = extra + ' · ' + meta.textContent;
   } else {
-    pxLabel(btn, 'Bientôt disponible');
-    if (head) { head.classList.remove('tbtn-main'); pxLabel(head, 'Le launcher'); }       // ne promet pas un téléchargement qui n'existe pas encore
+    pxLabel(btn, T.t('accueil.dl.soon', 'Bientôt disponible'));
+    if (head) { head.classList.remove('tbtn-main'); pxLabel(head, T.t('nav.launcher', 'Le launcher')); }       // ne promet pas un téléchargement qui n'existe pas encore
     const d = L.opening ? new Date(L.opening) : null, now = new Date();      // en jours de calendrier, comme le panneau de la grotte (grotte.js)
     const days = d && !isNaN(d) ? Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5) : -1;
-    if (days >= 0 && meta) meta.before(h('p', { class: 'countdown', text: 'Ouverture prévue ' + (days === 0 ? "aujourd'hui" : days === 1 ? 'demain' : 'le ' + d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · dans ' + days + ' jours') }));
+    if (days >= 0 && meta) meta.before(h('p', { class: 'countdown', text: days === 0 ? T.t('accueil.cd.today', "Ouverture prévue aujourd'hui") : days === 1 ? T.t('accueil.cd.tomorrow', 'Ouverture prévue demain') : T.t('accueil.cd.later', 'Ouverture prévue le {date} · dans {n} jours', { date: d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' }), n: days }) }));
   }
   if (Cm.url) {
-    const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, target: '_blank', rel: 'noopener' }), Cm.label || 'Rejoindre la communauté');
+    const mkLink = () => pxLabel(h('a', { class: 'btn btn-main community', href: Cm.url, target: '_blank', rel: 'noopener' }), T.pick(Cm, 'label') || T.t('accueil.community', 'Rejoindre la communauté'));
     if (meta) meta.after(mkLink());
   }
 }
 
 /* Le chantier : les 5 dernières nouvelles du site, du launcher et du jeu. assets/journal.json est réécrit toutes les heures
    par une tâche GitHub (.github/journal/build.mjs) à partir des lignes « Journal(…): » des commits des projets. */
-const PROJETS = { site: 'Site', launcher: 'Launcher', jeu: 'Jeu' };
+const PROJETS = { site: T.t('accueil.proj.site', 'Site'), launcher: T.t('accueil.proj.launcher', 'Launcher'), jeu: T.t('accueil.proj.game', 'Jeu') };
 function Journal() {
   const ol = $('#journal'); if (!ol) return;
   const quand = iso => {
     const d = new Date(iso), j = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 864e5);
-    return j <= 0 ? "aujourd'hui" : j === 1 ? 'hier' : j < 7 ? 'il y a ' + j + ' jours' : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+    return j <= 0 ? T.t('accueil.j.today', "aujourd'hui") : j === 1 ? T.t('accueil.j.yesterday', 'hier') : j < 7 ? T.t('accueil.j.ago', 'il y a {n} jours', { n: j }) : d.toLocaleDateString(T.locale, { day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
   };
   fetch('assets/journal.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error('journal ' + r.status); return r.json(); }).then(j => {
     const list = (j.entries || []).filter(e => PROJETS[e.p] && e.t && e.d).slice(0, 5); if (!list.length) return;
     ol.textContent = '';
     list.forEach(e => ol.appendChild(h('li', { class: 'j-e', 'data-p': e.p },
-      h('span', { class: 'j-p' }, PROJETS[e.p]), h('span', { class: 'j-t', text: e.t }), h('time', { class: 'j-d', datetime: e.d, text: quand(e.d) }))));
+      h('span', { class: 'j-p' }, PROJETS[e.p]), h('span', { class: 'j-t', text: (T.lang === 'en' && e.en) || e.t }), h('time', { class: 'j-d', datetime: e.d, text: quand(e.d) }))));
   }).catch(e => { if (window.console) console.warn(e); });
 }
 
@@ -306,7 +307,7 @@ function F3() {
   const set = (i, txt) => { if (cache[i] !== txt) { cache[i] = txt; pxLabel(rows[i], txt); } };
   set(0, 'The Last 26.1.2 (thelastmc.fr)');
   const BIOME = ['nether_wastes', 'nether_wastes', 'soul_sand_valley', 'soul_sand_valley'];
-  return (y, cur, label) => { set(1, 'XYZ: 0.500 / ' + y.toFixed(1) + ' / 46.700'); set(2, 'Biome: minecraft:' + BIOME[cur]); set(3, 'Couche: ' + label); };
+  return (y, cur, label) => { set(1, 'XYZ: 0.500 / ' + y.toFixed(1) + ' / 46.700'); set(2, 'Biome: minecraft:' + BIOME[cur]); set(3, T.t('accueil.f3.layer', 'Couche: {name}', { name: label })); };
 }
 
 function Depth(f3) {
@@ -316,7 +317,7 @@ function Depth(f3) {
     // le fond est trop court pour monter jusqu'au milieu de l'écran : on l'atteint quand on touche le bas de la page
     const mid = innerHeight * .5, pin = pinLen(), fr = floor.getBoundingClientRect(), low = Math.max(mid, innerHeight - fr.height) + 1; let cur = 0;
     secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= (s === floor ? low : mid)) cur = i; });
-    if (cur !== last) { last = cur; links.forEach((a, i) => { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }); if (cur === secs.length - 1) toast('fond', 'block:bedrock', 'Progrès réalisé !', 'Au fond du Nether'); }
+    if (cur !== last) { last = cur; links.forEach((a, i) => { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }); if (cur === secs.length - 1) toast('fond', 'block:bedrock', T.t('accueil.toast.adv', 'Progrès réalisé !'), T.t('accueil.toast.bottom', 'Au fond du Nether')); }
     // coordonnée Y : la mer de lave du Nether est à 31 ; on descend jusqu'à la bedrock (0)
     const camY = world ? world.camY() : 5, f = fr.top - low, sy = SY();
     const y = sy <= pin ? 31 + camY - 1 : f <= 0 ? 0 : 32 * clamp(f / Math.max(1, f + sy - pin), 0, 1);
@@ -337,10 +338,10 @@ function start() {
   Scene();
   toast = Toasts();
   align = Catch();
-  $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
+  $$('.top .tbtn').forEach(b => { if (b.classList.contains('lang-sw')) $$('a', b).forEach(a => pxLabel(a, a.textContent)); else pxLabel(b, b.textContent); });   // FR | EN : chaque moitié
   Tips(); Download(); Journal();
   depth = Depth(F3()); depth();
-  if (QS.has('toast')) toast('demo', 'fishing_rod', 'Progrès réalisé !', 'Belle prise');
+  if (QS.has('toast')) toast('demo', 'fishing_rod', T.t('accueil.toast.adv', 'Progrès réalisé !'), T.t('accueil.toast.catch', 'Belle prise'));
   root.classList.add('ready');
   if (SHOT) {                                            // mode capture : une image figée, pour les essais automatiques
     const shoot = () => {                               // le navigateur sans tête change la taille de la fenêtre après coup : on refait tout

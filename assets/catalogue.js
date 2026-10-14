@@ -12,6 +12,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const D = document, root = D.documentElement;
 const CFG = window.THE_LAST || {}, SHOP = CFG.shop || {}, SIMU = window.TL_SIMU, MC = window.MC || { items: {}, font: {} };
 const $ = s => D.querySelector(s);
@@ -36,12 +37,13 @@ function h(tag, attrs, ...kids) {
 /* ---------- chiffres : tout passe par TL_SIMU ---------- */
 // espace fine insécable (U+202F) des milliers : absente des polices du site, on met une espace insécable classique
 const nbsp = t => String(t).replace(/ /g, ' ');
-const fe = c => nbsp(SIMU ? SIMU.fmtEuros(c) : (c / 100).toFixed(2).replace('.', ',') + ' €');
+const fe = c => nbsp(SIMU ? SIMU.fmtEuros(c) : (T.lang === 'en' ? '€' + (c / 100).toFixed(2) : (c / 100).toFixed(2).replace('.', ',') + ' €'));
 const fb = n => nbsp(SIMU ? SIMU.fmtBraises(n) : String(n));
 const PACKS = SIMU ? SIMU.paquets(CFG) : [];
 const REF = PACKS.slice().sort((a, b) => a.braises - b.braises || a.cents - b.cents)[0] || null;   // le plus petit paquet : la Poignée
-const plur = (w, n) => n > 1 && !/[sx]$/i.test(w) ? w + 's' : w;
-const nObjets = n => n + (n > 1 ? ' objets' : ' objet');
+const plur = (w, n) => n <= 1 ? w : T.lang === 'en' ? (/(s|x|z|ch|sh)$/i.test(w) ? w + 'es' : w + 's') : /[sx]$/i.test(w) ? w : w + 's';   // anglais : Pouch -> Pouches
+const nObjets = n => { const un = T.lang === 'en' ? n === 1 : n <= 1; return T.t(un ? 'taverne.items-1' : 'taverne.items-n', un ? '{n} objet' : '{n} objets', { n }); };
+const L_PACKS = T.t('taverne.in-packs', 'En paquets'), L_PAY = T.t('taverne.eq-pay', '= À payer');
 const basketTxt = r => r.lignes.map(l => l.n + ' ' + plur(l.pack.short, l.n)).join(' + ');
 const cachePanier = new Map();
 function panier(br) {                                            // le panier le moins cher qui donne au moins br Braises
@@ -56,17 +58,24 @@ function panier(br) {                                            // le panier le
 /* ---------- le catalogue ---------- */
 const norm = s => String(s == null ? '' : s).toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae')
   .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-const OBJS = (SHOP.inGame || []).filter(o => o && o.id && o.braises > 0).slice().sort((a, b) => a.braises - b.braises || String(a.name).localeCompare(b.name, 'fr'));
+const OBJS = (SHOP.inGame || []).filter(o => o && o.id && o.braises > 0).slice().sort((a, b) => a.braises - b.braises || String(T.pick(a, 'name')).localeCompare(T.pick(b, 'name'), T.locale));
+/* en anglais, la recherche lit les deux langues : les mots anglais ET les mots français trouvent l'objet */
+const EN = T.lang === 'en';
+const nameOf = x => T.pick(x, 'name'), descOf = x => T.pick(x, 'desc');
+const namesOf = x => EN && x.en && x.en.name ? [x.name, x.en.name] : [x.name];
+const loresOf = x => EN && x.en && x.en.lore ? [x.lore, x.en.lore] : [x.lore];
+const tagsOf = x => (x.tags || []).concat(EN && x.en && x.en.tags ? x.en.tags : []);
 OBJS.forEach(o => {
-  o._n = norm(o.name);
-  o._w = norm([o.name, o.lore, (o.tags || []).join(' ')].join(' ')).split(' ').filter(Boolean);
+  o._n = norm(namesOf(o).join(' '));
+  o._w = norm([namesOf(o).join(' '), loresOf(o).join(' '), tagsOf(o).join(' ')].join(' ')).split(' ').filter(Boolean);
   o._h = ' ' + o._w.join(' ') + ' ';
-  o._f = norm([o.name, (o.tags || []).join(' ')].join(' ')).split(' ').filter(Boolean);   // la faute tolérée : nom et synonymes seulement
+  o._f = norm([namesOf(o).join(' '), tagsOf(o).join(' ')].join(' ')).split(' ').filter(Boolean);   // la faute tolérée : nom et synonymes seulement
 });
 let CATS = (Array.isArray(SHOP.categories) ? SHOP.categories : []).filter(c => c && c.id && c.name).map(c => Object.assign({}, c, { items: [] }));
 const byCat = new Map(CATS.map(c => [c.id, c]));
 if (CATS.length) {
-  const autres = { id: 'autres', name: 'Autres', icon: null, desc: 'Ce qui ne rentre dans aucune autre catégorie.', items: [] };
+  const autres = { id: 'autres', name: 'Autres', icon: null, desc: 'Ce qui ne rentre dans aucune autre catégorie.', items: [],
+    en: { name: T.t('taverne.other', 'Autres'), desc: T.t('taverne.other-desc', 'Ce qui ne rentre dans aucune autre catégorie.') } };
   OBJS.forEach(o => { const c = byCat.get(o.cat) || autres; o._c = c; c.items.push(o); });
   if (autres.items.length && !byCat.has('autres')) { CATS.push(autres); byCat.set('autres', autres); }
   CATS = CATS.filter(c => c.items.length);                       // une catégorie vide n'est pas affichée
@@ -76,7 +85,7 @@ const isGrade = o => (o._c && (o._c.paliers || o._c.id === 'grades')) || /^grade
 const range = list => {
   if (!list.length) return '';
   const a = list[0].braises, b = list[list.length - 1].braises;
-  return a === b ? fb(a) + ' Braises' : 'de ' + fb(a) + ' à ' + fb(b) + ' Braises';
+  return a === b ? fb(a) + ' Braises' : T.t('taverne.range', 'de {a} à {b} Braises', { a: fb(a), b: fb(b) });
 };
 
 /* ---------- police du jeu (glyphes de mc.js), pour les titres et l'afficheur ---------- */
@@ -155,24 +164,24 @@ function itemTile(o, showCat) {
   const pa = conv ? panier(o.braises) : null;
   return h('button', { class: 'cb-it', type: 'button', 'data-id': o.id, on: { click: () => openFiche(o.id, true) } },
     icon(o.icon, 40),
-    h('span', { class: 'cb-it-n', text: o.name }),
-    showCat && o._c ? h('span', { class: 'cb-it-k', text: o._c.name }) : null,
+    h('span', { class: 'cb-it-n', text: nameOf(o) }),
+    showCat && o._c ? h('span', { class: 'cb-it-k', text: nameOf(o._c) }) : null,
     h('span', { class: 'cb-it-p' }, h('b', { text: fb(o.braises) }), coin(), ' Braises'),
-    pa ? h('span', { class: 'cb-it-pk' }, h('span', { class: 'sr', text: ', en paquets : ' }), pa.txt + ' · ' + fe(pa.cents) + ' · reste ' + fb(pa.reste)) : null);
+    pa ? h('span', { class: 'cb-it-pk' }, h('span', { class: 'sr', text: T.t('taverne.tile-sr', ', en paquets : ') }), T.t('taverne.tile-pk', '{txt} · {price} · reste {left}', { txt: pa.txt, price: fe(pa.cents), left: fb(pa.reste) })) : null);
 }
 const grid = (list, showCat) => h('div', { class: 'cb-grid cb-grid-it' }, ...list.map(o => itemTile(o, showCat)));
 
 function catTile(c) {
   return h('button', { class: 'cb-cat', type: 'button', 'data-cat': c.id, on: { click: () => openCat(c.id, true) } },
     c.icon ? icon(c.icon, 48) : coinIcon(48),
-    pxEl('span', { class: 'cb-cat-n' }, c.name),
+    pxEl('span', { class: 'cb-cat-n' }, nameOf(c)),
     h('span', { class: 'cb-cat-c', text: nObjets(c.items.length) }),
     h('span', { class: 'cb-cat-r', text: range(c.items) }));
 }
 function allTile() {
   return h('button', { class: 'cb-cat cb-all', type: 'button', 'data-cat': '*', on: { click: () => openAll(true) } },
     coinIcon(48),
-    pxEl('span', { class: 'cb-cat-n' }, 'Tout voir'),
+    pxEl('span', { class: 'cb-cat-n' }, T.t('taverne.all', 'Tout voir')),
     h('span', { class: 'cb-cat-c', text: nObjets(OBJS.length) }),
     h('span', { class: 'cb-cat-r', text: range(OBJS) }));
 }
@@ -180,12 +189,12 @@ function bar(label, current) {                                     // « ← Cat
   if (FLAT && !q.trim()) return null;                              // une seule liste : rien à remonter
   const back = FLAT ? () => { clearQ(); render(false); title.focus({ preventScroll: true }); } : backToCats;
   return h('div', { class: 'cb-bar' },
-    h('button', { class: 'cb-back', type: 'button', on: { click: back } }, h('span', { 'aria-hidden': 'true', text: '← ' }), FLAT ? 'Tous les objets' : label || 'Catégories'),
+    h('button', { class: 'cb-back', type: 'button', on: { click: back } }, h('span', { 'aria-hidden': 'true', text: '← ' }), FLAT ? T.t('taverne.all-items', 'Tous les objets') : label || T.t('taverne.categories', 'Catégories')),
     current ? h('span', { class: 'cb-crumb', 'aria-hidden': 'true' }, h('i', { text: '›' }), current) : null);
 }
 function emptyCatalogue() {
   return h('div', { class: 'cb-empty' }, coinIcon(48),
-    h('p', { text: "Le tavernier n'a encore rien posé sur l'étal. Les objets arriveront avant l'ouverture." }));
+    h('p', { text: T.t('taverne.empty', "Le tavernier n'a encore rien posé sur l'étal. Les objets arriveront avant l'ouverture.") }));
 }
 
 /* ---------- la recherche : sans accents ni casse, une faute tolérée sur les mots de 5 lettres ou plus ---------- */
@@ -216,8 +225,8 @@ function search(raw) {
   });
   return out.sort((a, b) => a.score - b.score || a.o.braises - b.o.braises).map(r => r.o);
 }
-const exactCat = raw => { const n = norm(raw); return n ? CATS.find(c => norm(c.name) === n || c.id === n) : null; };
-const nearCat = raw => { const n = norm(raw); return n.length >= 3 ? CATS.find(c => { const m = norm(c.name); return m.startsWith(n) || n.startsWith(m) || lev1(n, m); }) : null; };
+const exactCat = raw => { const n = norm(raw); return n ? CATS.find(c => namesOf(c).some(m => norm(m) === n) || c.id === n) : null; };
+const nearCat = raw => { const n = norm(raw); return n.length >= 3 ? CATS.find(c => namesOf(c).some(nm => { const m = norm(nm); return m.startsWith(n) || n.startsWith(m) || lev1(n, m); })) : null; };
 
 /* ---------- l'écran ---------- */
 let lastAnnounce = '';
@@ -233,44 +242,44 @@ function render(focusHead) {
   if (qq && !ex) {                                                  // résultats, toutes catégories
     const res = search(qq);
     const nc = nearCat(qq);
-    { const b = bar('Catégories', 'Résultats'); if (b) scroll.appendChild(b); }
-    const hd = h('h3', { class: 'cb-h', tabindex: '-1' }, 'Résultats pour « ' + qq + ' »', h('small', { text: ' · ' + nObjets(res.length) }));
+    { const b = bar(T.t('taverne.categories', 'Catégories'), T.t('taverne.results', 'Résultats')); if (b) scroll.appendChild(b); }
+    const hd = h('h3', { class: 'cb-h', tabindex: '-1' }, T.t('taverne.results-for', 'Résultats pour « {q} »', { q: qq }), h('small', { text: ' · ' + nObjets(res.length) }));
     scroll.appendChild(hd); focusEl = hd;
-    if (nc) scroll.appendChild(h('p', { class: 'cb-hint' }, h('button', { class: 'cb-chip', type: 'button', on: { click: () => { clearQ(); openCat(nc.id, true); } } }, 'Voir la catégorie ' + nc.name + ' (' + nObjets(nc.items.length) + ')')));
+    if (nc) scroll.appendChild(h('p', { class: 'cb-hint' }, h('button', { class: 'cb-chip', type: 'button', on: { click: () => { clearQ(); openCat(nc.id, true); } } }, T.t('taverne.see-cat', 'Voir la catégorie {name} ({items})', { name: nameOf(nc), items: nObjets(nc.items.length) }))));
     if (res.length) scroll.appendChild(grid(res, !FLAT));
     else {
       scroll.appendChild(h('div', { class: 'cb-empty' },
-        h('p', { text: 'Aucun objet ne correspond à « ' + qq + ' ». Essaie : titre, couleur, compagnon.' }),
+        h('p', { text: T.t('taverne.no-match', 'Aucun objet ne correspond à « {q} ». Essaie : titre, couleur, compagnon.', { q: qq }) }),
         h('p', { class: 'cb-empty-b' },
-          h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); qIn.focus(); } } }, 'Effacer la recherche'),
-          FLAT ? null : h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); backToCats(); } } }, 'Voir les catégories'))));
+          h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); qIn.focus(); } } }, T.t('taverne.clear', 'Effacer la recherche')),
+          FLAT ? null : h('button', { class: 'btn btn-sm', type: 'button', on: { click: () => { clearQ(); backToCats(); } } }, T.t('taverne.see-cats', 'Voir les catégories')))));
     }
-    announce(res.length ? nObjets(res.length) + (res.length > 1 ? ' trouvés' : ' trouvé') : 'Aucun objet trouvé');
+    announce(res.length ? T.t(res.length > 1 ? 'taverne.found-n' : 'taverne.found-1', res.length > 1 ? '{items} trouvés' : '{items} trouvé', { items: nObjets(res.length) }) : T.t('taverne.found-0', 'Aucun objet trouvé'));
   } else if (ex || view === 'cat') {
     const c = ex || byCat.get(catId);
-    { const b = bar('Catégories', c.name); if (b) scroll.appendChild(b); }
+    { const b = bar(T.t('taverne.categories', 'Catégories'), nameOf(c)); if (b) scroll.appendChild(b); }
     const hd = h('h3', { class: 'cb-h cb-h-px', tabindex: '-1' });
-    px(ex ? 'Catégorie ' + c.name : c.name).forEach(n => hd.appendChild(n));
+    px(ex ? T.t('taverne.cat-prefix', 'Catégorie {name}', { name: nameOf(c) }) : nameOf(c)).forEach(n => hd.appendChild(n));
     hd.appendChild(h('small', { text: ex ? '(' + nObjets(c.items.length) + ')' : nObjets(c.items.length) }));
     scroll.appendChild(hd); focusEl = hd;
-    if (c.desc) scroll.appendChild(h('p', { class: 'cb-desc', text: c.desc }));
+    if (descOf(c)) scroll.appendChild(h('p', { class: 'cb-desc', text: descOf(c) }));
     scroll.appendChild(grid(c.items, false));
-    if (ex) announce('Catégorie ' + c.name + ', ' + nObjets(c.items.length));
+    if (ex) announce(T.t('taverne.cat-announce', 'Catégorie {name}, {items}', { name: nameOf(c), items: nObjets(c.items.length) }));
   } else if (view === 'all') {
-    { const b = bar('Catégories', 'Tout voir'); if (b) scroll.appendChild(b); }
+    { const b = bar(T.t('taverne.categories', 'Catégories'), T.t('taverne.all', 'Tout voir')); if (b) scroll.appendChild(b); }
     const hd = h('h3', { class: 'cb-h cb-h-px', tabindex: '-1' });
-    px(FLAT ? 'Tous les objets' : 'Tout voir').forEach(n => hd.appendChild(n));
-    hd.appendChild(h('small', { text: nObjets(OBJS.length) + ', du moins cher au plus cher' }));
+    px(FLAT ? T.t('taverne.all-items', 'Tous les objets') : T.t('taverne.all', 'Tout voir')).forEach(n => hd.appendChild(n));
+    hd.appendChild(h('small', { text: T.t('taverne.all-sub', '{items}, du moins cher au plus cher', { items: nObjets(OBJS.length) }) }));
     scroll.appendChild(hd); focusEl = hd;
     if (FLAT) scroll.appendChild(grid(OBJS, false));
     else CATS.forEach(c => {
-      scroll.appendChild(h('h4', { class: 'cb-h4' }, c.name, h('small', { text: ' · ' + nObjets(c.items.length) })));
+      scroll.appendChild(h('h4', { class: 'cb-h4' }, nameOf(c), h('small', { text: ' · ' + nObjets(c.items.length) })));
       scroll.appendChild(grid(c.items, false));
     });
   } else {                                                          // écran 1 : les catégories
     // « Tout voir » à part, en bas de la fenêtre (catalogue.css : .cb-scroll-cats)
     scroll.classList.add('cb-scroll-cats');
-    const lab = h('p', { class: 'cb-lab', id: 'cb-lab', text: 'Catégorie :' });
+    const lab = h('p', { class: 'cb-lab', id: 'cb-lab', text: T.t('taverne.cat-label', 'Catégorie :') });
     scroll.appendChild(lab);
     scroll.appendChild(h('div', { class: 'cb-grid cb-grid-cat', role: 'group', 'aria-labelledby': 'cb-lab' }, ...CATS.map(catTile)));
     scroll.appendChild(allTile());
@@ -317,18 +326,18 @@ let calcIn = null, calcOut = null, calcVal = '';                 // la saisie su
 function drawCalc() {
   plate.dataset.mode = 'calc';
   plate.textContent = '';
-  if (!SIMU || !PACKS.length) { plate.appendChild(h('p', { class: 'cb-plate-msg', text: 'Les paquets ne sont pas encore fixés.' })); return; }
+  if (!SIMU || !PACKS.length) { plate.appendChild(h('p', { class: 'cb-plate-msg', text: T.t('taverne.no-packs', 'Les paquets ne sont pas encore fixés.') })); return; }
   const eur = mode === 'eur';
-  calcIn = h('input', { id: 'cb-in', type: 'text', inputmode: eur ? 'decimal' : 'numeric', autocomplete: 'off', spellcheck: 'false', placeholder: eur ? 'ex : 10' : 'ex : 2 000' });
+  calcIn = h('input', { id: 'cb-in', type: 'text', inputmode: eur ? 'decimal' : 'numeric', autocomplete: 'off', spellcheck: 'false', placeholder: eur ? T.t('taverne.ph-eur', 'ex : 10') : T.t('taverne.ph-br', 'ex : 2 000') });
   calcIn.value = calcVal;
   calcIn.addEventListener('input', () => { calcVal = calcIn.value; calc(); });
   calcOut = h('output', { class: 'cb-out', for: 'cb-in', 'aria-live': 'polite' });
   plate.append(
     h('div', { class: 'cb-cell cb-cell-in' },
       h('span', { class: 'cb-lrow' },
-        h('label', { class: 'cb-cell-l', for: 'cb-in', text: eur ? 'Ton budget' : 'Tu veux' }),
+        h('label', { class: 'cb-cell-l', for: 'cb-in', text: eur ? T.t('taverne.l-budget', 'Ton budget') : T.t('taverne.l-want', 'Tu veux') }),
         h('button', { class: 'cb-link', type: 'button', on: { click: () => { mode = eur ? 'br' : 'eur'; calcVal = ''; drawCalc(); calcIn.focus(); } } },
-          eur ? 'ou partir d\'un nombre de Braises' : 'ou partir d\'un budget en euros')),
+          eur ? T.t('taverne.to-br', 'ou partir d\'un nombre de Braises') : T.t('taverne.to-eur', 'ou partir d\'un budget en euros'))),
       h('span', { class: 'cb-inbox' }, calcIn, h('span', { class: 'cb-unit', 'aria-hidden': 'true', text: eur ? '€' : 'Braises' }))),
     calcOut);
   calc();
@@ -339,28 +348,28 @@ function calc() {
   const v = raw.trim() ? (eur ? SIMU.lireEuros(raw) : SIMU.lireBraises(raw)) : null;
   const put = (a, b, c) => calcOut.append(cell(a, b), c);
   if (!raw.trim()) {
-    put(eur ? '= Braises' : '= À payer', lcd(eur ? '0' : '0,00 €', eur ? '0 Braises' : '0 €'),
-      cell('En paquets', h('span', { class: 'cb-cell-t dim', text: eur ? 'Écris un montant : je te dis ce que ça donne en paquets.' : 'Écris un nombre de Braises : je te dis le moins cher.' })));
+    put(eur ? '= Braises' : L_PAY, lcd(eur ? '0' : T.t('taverne.zero-eur', '0,00 €'), eur ? '0 Braises' : T.t('taverne.zero-eur-sr', '0 €')),
+      cell(L_PACKS, h('span', { class: 'cb-cell-t dim', text: eur ? T.t('taverne.hint-eur', 'Écris un montant : je te dis ce que ça donne en paquets.') : T.t('taverne.hint-br', 'Écris un nombre de Braises : je te dis le moins cher.') })));
     return;
   }
   if (v == null || v === 0) {
-    put(eur ? '= Braises' : '= À payer', lcd('----', '—'),
-      cell('En paquets', h('span', { class: 'cb-cell-t', text: v === 0 ? 'Écris un nombre plus grand que 0.' : 'Je ne lis pas « ' + raw.trim() + ' ». Écris par exemple ' + (eur ? '10 ou 12,50.' : '2000.') })));
+    put(eur ? '= Braises' : L_PAY, lcd('----', '—'),
+      cell(L_PACKS, h('span', { class: 'cb-cell-t', text: v === 0 ? T.t('taverne.gt0', 'Écris un nombre plus grand que 0.') : T.t(eur ? 'taverne.bad-eur' : 'taverne.bad-br', eur ? 'Je ne lis pas « {raw} ». Écris par exemple 10 ou 12,50.' : 'Je ne lis pas « {raw} ». Écris par exemple 2000.', { raw: raw.trim() }) })));
     return;
   }
   if (eur) {
     const r = SIMU.pourEuros(PACKS, v);
-    if (!r.braises) { put('= Braises', lcd('0', '0 Braises'), cell('En paquets', h('span', { class: 'cb-cell-t', text: 'Pas de paquet : le plus petit (' + REF.short + ') coûte ' + fe(REF.cents) + '.' }))); return; }
+    if (!r.braises) { put('= Braises', lcd('0', '0 Braises'), cell(L_PACKS, h('span', { class: 'cb-cell-t', text: T.t('taverne.no-pack', 'Pas de paquet : le plus petit ({pack}) coûte {price}.', { pack: REF.short, price: fe(REF.cents) }) }))); return; }
     put('= Braises', h('span', { class: 'cb-lcd-row' }, lcd(fb(r.braises), fb(r.braises) + ' Braises'), coinIcon(22)),
-      cell('En paquets', h('span', { class: 'cb-cell-t' }, h('b', { text: basketTxt(r) }), ' (' + fe(r.cents) + ')',
-        r.reste > 0 ? h('small', { text: ' · non dépensé : ' + fe(r.reste) }) : null,
-        r.plafond ? h('small', { text: ' · calcul arrêté à ' + fe(SIMU.MAX_CENTS) }) : null)));
+      cell(L_PACKS, h('span', { class: 'cb-cell-t' }, h('b', { text: basketTxt(r) }), ' (' + fe(r.cents) + ')',
+        r.reste > 0 ? h('small', { text: ' · ' + T.t('taverne.unspent', 'non dépensé : {amount}', { amount: fe(r.reste) }) }) : null,
+        r.plafond ? h('small', { text: ' · ' + T.t('taverne.capped', 'calcul arrêté à {amount}', { amount: fe(SIMU.MAX_CENTS) }) }) : null)));
   } else {
     const r = SIMU.pourBraises(PACKS, v);
-    put('= À payer', lcd(fe(r.cents), fe(r.cents)),
-      cell('En paquets', h('span', { class: 'cb-cell-t' }, h('b', { text: basketTxt(r) }), ', pour ' + fb(r.braises) + ' Braises',
-        r.surplus > 0 ? h('small', { text: ' · ' + fb(r.surplus) + ' de plus que voulu' }) : null,
-        r.plafond ? h('small', { text: ' · calcul arrêté à ' + fb(SIMU.MAX_BRAISES) + ' Braises' }) : null)));
+    put(L_PAY, lcd(fe(r.cents), fe(r.cents)),
+      cell(L_PACKS, h('span', { class: 'cb-cell-t' }, h('b', { text: basketTxt(r) }), ', ' + T.t('taverne.for-n', 'pour {n} Braises', { n: fb(r.braises) }),
+        r.surplus > 0 ? h('small', { text: ' · ' + T.t('taverne.surplus', '{n} de plus que voulu', { n: fb(r.surplus) }) }) : null,
+        r.plafond ? h('small', { text: ' · ' + T.t('taverne.capped-br', 'calcul arrêté à {n} Braises', { n: fb(SIMU.MAX_BRAISES) }) }) : null)));
   }
 }
 function drawPesee(o) {
@@ -368,9 +377,9 @@ function drawPesee(o) {
   plate.textContent = '';
   const pa = panier(o.braises);
   plate.append(
-    h('div', { class: 'cb-cell cb-cell-obj' }, h('span', { class: 'cb-cell-l', text: 'Sur le plateau' }), h('span', { class: 'cb-obj' }, icon(o.icon, 32), h('b', { text: o.name }))),
-    cell('Prix en jeu', h('span', { class: 'cb-lcd-row' }, lcd(fb(o.braises), fb(o.braises) + ' Braises'), coinIcon(22))),
-    pa ? cell('En paquets', h('span', { class: 'cb-cell-t' }, h('b', { text: pa.txt + ' = ' + fe(pa.cents) }), pa.reste ? ', il te restera ' + fb(pa.reste) + ' Braises' : ', il ne te restera rien')) : null);
+    h('div', { class: 'cb-cell cb-cell-obj' }, h('span', { class: 'cb-cell-l', text: T.t('taverne.on-scale', 'Sur le plateau') }), h('span', { class: 'cb-obj' }, icon(o.icon, 32), h('b', { text: nameOf(o) }))),
+    cell(T.t('taverne.ingame-price', 'Prix en jeu'), h('span', { class: 'cb-lcd-row' }, lcd(fb(o.braises), fb(o.braises) + ' Braises'), coinIcon(22))),
+    pa ? cell(L_PACKS, h('span', { class: 'cb-cell-t' }, h('b', { text: pa.txt + ' = ' + fe(pa.cents) }), pa.reste ? ', ' + T.t('taverne.left-n', 'il te restera {n} Braises', { n: fb(pa.reste) }) : ', ' + T.t('taverne.left-0', 'il ne te restera rien'))) : null);
 }
 function setPlate(open) {
   plateOpen = open; bsw.setAttribute('aria-checked', open ? 'true' : 'false');
@@ -385,21 +394,21 @@ function openFiche(id, user) {
   ficheId = id;
   const pa = panier(o.braises);
   fiche.textContent = '';
-  const name = h('h3', { class: 'cb-f-n', id: 'cb-f-n', tabindex: '-1', text: o.name });
+  const name = h('h3', { class: 'cb-f-n', id: 'cb-f-n', tabindex: '-1', text: nameOf(o) });
   fiche.append(
     h('div', { class: 'cb-f-top' },
       icon(o.icon, 64),
-      h('div', null, name, o._c ? h('p', { class: 'cb-f-k', text: o._c.name }) : null),
-      h('button', { class: 'cb-x cb-f-x', type: 'button', 'aria-label': 'Fermer la fiche', on: { click: backFromFiche } }, h('span', { 'aria-hidden': 'true' }))),
-    o.lore ? h('p', { class: 'cb-f-lore', text: o.lore }) : null,
+      h('div', null, name, o._c ? h('p', { class: 'cb-f-k', text: nameOf(o._c) }) : null),
+      h('button', { class: 'cb-x cb-f-x', type: 'button', 'aria-label': T.t('taverne.f-close', 'Fermer la fiche'), on: { click: backFromFiche } }, h('span', { 'aria-hidden': 'true' }))),
+    T.pick(o, 'lore') ? h('p', { class: 'cb-f-lore', text: T.pick(o, 'lore') }) : null,
     h('div', { class: 'cb-f-price' },
       h('p', { class: 'cb-f-br' }, h('b', { text: fb(o.braises) }), coin(), ' Braises'),
-      pa ? h('p', { class: 'cb-f-pk' }, 'Le moins cher en paquets : ', h('b', { text: pa.txt + ' = ' + fe(pa.cents) }), ' pour ' + fb(pa.braises) + ' Braises.',
-        pa.reste ? ' Il te restera ' + fb(pa.reste) + ' Braises.' : ' Il ne te restera rien.') : null),
+      pa ? h('p', { class: 'cb-f-pk' }, T.t('taverne.f-pk1', 'Le moins cher en paquets : '), h('b', { text: pa.txt + ' = ' + fe(pa.cents) }), ' ' + T.t('taverne.f-pk2', 'pour {n} Braises.', { n: fb(pa.braises) }),
+        pa.reste ? ' ' + T.t('taverne.f-left', 'Il te restera {n} Braises.', { n: fb(pa.reste) }) : ' ' + T.t('taverne.f-left0', 'Il ne te restera rien.')) : null),
     h('ul', { class: 'cb-f-notes' },
-      h('li', { text: 'Purement visuel : aucun avantage en jeu.' }),
-      isGrade(o) ? h('li', { text: 'Un seul grade à la fois.' }) : null,
-      h('li', { text: 'Se règle en jeu, au comptoir du tavernier.' })));
+      h('li', { text: T.t('taverne.f-n1', 'Purement visuel : aucun avantage en jeu.') }),
+      isGrade(o) ? h('li', { text: T.t('taverne.f-n2', 'Un seul grade à la fois.') }) : null,
+      h('li', { text: T.t('taverne.f-n3', 'Se règle en jeu, au comptoir du tavernier.') })));
   fiche.hidden = false; scrim.hidden = false;
   main.inert = true; plate.inert = true;
   dlg.classList.add('cb-fiche-on');
@@ -433,9 +442,9 @@ scrim.addEventListener('click', backFromFiche);
 function drawFoot() {
   foot.textContent = '';
   foot.append(
-    h('p', null, h('b', { text: 'Tarifs indicatifs' }), ' · Rien n\'est encore en vente. Pas de cape, aucun avantage en jeu : uniquement de l\'apparence.'),
-    h('p', null, 'Les Braises n\'ont pas de valeur monétaire : ni convertibles en argent, ni transférables.',
-      PACKS.length ? ' On n\'achète que des paquets entiers.' : ''));
+    h('p', null, h('b', { text: T.t('taverne.foot-b', 'Tarifs indicatifs') }), ' · ' + T.t('taverne.foot-1', 'Rien n\'est encore en vente. Pas de cape, aucun avantage en jeu : uniquement de l\'apparence.')),
+    h('p', null, T.t('taverne.foot-2', 'Les Braises n\'ont pas de valeur monétaire : ni convertibles en argent, ni transférables.'),
+      PACKS.length ? ' ' + T.t('taverne.foot-3', 'On n\'achète que des paquets entiers.') : ''));
 }
 
 /* ---------- ouvrir, fermer, revenir en arrière ---------- */
@@ -505,7 +514,7 @@ qIn.addEventListener('input', () => {
   qTimer = setTimeout(() => {
     dropFiche();
     const had = !!q.trim(); q = qIn.value;
-    if (!q.trim() && had) announce(view === 'cats' ? 'Catégories' : '');
+    if (!q.trim() && had) announce(view === 'cats' ? T.t('taverne.categories', 'Catégories') : '');
     render(false);
   }, 150);
 });

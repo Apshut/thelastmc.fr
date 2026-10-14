@@ -5,27 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="The Last est un serveur Minecraft: Java Edition moddé (NeoForge) au contenu fait maison, avec son propre launcher sécurisé. Ouverture prochaine.">
-  <meta property="og:title" content="The Last — Serveur Minecraft: Java Edition">
-  <meta property="og:description" content="Un serveur moddé au contenu fait maison, avec son launcher sécurisé. Ouverture prochaine.">
+  <meta name="description" data-i18n-attr="content:accueil.meta.desc" content="The Last est un serveur Minecraft: Java Edition moddé (NeoForge) au contenu fait maison, avec son propre launcher sécurisé. Ouverture prochaine.">
+  <meta property="og:title" data-i18n-attr="content:accueil.meta.og-title" content="The Last — Serveur Minecraft: Java Edition">
+  <meta property="og:description" data-i18n-attr="content:accueil.meta.og-desc" content="Un serveur moddé au contenu fait maison, avec son launcher sécurisé. Ouverture prochaine.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://thelastmc.fr/">
   <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Une forteresse-bête du Nether gravée THE LAST en blocs d'or, au milieu d'un lac de lave">
+  <meta property="og:image:alt" data-i18n-attr="content:accueil.meta.og-alt" content="Une forteresse-bête du Nether gravée THE LAST en blocs d'or, au milieu d'un lac de lave">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0608">
   <link rel="canonical" href="https://thelastmc.fr/">
-  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/en">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <script>document.documentElement.className = "js";</script>
+  <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="assets/fonts.css">
   <link rel="stylesheet" href="assets/nether.css">
   <link rel="stylesheet" href="assets/compte.css">
   <link rel="stylesheet" href="assets/volkar.css">
+  <script src="assets/i18n.js" defer></script>
+  <script src="assets/lang/en-commun.js" defer></script>
+  <script src="assets/lang/en-compte.js" defer></script>
+  <script src="assets/lang/en-accueil.js" defer></script>
+  <script src="assets/lang/en-volkar.js" defer></script>
   <script src="assets/config.js" defer></script>
   <script src="assets/mc/mc.js" defer></script>
   <script src="assets/castle.js" defer></script>
@@ -37,66 +45,67 @@
   <script src="assets/volkar.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#launcher">Aller au téléchargement</a>
+  <a class="skip" href="#launcher" data-i18n="accueil.skip">Aller au téléchargement</a>
 
   <header class="top" id="top">
     <a class="brand" href="#lac"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale">
-      <a class="tbtn tbtn-main" href="#launcher">Télécharger</a>
-      <a class="tbtn" href="/boutique">Boutique</a>
-      <a class="tbtn" href="/chantier">Chantier</a>
-      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+      <a class="tbtn tbtn-main" href="#launcher" data-i18n="nav.download">Télécharger</a>
+      <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
+      <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
     </nav>
   </header>
 
-  <nav class="depth" aria-label="Profondeur">
+  <nav class="depth" aria-label="Profondeur" data-i18n-attr="aria-label:accueil.depth.aria">
     <ol>
-      <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span>Le lac de lave</span></a></li>
-      <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span>Sous la lave · le launcher</span></a></li>
-      <li><a href="#portail" data-sec="#grotte" data-tex="crying_obsidian"><span>La grotte · le portail du chantier</span></a></li>
-      <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span>Bedrock · le fond</span></a></li>
+      <li><a href="#lac" data-sec="#lac" data-tex="gilded_blackstone"><span data-i18n="accueil.depth.lake">Le lac de lave</span></a></li>
+      <li><a href="#launcher" data-sec="#abysse" data-tex="lava_still"><span data-i18n="accueil.depth.launcher">Sous la lave · le launcher</span></a></li>
+      <li><a href="#portail" data-sec="#grotte" data-tex="crying_obsidian"><span data-i18n="accueil.depth.cave">La grotte · le portail du chantier</span></a></li>
+      <li><a href="#fond" data-sec="#fond" data-tex="bedrock"><span data-i18n="accueil.depth.bottom">Bedrock · le fond</span></a></li>
     </ol>
     <p class="depth-y" aria-hidden="true">Y <b>48</b></p>
   </nav>
 
-  <canvas id="scene" role="img" aria-label="Une forteresse de pierre noire à cornes et aux yeux de feu, gravée des mots THE LAST en blocs d'or, sur une île au milieu d'un lac de lave. Au premier plan, un piglin assis sur un arpenteur pêche dans la lave."></canvas>
+  <canvas id="scene" role="img" data-i18n-attr="aria-label:accueil.scene.aria" aria-label="Une forteresse de pierre noire à cornes et aux yeux de feu, gravée des mots THE LAST en blocs d'or, sur une île au milieu d'un lac de lave. Au premier plan, un piglin assis sur un arpenteur pêche dans la lave."></canvas>
 
   <main id="monde">
     <!-- ============ Le lac ============ -->
-    <section class="hero" id="lac" aria-label="Le lac de lave">
-      <h1 class="sr">The Last — serveur Minecraft: Java Edition</h1>
+    <section class="hero" id="lac" aria-label="Le lac de lave" data-i18n-attr="aria-label:accueil.depth.lake">
+      <h1 class="sr" data-i18n="accueil.h1">The Last — serveur Minecraft: Java Edition</h1>
       <div class="hero-ui">
-        <p class="loader" aria-hidden="true"><span class="px" data-fs="3">Ouverture du Nether...</span></p>
-        <a class="hero-hint" id="hint" href="#launcher"><span class="px" data-fs="2">Suis la ligne ↓</span></a>
+        <p class="loader" aria-hidden="true"><span class="px" data-fs="3" data-i18n="accueil.loader">Ouverture du Nether...</span></p>
+        <a class="hero-hint" id="hint" href="#launcher"><span class="px" data-fs="2" data-i18n="accueil.hint">Suis la ligne ↓</span></a>
       </div>
     </section>
 
     <!-- ============ Sous la lave : le launcher ============ -->
-    <section class="stratum s-lava" id="abysse" aria-label="Sous la lave">
+    <section class="stratum s-lava" id="abysse" aria-label="Sous la lave" data-i18n-attr="aria-label:accueil.abyss.aria">
       <article class="catch" id="launcher" aria-labelledby="t-launcher">
         <i class="ring" aria-hidden="true"></i>
         <div class="panel">
           <h2 class="px" id="t-launcher" data-fs="4">The Last Launcher</h2>
-          <p class="lead">Minecraft, Java, NeoForge, les mods et les réglages du serveur&nbsp;: il installe tout
+          <p class="lead" data-i18n="accueil.lead">Minecraft, Java, NeoForge, les mods et les réglages du serveur&nbsp;: il installe tout
             et garde tout à jour. Toi, tu cliques sur «&nbsp;Jouer&nbsp;».</p>
           <div class="dl">
-            <button class="btn btn-big btn-locked" id="dl" type="button" disabled>Bientôt disponible</button>
-            <p class="dl-meta" id="dl-meta">Windows 10 / 11 · gratuit · compte Microsoft avec Minecraft: Java Edition</p>
+            <button class="btn btn-big btn-locked" id="dl" type="button" disabled data-i18n="accueil.dl.soon">Bientôt disponible</button>
+            <p class="dl-meta" id="dl-meta" data-i18n="accueil.dl.meta">Windows 10 / 11 · gratuit · compte Microsoft avec Minecraft: Java Edition</p>
           </div>
           <ul class="tips" id="tips">
-            <li data-icon="trial_key"><strong>Connexion Microsoft officielle</strong>
-              <span>Tu te connectes dans ton navigateur, sur la page de Microsoft. Le launcher ne voit jamais ton mot de passe.</span></li>
-            <li data-icon="written_book"><strong>Fichiers officiels et signés</strong>
-              <span>Minecraft vient des serveurs de Mojang. Les fichiers du serveur sont signés et vérifiés avant chaque lancement.</span></li>
-            <li data-icon="totem_of_undying"><strong>Réparation en un clic</strong>
-              <span>Un fichier abîmé ou modifié&nbsp;? Le launcher le repère et le ressuscite dans sa bonne version.</span></li>
-            <li data-icon="ender_eye+barrier"><strong>Zéro pistage</strong>
-              <span>Pas de télémétrie, pas de publicité, pas d'empreinte de ton matériel. Aucun cookie de pistage : seule la connexion à ton compte en utilise un.</span></li>
-            <li data-icon="name_tag"><strong>Aucun mode «&nbsp;crack&nbsp;»</strong>
-              <span>Pas de connexion hors ligne&nbsp;: il faut un compte Microsoft qui possède Minecraft: Java Edition.</span></li>
+            <li data-icon="trial_key"><strong data-i18n="accueil.tip1.t">Connexion Microsoft officielle</strong>
+              <span data-i18n="accueil.tip1.d">Tu te connectes dans ton navigateur, sur la page de Microsoft. Le launcher ne voit jamais ton mot de passe.</span></li>
+            <li data-icon="written_book"><strong data-i18n="accueil.tip2.t">Fichiers officiels et signés</strong>
+              <span data-i18n="accueil.tip2.d">Minecraft vient des serveurs de Mojang. Les fichiers du serveur sont signés et vérifiés avant chaque lancement.</span></li>
+            <li data-icon="totem_of_undying"><strong data-i18n="accueil.tip3.t">Réparation en un clic</strong>
+              <span data-i18n="accueil.tip3.d">Un fichier abîmé ou modifié&nbsp;? Le launcher le repère et le ressuscite dans sa bonne version.</span></li>
+            <li data-icon="ender_eye+barrier"><strong data-i18n="accueil.tip4.t">Zéro pistage</strong>
+              <span data-i18n="accueil.tip4.d">Pas de télémétrie, pas de publicité, pas d'empreinte de ton matériel. Aucun cookie de pistage : seule la connexion à ton compte en utilise un.</span></li>
+            <li data-icon="name_tag"><strong data-i18n="accueil.tip5.t">Aucun mode «&nbsp;crack&nbsp;»</strong>
+              <span data-i18n="accueil.tip5.d">Pas de connexion hors ligne&nbsp;: il faut un compte Microsoft qui possède Minecraft: Java Edition.</span></li>
           </ul>
-          <p class="only">Le launcher sera proposé ici, et uniquement ici. Ne télécharge jamais
+          <p class="only" data-i18n="accueil.only">Le launcher sera proposé ici, et uniquement ici. Ne télécharge jamais
             «&nbsp;The Last Launcher&nbsp;» depuis un autre site.</p>
+          <p class="only" data-only="en" hidden>The Last is a French-speaking server: the community and the Discord speak French.</p>
         </div>
       </article>
       <div class="bones" aria-hidden="true"></div>
@@ -107,82 +116,82 @@
       <div class="g-pin">
       <span class="g-mark" id="portail" aria-hidden="true"></span>
       <div class="g-stage" id="g-stage">
-        <canvas id="g-cv" role="img" aria-label="Une grotte sous le lac de lave, au plafond troué de lave. Au centre, sur une estrade, un portail du Nether à moitié construit en obsidienne, les blocs manquants dessinés en pointillés. À gauche, un squelette attend assis près d'un panneau. À droite, un piglin monte un bloc sur un échafaudage."></canvas>
+        <canvas id="g-cv" role="img" data-i18n-attr="aria-label:accueil.cave.aria" aria-label="Une grotte sous le lac de lave, au plafond troué de lave. Au centre, sur une estrade, un portail du Nether à moitié construit en obsidienne, les blocs manquants dessinés en pointillés. À gauche, un squelette attend assis près d'un panneau. À droite, un piglin monte un bloc sur un échafaudage."></canvas>
         <div class="g-layer" id="g-layer"></div>
       </div>
       </div>
       <div class="g-doc">
         <div class="g-head">
-          <h2 class="px" id="t-grotte" data-fs="4">Le portail du chantier</h2>
-          <p class="sub">Chaque bloc posé est une étape finie. Le jour où le dernier bloc est posé, le portail s'allume et le serveur ouvre.</p>
+          <h2 class="px" id="t-grotte" data-fs="4" data-i18n="accueil.cave.title">Le portail du chantier</h2>
+          <p class="sub" data-i18n="accueil.cave.sub">Chaque bloc posé est une étape finie. Le jour où le dernier bloc est posé, le portail s'allume et le serveur ouvre.</p>
         </div>
         <section class="g-box" id="g-route" aria-labelledby="t-route">
-          <h3 id="t-route">La feuille de route</h3>
+          <h3 id="t-route" data-i18n="accueil.route.title">La feuille de route</h3>
           <ol class="route" id="route">
-            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">Le site</span> <span class="r-s">Posé le 5 octobre 2026</span></span></li>
-            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">Le launcher</span> <span class="r-s">Posé le 5 octobre 2026</span></span></li>
-            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">La connexion Microsoft</span> <span class="r-s">Posé le 6 octobre 2026</span></span></li>
-            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">La taverne</span> <span class="r-s">Posé le 7 octobre 2026</span></span></li>
-            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n">L'accès à la connexion Minecraft</span> <span class="r-s">Posé le 8 octobre 2026</span></span></li>
-            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n">Le monde de The Last</span> <span class="r-s">À venir</span></span></li>
-            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n">L'ouverture</span> <span class="r-s">À venir</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n1">Le site</span> <span class="r-s" data-i18n="accueil.route.d5">Posé le 5 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n2">Le launcher</span> <span class="r-s" data-i18n="accueil.route.d5">Posé le 5 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n3">La connexion Microsoft</span> <span class="r-s" data-i18n="accueil.route.d6">Posé le 6 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n4">La taverne</span> <span class="r-s" data-i18n="accueil.route.d7">Posé le 7 octobre 2026</span></span></li>
+            <li class="r-step" data-state="fait"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n5">L'accès à la connexion Minecraft</span> <span class="r-s" data-i18n="accueil.route.d8">Posé le 8 octobre 2026</span></span></li>
+            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n6">Le monde de The Last</span> <span class="r-s" data-i18n="accueil.state.soon">À venir</span></span></li>
+            <li class="r-step" data-state="avenir"><span class="r-b"><span class="r-n" data-i18n="accueil.route.n7">L'ouverture</span> <span class="r-s" data-i18n="accueil.state.soon">À venir</span></span></li>
           </ol>
         </section>
         <section class="g-box" id="g-ouv" aria-labelledby="t-ouv">
-          <h3 id="t-ouv">Ouverture</h3>
-          <p id="ouv">Pas encore de date. Elle sera annoncée ici, sur ce panneau, et dans le salon #annonces de notre Discord, nulle part ailleurs.</p>
+          <h3 id="t-ouv" data-i18n="accueil.ouv.title">Ouverture</h3>
+          <p id="ouv" data-i18n="accueil.ouv.nodate">Pas encore de date. Elle sera annoncée ici, sur ce panneau, et dans le salon #annonces de notre Discord, nulle part ailleurs.</p>
         </section>
         <section class="g-box g-panel" id="g-news" aria-labelledby="t-news">
-          <h3 id="t-news">Le chantier : quoi de neuf ?</h3>
+          <h3 id="t-news" data-i18n="accueil.news.title">Le chantier : quoi de neuf ?</h3>
           <ol class="journal" id="journal">
-            <li class="j-vide">Le journal du chantier s'affiche ici.</li>
+            <li class="j-vide" data-i18n="accueil.news.empty">Le journal du chantier s'affiche ici.</li>
           </ol>
-          <p class="j-tout"><a class="btn btn-sm" href="/chantier">Tout le journal du chantier</a></p>
+          <p class="j-tout"><a class="btn btn-sm" href="/chantier" data-i18n="accueil.news.all">Tout le journal du chantier</a></p>
         </section>
         <section class="g-box g-panel" id="g-faq" aria-labelledby="t-faq">
-          <h3 id="t-faq">Questions</h3>
+          <h3 id="t-faq" data-i18n="accueil.faq.title">Questions</h3>
           <div class="faq">
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>C'est quoi, The Last&nbsp;?</summary>
-              <p>Un serveur Minecraft: Java Edition moddé (NeoForge), au contenu fait maison. De l'aventure,
+              <summary data-i18n="accueil.faq1.q"><i class="flame" aria-hidden="true"></i>C'est quoi, The Last&nbsp;?</summary>
+              <p data-i18n="accueil.faq1.a">Un serveur Minecraft: Java Edition moddé (NeoForge), au contenu fait maison. De l'aventure,
                 de la construction et de la progression, pas un énième PvP faction. C'est un projet indépendant,
                 développé en France.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
-              <p>Oui. Le launcher et l'accès au serveur sont gratuits. <a href="/boutique">La taverne</a> vend des Braises,
+              <summary data-i18n="accueil.faq2.q"><i class="flame" aria-hidden="true"></i>C'est gratuit&nbsp;?</summary>
+              <p data-i18n="accueil.faq2.a">Oui. Le launcher et l'accès au serveur sont gratuits. <a href="/boutique">La taverne</a> vend des Braises,
                 la monnaie du serveur, qu'on dépense ensuite en jeu contre des grades et des cosmétiques. Rien n'y donne
                 d'avantage en jeu, et il n'y a pas de cape.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
-              <p>La monnaie du serveur. On l'achète dans <a href="/boutique">la taverne</a>, puis on la dépense en jeu,
+              <summary data-i18n="accueil.faq3.q"><i class="flame" aria-hidden="true"></i>C'est quoi, les Braises&nbsp;?</summary>
+              <p data-i18n="accueil.faq3.a">La monnaie du serveur. On l'achète dans <a href="/boutique">la taverne</a>, puis on la dépense en jeu,
                 au comptoir du tavernier. Les Braises n'ont aucune valeur réelle&nbsp;: elles ne se remboursent pas,
                 ne s'échangent pas contre de l'argent et ne passent pas d'un compte ou d'un serveur à l'autre.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
-              <p>Un PC sous Windows et un compte Microsoft qui possède Minecraft: Java Edition. Le serveur
+              <summary data-i18n="accueil.faq4.q"><i class="flame" aria-hidden="true"></i>Il me faut quoi pour jouer&nbsp;?</summary>
+              <p data-i18n="accueil.faq4.a">Un PC sous Windows et un compte Microsoft qui possède Minecraft: Java Edition. Le serveur
                 vérifie chaque compte auprès de Mojang&nbsp;: il n'y a pas de mode hors ligne.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
-              <p>Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
+              <summary data-i18n="accueil.faq5.q"><i class="flame" aria-hidden="true"></i>Et mon mot de passe&nbsp;?</summary>
+              <p data-i18n="accueil.faq5.a">Il ne passe jamais par nous. Tu te connectes sur la page de Microsoft, dans ton navigateur.
                 Seule la clé de connexion fournie par Microsoft est gardée, chiffrée, sur ton ordinateur.
                 Le détail est dans la <a href="/confidentialite">politique de confidentialité</a>.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>Pourquoi aucune image du jeu&nbsp;?</summary>
-              <p>Parce que le monde du serveur n'est pas encore prêt, et qu'on ne montrera pas de fausses captures.
+              <summary data-i18n="accueil.faq6.q"><i class="flame" aria-hidden="true"></i>Pourquoi aucune image du jeu&nbsp;?</summary>
+              <p data-i18n="accueil.faq6.a">Parce que le monde du serveur n'est pas encore prêt, et qu'on ne montrera pas de fausses captures.
                 Les premières vraies images arriveront ici, dans le portail.</p>
             </details>
             <details name="faq">
-              <summary><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
-              <p>Quand le dernier bloc du portail sera posé. La date sera annoncée sur cette page et dans le salon #annonces de <a href="discord/" target="_blank" rel="noopener">notre Discord</a>, nulle part ailleurs&nbsp;;
+              <summary data-i18n="accueil.faq7.q"><i class="flame" aria-hidden="true"></i>Ça ouvre quand&nbsp;?</summary>
+              <p data-i18n="accueil.faq7.a">Quand le dernier bloc du portail sera posé. La date sera annoncée sur cette page et dans le salon #annonces de <a href="discord/" target="_blank" rel="noopener">notre Discord</a>, nulle part ailleurs&nbsp;;
                 le launcher sera proposé ici, et uniquement ici.</p>
             </details>
           </div>
-          <p class="j-tout"><a class="btn btn-sm" href="#volkar">Une autre question&nbsp;? Demande à Volkar</a></p>
+          <p class="j-tout"><a class="btn btn-sm" href="#volkar" data-i18n="accueil.faq.ask">Une autre question&nbsp;? Demande à Volkar</a></p>
         </section>
       </div>
     </section>
@@ -191,18 +200,18 @@
     <footer class="fond" id="fond">
       <div class="wrap">
         <div class="cols">
-          <div>© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
-          <nav aria-label="Liens légaux">
-            <a href="/confidentialite">Confidentialité</a>
-            <a href="/cgu">Conditions d'utilisation</a>
-            <a href="/mentions-legales">Mentions légales</a>
-            <a href="/en" lang="en">English</a>
+          <div data-i18n="foot.contact">© 2026 The Last — contact : <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
+          <nav aria-label="Liens légaux" data-i18n-attr="aria-label:foot.legal-aria">
+            <a href="/confidentialite" data-i18n="foot.privacy">Confidentialité</a>
+            <a href="/cgu" data-i18n="foot.terms">Conditions d'utilisation</a>
+            <a href="/mentions-legales" data-i18n="foot.legal">Mentions légales</a>
+            <a href="/en" data-only="en" hidden>Launcher: technical overview</a>
           </nav>
         </div>
         <div class="disclaimer">
-          <p>Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+          <p data-only="fr">Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
           <p lang="en">Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
-          <p>Minecraft, ses textures et ses créatures appartiennent à Mojang AB.</p>
+          <p data-i18n="foot.mojang">Minecraft, ses textures et ses créatures appartiennent à Mojang AB.</p>
         </div>
       </div>
     </footer>
@@ -214,8 +223,8 @@
 
   <!-- Volkar, l'assistant IA : une bulle en bas à droite (cette page seulement). Rien n'est envoyé à aucun service tant
        qu'on n'ouvre pas la bulle ; l'adresse /#volkar l'ouvre directement (voir volkar.js). -->
-  <button class="vk-btn" id="vk-btn" type="button" aria-expanded="false" aria-controls="volkar" aria-label="Demande à Volkar, l'assistant IA" hidden>
-    <span class="vk-lbl" aria-hidden="true"><span class="px" data-fs="2">Demande à Volkar</span></span>
+  <button class="vk-btn" id="vk-btn" type="button" aria-expanded="false" aria-controls="volkar" aria-label="Demande à Volkar, l'assistant IA" data-i18n-attr="aria-label:accueil.vk.btn-aria" hidden>
+    <span class="vk-lbl" aria-hidden="true"><span class="px" data-fs="2" data-i18n="accueil.vk.label">Demande à Volkar</span></span>
     <span class="vk-med" aria-hidden="true">
       <img src="assets/gromaur-128.png" alt="" width="48" height="48">
       <span class="vk-x"></span>
@@ -228,50 +237,51 @@
     <div class="gm-box">
       <div class="gm-head">
         <span class="vk-medal"><img class="gm-av" src="assets/gromaur-128.png" alt="" width="40" height="40"></span>
-        <h2 class="gm-id" id="t-gm" tabindex="-1"><span class="gm-nom">Volkar</span> <span class="gm-ia" title="Intelligence artificielle">IA</span>
-          <span class="gm-role">Le tavernier, assistant IA de The Last</span></h2>
-        <p class="gm-pill" id="gm-pill" hidden><i aria-hidden="true"></i>Bientôt</p>
-        <button class="vk-ico" id="gm-new" type="button" aria-label="Nouvelle conversation" title="Nouvelle conversation" hidden>
+        <h2 class="gm-id" id="t-gm" tabindex="-1"><span class="gm-nom">Volkar</span> <span class="gm-ia" title="Intelligence artificielle" data-i18n="accueil.vk.ai" data-i18n-attr="title:accueil.vk.ai-title">IA</span>
+          <span class="gm-role" data-i18n="accueil.vk.role">Le tavernier, assistant IA de The Last</span></h2>
+        <p class="gm-pill" id="gm-pill" data-i18n="accueil.vk.pill" hidden><i aria-hidden="true"></i>Bientôt</p>
+        <button class="vk-ico" id="gm-new" type="button" aria-label="Nouvelle conversation" title="Nouvelle conversation" data-i18n-attr="aria-label:accueil.vk.new;title:accueil.vk.new" hidden>
           <svg viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h10v1H1zM1 8h10v1H1zM0 2h1v6H0zM11 2h1v6h-1zM2 9h3v1H2zM2 10h1v1H2zM5 3h2v4H5zM3 4h6v2H3z"/></svg>
         </button>
-        <button class="vk-ico vk-taille" id="vk-taille" type="button" aria-label="Agrandir la conversation" title="Agrandir">
+        <button class="vk-ico vk-taille" id="vk-taille" type="button" aria-label="Agrandir la conversation" title="Agrandir" data-i18n-attr="aria-label:accueil.vk.grow-aria;title:accueil.vk.grow">
           <svg class="vk-plus" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h4v1H2v3H1zM7 1h4v4h-1V2H7zM1 7h1v3h3v1H1zM10 7h1v4H7v-1h3z"/></svg>
           <svg class="vk-moins" viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M4 1h1v4H1V4h3zM7 1h1v3h3v1H7zM1 7h4v4H4V8H1zM7 7h4v1H8v3H7z"/></svg>
         </button>
-        <button class="vk-ico" id="vk-close" type="button" aria-label="Fermer la conversation" title="Fermer">
+        <button class="vk-ico" id="vk-close" type="button" aria-label="Fermer la conversation" title="Fermer" data-i18n-attr="aria-label:accueil.vk.close-aria;title:accueil.vk.close">
           <svg viewBox="0 0 12 12" aria-hidden="true"><path fill="currentColor" d="M1 1h2v1h1v1h1v1h2V3h1V2h1V1h2v2h-1v1h-1v1h-1v2h1v1h1v1h1v2H9v-1H8V9H7V8H5v1H4v1H3v1H1V9h1V8h1V7h1V5H3V4H2V3H1z"/></svg>
         </button>
       </div>
 
       <div class="vk-fil" id="vk-fil">
-        <div class="gm-log" id="gm-log" role="log" aria-label="Conversation avec Volkar">
+        <div class="gm-log" id="gm-log" role="log" aria-label="Conversation avec Volkar" data-i18n-attr="aria-label:accueil.vk.log">
           <div class="gm-msg gm-bot gm-accueil">
-            <p class="gm-de"><span class="sr">Volkar, IA&nbsp;:</span><span aria-hidden="true">Volkar · IA</span></p>
+            <p class="gm-de"><span class="sr" data-i18n="accueil.vk.from-sr">Volkar, IA&nbsp;:</span><span aria-hidden="true" data-i18n="accueil.vk.from">Volkar · IA</span></p>
             <div class="gm-txt">
-              <p>Salut, voyageur&nbsp;! Moi, c'est Volkar, le tavernier. Attention&nbsp;: je suis une
+              <p data-i18n="accueil.vk.hello">Salut, voyageur&nbsp;! Moi, c'est Volkar, le tavernier. Attention&nbsp;: je suis une
                 <strong>intelligence artificielle</strong>. Je ne connais que ce que l'équipe m'a appris sur The Last,
                 et je peux me tromper.</p>
-              <p class="gm-invite">Pose ta question ou choisis-en une ci-dessous. Si je ne sais pas, je te dirai où trouver un humain
+              <p data-only="en" hidden>One thing to know: for now I only speak French, so my answers will be in French.</p>
+              <p class="gm-invite" data-i18n="accueil.vk.invite">Pose ta question ou choisis-en une ci-dessous. Si je ne sais pas, je te dirai où trouver un humain
                 (forum #aide ou ticket privé sur <a href="discord/" target="_blank" rel="noopener">le Discord</a>).</p>
             </div>
           </div>
         </div>
-        <div class="gm-sugg" id="gm-sugg" role="group" aria-label="Questions à poser à Volkar" hidden></div>
+        <div class="gm-sugg" id="gm-sugg" role="group" aria-label="Questions à poser à Volkar" data-i18n-attr="aria-label:accueil.vk.sugg" hidden></div>
       </div>
 
       <form class="gm-form" id="gm-form" hidden>
-        <label class="sr" for="gm-q">Ta question à Volkar</label>
+        <label class="sr" for="gm-q" data-i18n="accueil.vk.q-label">Ta question à Volkar</label>
         <textarea id="gm-q" name="q" rows="2" maxlength="500" enterkeyhint="send" autocomplete="off" spellcheck="true"
-          placeholder="Pose ta question à Volkar…" aria-describedby="gm-aide gm-mention"></textarea>
+          placeholder="Pose ta question à Volkar…" data-i18n-attr="placeholder:accueil.vk.q-ph" aria-describedby="gm-aide gm-mention"></textarea>
         <div class="gm-bar">
-          <span class="gm-aide" id="gm-aide">Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 500 caractères au plus.</span>
+          <span class="gm-aide" id="gm-aide" data-i18n="accueil.vk.help">Entrée pour envoyer, Maj+Entrée pour aller à la ligne. 500 caractères au plus.</span>
           <span class="gm-compte" id="gm-compte" aria-hidden="true">0 / 500</span>
-          <button class="btn btn-main gm-send" id="gm-send" type="submit">Envoyer</button>
-          <button class="btn gm-stop" id="gm-stop" type="button" aria-label="Arrêter la réponse" hidden>Arrêter</button>
+          <button class="btn btn-main gm-send" id="gm-send" type="submit" data-i18n="accueil.vk.send">Envoyer</button>
+          <button class="btn gm-stop" id="gm-stop" type="button" aria-label="Arrêter la réponse" data-i18n-attr="aria-label:accueil.vk.stop-aria" data-i18n="accueil.vk.stop" hidden>Arrêter</button>
         </div>
       </form>
 
-      <p class="gm-mention" id="gm-mention">Volkar est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
+      <p class="gm-mention" id="gm-mention" data-i18n="accueil.vk.mention">Volkar est une IA&nbsp;: il peut se tromper, les conditions d'utilisation
         font foi. N'écris aucune donnée personnelle. Tes questions sont envoyées à Cloudflare et Anthropic (États-Unis)
         pour générer la réponse, sans être enregistrées par nous. <a href="/confidentialite#volkar">Détails</a></p>
     </div>

@@ -7,50 +7,54 @@
   <meta name="referrer" content="no-referrer">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="Les paramètres de ton compte The Last : profil, appareils connectés et données.">
+  <meta name="description" content="Les paramètres de ton compte The Last : profil, appareils connectés et données." data-i18n-attr="content:compte.parametres.desc">
   <meta name="theme-color" content="#0a0608">
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <script>document.documentElement.classList.add("js");</script>
+  <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="/assets/fonts.css">
   <link rel="stylesheet" href="/assets/nether.css">
   <link rel="stylesheet" href="/assets/chantier.css">
   <link rel="stylesheet" href="/assets/compte.css">
   <link rel="stylesheet" href="/assets/compte-pages.css">
+  <script src="/assets/i18n.js" defer></script>
+  <script src="/assets/lang/en-commun.js" defer></script>
+  <script src="/assets/lang/en-compte.js" defer></script>
   <script src="/assets/config.js" defer></script>
   <script src="/assets/mc/mc.js" defer></script>
   <script src="/assets/compte.js" defer></script>
   <script src="/assets/compte-pages.js" defer></script>
 </head>
 <body data-page="parametres">
-  <a class="skip" href="#contenu">Aller au contenu</a>
+  <a class="skip" href="#contenu" data-i18n="compte.skip">Aller au contenu</a>
 
   <header class="top solid" id="top">
     <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale">
-      <a class="tbtn" href="/">Accueil</a>
-      <a class="tbtn" href="/boutique">Boutique</a>
-      <a class="tbtn" href="/chantier">Chantier</a>
-      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+      <a class="tbtn" href="/" data-i18n="nav.home">Accueil</a>
+      <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
+      <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
     </nav>
   </header>
 
   <main class="ch-main cp-main" id="contenu">
-    <h1 class="cp-h1">Paramètres</h1>
-    <p class="sub">Ton profil, les appareils où ton compte est ouvert, et tes données.</p>
+    <h1 class="cp-h1" data-i18n="compte.parametres.h1">Paramètres</h1>
+    <p class="sub" data-i18n="compte.parametres.sub">Ton profil, les appareils où ton compte est ouvert, et tes données.</p>
     <div class="cp-corps" id="cp-corps">
       <noscript><p class="ch-vide">Les paramètres de ton compte ont besoin de JavaScript pour s'afficher.</p></noscript>
     </div>
   </main>
 
   <footer class="ch-foot">
-    <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
-    <nav aria-label="Liens légaux">
+    <p data-i18n="foot.unofficial">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+    <nav aria-label="Liens légaux" data-i18n-attr="aria-label:foot.legal-aria">
       <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
-      <a href="/confidentialite">Confidentialité</a>
-      <a href="/cgu">Conditions d'utilisation</a>
-      <a href="/mentions-legales">Mentions légales</a>
+      <a href="/confidentialite" data-i18n="foot.privacy">Confidentialité</a>
+      <a href="/cgu" data-i18n="foot.terms">Conditions d'utilisation</a>
+      <a href="/mentions-legales" data-i18n="foot.legal">Mentions légales</a>
     </nav>
   </footer>
 </body>

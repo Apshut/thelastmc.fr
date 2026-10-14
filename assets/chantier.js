@@ -4,11 +4,14 @@
    Le filtre se retrouve dans l'adresse (?p=site,jeu) : on peut partager une vue. Aucun stockage, aucun appel externe. */
 (() => {
 'use strict';
-
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const MC = window.MC || { blocks: {}, font: {} }, D = document, root = D.documentElement;
 const $ = (s, r) => (r || D).querySelector(s), $$ = (s, r) => Array.from((r || D).querySelectorAll(s));
-const PROJETS = { site: 'Site', launcher: 'Launcher', jeu: 'Jeu' };
+const PROJETS = { site: T.t('pages.chantier.p-site', 'Site'), launcher: T.t('pages.chantier.p-launcher', 'Launcher'), jeu: T.t('pages.chantier.p-jeu', 'Jeu') };
 const MOIS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+const nouvelles = n => n > 1 ? T.t('pages.chantier.nouvelles', '{n} nouvelles', { n }) : T.t('pages.chantier.nouvelle', '{n} nouvelle', { n });
+const nomMois = d => T.lang === 'en' ? d.toLocaleDateString(T.locale, { month: 'long' }) : MOIS[d.getMonth()];
 
 function h(tag, attrs, ...kids) {
   const e = D.createElement(tag);
@@ -65,21 +68,21 @@ const actifs = () => $$('.ch-f').filter(b => b.getAttribute('aria-pressed') === 
 function rendre() {
   const on = actifs(), list = entries.filter(e => on.includes(e.p));
   box.textContent = '';
-  if (!on.length) { box.appendChild(h('p', { class: 'ch-vide', text: 'Choisis au moins un projet : Site, Launcher ou Jeu.' })); return; }
-  if (!list.length) { box.appendChild(h('p', { class: 'ch-vide', text: 'Rien pour l\'instant de ce côté du chantier.' })); return; }
+  if (!on.length) { box.appendChild(h('p', { class: 'ch-vide', text: T.t('pages.chantier.aucun', 'Choisis au moins un projet : Site, Launcher ou Jeu.') })); return; }
+  if (!list.length) { box.appendChild(h('p', { class: 'ch-vide', text: T.t('pages.chantier.rien', 'Rien pour l\'instant de ce côté du chantier.') })); return; }
   let annee = null, mois = null, ol = null;
   list.forEach(e => {
     const d = new Date(e.d), y = d.getFullYear(), m = d.getMonth();
     if (y !== annee) { annee = y; mois = null; box.appendChild(pxText(h('h2', { class: 'px ch-annee', 'data-fs': '4' }), String(y))); }
     if (m !== mois) {
       mois = m; const n = list.filter(x => { const q = new Date(x.d); return q.getFullYear() === y && q.getMonth() === m; }).length;
-      const sec = h('section', { class: 'ch-mois', 'aria-label': MOIS[m] + ' ' + y });
-      sec.appendChild(h('h3', { class: 'ch-mt' }, h('span', { text: MOIS[m] + ' ' + y }), h('small', { text: n + (n > 1 ? ' nouvelles' : ' nouvelle') })));
+      const sec = h('section', { class: 'ch-mois', 'aria-label': nomMois(d) + ' ' + y });
+      sec.appendChild(h('h3', { class: 'ch-mt' }, h('span', { text: nomMois(d) + ' ' + y }), h('small', { text: nouvelles(n) })));
       ol = h('ol', { class: 'journal' }); sec.appendChild(ol); box.appendChild(sec);
     }
     ol.appendChild(h('li', { class: 'j-e', 'data-p': e.p },
-      h('span', { class: 'j-p' }, PROJETS[e.p]), h('span', { class: 'j-t', text: e.t }),
-      h('time', { class: 'j-d', datetime: e.d, text: d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) })));
+      h('span', { class: 'j-p' }, PROJETS[e.p]), h('span', { class: 'j-t', text: (T.lang === 'en' && e.en) || e.t }),
+      h('time', { class: 'j-d', datetime: e.d, text: d.toLocaleDateString(T.locale, { day: 'numeric', month: 'short' }) })));
   });
 }
 function filtres() {
@@ -88,7 +91,7 @@ function filtres() {
   $$('.ch-f').forEach(b => {
     const n = entries.filter(e => e.p === b.dataset.p).length;
     pxLabel(b, PROJETS[b.dataset.p]); b.appendChild(h('span', { class: 'ch-n', text: String(n) }));
-    b.setAttribute('aria-label', PROJETS[b.dataset.p] + ' : ' + n + (n > 1 ? ' nouvelles' : ' nouvelle'));
+    b.setAttribute('aria-label', PROJETS[b.dataset.p] + T.t('pages.chantier.deux-points', ' : ') + nouvelles(n));
     b.addEventListener('click', () => {
       b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
       const on = actifs(), u = new URL(location.href);
@@ -99,7 +102,7 @@ function filtres() {
   });
 }
 
-$$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
+$$('.top .tbtn').forEach(b => { if (b.classList.contains('lang-sw')) $$('a', b).forEach(a => pxLabel(a, a.textContent)); else pxLabel(b, b.textContent); });   // FR | EN : chaque moitié
 $$('h1.px').forEach(el => pxText(el));
 fond();
 fetch('assets/journal.json', { cache: 'no-cache' })
@@ -108,5 +111,5 @@ fetch('assets/journal.json', { cache: 'no-cache' })
     entries = (j.entries || []).filter(e => PROJETS[e.p] && e.t && e.d).sort((a, b) => b.d.localeCompare(a.d));
     filtres(); rendre();
   })
-  .catch(e => { box.textContent = ''; box.appendChild(h('p', { class: 'ch-vide', text: 'Le journal est indisponible pour le moment. Reviens dans un instant.' })); if (window.console) console.warn(e); });
+  .catch(e => { box.textContent = ''; box.appendChild(h('p', { class: 'ch-vide', text: T.t('pages.chantier.indispo', 'Le journal est indisponible pour le moment. Reviens dans un instant.') })); if (window.console) console.warn(e); });
 })();

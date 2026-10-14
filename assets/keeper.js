@@ -78,6 +78,8 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
+
 const { sin, cos, abs, sqrt, PI } = Math;
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v, lerp = (a, b, t) => a + (b - a) * t;
 const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
@@ -764,10 +766,10 @@ window.TAVERN_KEEPER = {
   pose,
   blend,
   lines: {
-    idle: ['Grmmh. Tu prends quoi ?', 'Ici, on paie en Braises.', 'Les Braises, ça se dépense au comptoir. En jeu.', 'Herobrine a une ardoise ici. Il paie jamais.', 'Je t\'ai à l\'œil.'],
-    threat: ['Ahh. Bon choix.', 'Ça brille, hein ?', 'Celui-là, il part vite.'],
-    angry: ['GRAAAH !', 'MON COMPTOIR !', 'On tripote pas la marchandise !', 'Pas de crédit ! JAMAIS !'],
-    don: ['Un don ? Grmmh... Merci.', 'Pour le serveur ? Respect.', 'Rien en échange. Juste merci.']
+    idle: [T.t('taverne.k-idle1', 'Grmmh. Tu prends quoi ?'), T.t('taverne.k-idle2', 'Ici, on paie en Braises.'), T.t('taverne.k-idle3', 'Les Braises, ça se dépense au comptoir. En jeu.'), T.t('taverne.k-idle4', 'Herobrine a une ardoise ici. Il paie jamais.'), T.t('taverne.k-idle5', 'Je t\'ai à l\'œil.')],
+    threat: [T.t('taverne.k-threat1', 'Ahh. Bon choix.'), T.t('taverne.k-threat2', 'Ça brille, hein ?'), T.t('taverne.k-threat3', 'Celui-là, il part vite.')],
+    angry: [T.t('taverne.k-angry1', 'GRAAAH !'), T.t('taverne.k-angry2', 'MON COMPTOIR !'), T.t('taverne.k-angry3', 'On tripote pas la marchandise !'), T.t('taverne.k-angry4', 'Pas de crédit ! JAMAIS !')],
+    don: [T.t('taverne.k-don1', 'Un don ? Grmmh... Merci.'), T.t('taverne.k-don2', 'Pour le serveur ? Respect.'), T.t('taverne.k-don3', 'Rien en échange. Juste merci.')]
   }
 };
 })();

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="La boutique du serveur Minecraft The Last : des Braises, la monnaie du serveur, à dépenser en jeu contre des grades et des cosmétiques. Sans avantage en jeu, sans cape.">
-  <meta property="og:title" content="La taverne — The Last">
-  <meta property="og:description" content="Des Braises à dépenser en jeu, au comptoir d'un tavernier qui n'aime pas qu'on touche à sa marchandise.">
+  <meta name="description" data-i18n-attr="content:taverne.meta-desc" content="La boutique du serveur Minecraft The Last : des Braises, la monnaie du serveur, à dépenser en jeu contre des grades et des cosmétiques. Sans avantage en jeu, sans cape.">
+  <meta property="og:title" data-i18n-attr="content:taverne.og-title" content="La taverne — The Last">
+  <meta property="og:description" data-i18n-attr="content:taverne.og-desc" content="Des Braises à dépenser en jeu, au comptoir d'un tavernier qui n'aime pas qu'on touche à sa marchandise.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://thelastmc.fr/boutique">
   <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
@@ -16,15 +16,23 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0608">
   <link rel="canonical" href="https://thelastmc.fr/boutique">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/boutique">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/boutique?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/boutique">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <script>document.documentElement.classList.add("js");</script>
+  <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="assets/fonts.css">
   <link rel="stylesheet" href="assets/nether.css">
   <link rel="stylesheet" href="assets/tavern.css">
   <link rel="stylesheet" href="assets/compte.css">
   <link rel="stylesheet" href="assets/catalogue.css">
+  <script src="assets/i18n.js" defer></script>
+  <script src="assets/lang/en-commun.js" defer></script>
+  <script src="assets/lang/en-compte.js" defer></script>
+  <script src="assets/lang/en-taverne.js" defer></script>
   <script src="assets/config.js" defer></script>
   <script src="assets/mc/mc.js" defer></script>
   <script src="assets/keeper.js" defer></script>
@@ -34,48 +42,48 @@
   <script src="assets/catalogue.js" defer></script>
 </head>
 <body class="tavern">
-  <a class="skip" href="#etal">Aller aux articles</a>
+  <a class="skip" href="#etal" data-i18n="taverne.skip">Aller aux articles</a>
 
   <header class="top solid" id="top">
     <a class="brand" href="/"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale">
-      <a class="tbtn" href="/">Accueil</a>
-      <a class="tbtn tbtn-main" href="/boutique" aria-current="page">Boutique</a>
-      <a class="tbtn" href="/chantier">Chantier</a>
-      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+      <a class="tbtn" href="/" data-i18n="nav.home">Accueil</a>
+      <a class="tbtn tbtn-main" href="/boutique" aria-current="page" data-i18n="nav.shop">Boutique</a>
+      <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
     </nav>
   </header>
 
   <main class="tv-main" id="taverne">
     <div class="intro">
-      <h1 class="px" data-fs="4">La taverne</h1>
-      <p class="lede">Ici, on achète des <strong>Braises</strong>, la monnaie du serveur. On les dépense ensuite
+      <h1 class="px" data-fs="4" data-i18n="taverne.h1">La taverne</h1>
+      <p class="lede" data-i18n="taverne.lede">Ici, on achète des <strong>Braises</strong>, la monnaie du serveur. On les dépense ensuite
         en jeu, au comptoir du tavernier.</p>
-      <p class="pill"><i aria-hidden="true"></i><span id="shop-state">Aperçu : la taverne ouvrira avec le serveur.</span></p>
+      <p class="pill"><i aria-hidden="true"></i><span id="shop-state" data-i18n="taverne.state-preview">Aperçu : la taverne ouvrira avec le serveur.</span></p>
     </div>
 
     <div class="stage" id="stage">
-      <canvas id="tavern" role="img" aria-label="Une taverne du Nether en briques sombres, éclairée par des lanternes, un feu de cheminée et une chute de lave derrière des barreaux. Derrière un comptoir de pierre noire, Volkar, un tavernier centaure : torse et tête de bouc aux longues cornes annelées, sur un corps de bouc à quatre pattes, poings sur les hanches, trois chopes devant lui. Devant le comptoir, sur un tapis rouge : un tas de pièces de braise, une bourse, un sac et un coffre ouvert."></canvas>
-      <div class="etal" id="etal" role="group" aria-label="Articles posés devant le comptoir"></div>
-      <p class="loader" aria-hidden="true"><span class="px" data-fs="3">Allumage des lanternes...</span></p>
+      <canvas id="tavern" role="img" data-i18n-attr="aria-label:taverne.canvas-aria" aria-label="Une taverne du Nether en briques sombres, éclairée par des lanternes, un feu de cheminée et une chute de lave derrière des barreaux. Derrière un comptoir de pierre noire, Volkar, un tavernier centaure : torse et tête de bouc aux longues cornes annelées, sur un corps de bouc à quatre pattes, poings sur les hanches, trois chopes devant lui. Devant le comptoir, sur un tapis rouge : un tas de pièces de braise, une bourse, un sac et un coffre ouvert."></canvas>
+      <div class="etal" id="etal" role="group" aria-label="Articles posés devant le comptoir" data-i18n-attr="aria-label:taverne.etal-aria"></div>
+      <p class="loader" aria-hidden="true"><span class="px" data-fs="3" data-i18n="taverne.loader">Allumage des lanternes...</span></p>
       <noscript><p class="nojs">La taverne a besoin de JavaScript pour s'afficher. Les Braises se vendront ici, à l'ouverture du serveur.</p></noscript>
     </div>
     <p class="say" id="say" aria-hidden="true"></p>
 
     <section class="deal panel" id="deal" aria-live="polite" aria-labelledby="deal-name">
-      <h2 class="deal-t" id="deal-name">Le comptoir</h2>
+      <h2 class="deal-t" id="deal-name" data-i18n="taverne.counter">Le comptoir</h2>
     </section>
 
     <div class="tv-side">
       <aside class="slate" aria-labelledby="t-slate">
-        <h2 class="px" id="t-slate" data-fs="2">Bon à savoir</h2>
-        <p>Les Braises n'ont aucune valeur réelle : elles ne sont ni remboursables, ni échangeables contre de l'argent,
+        <h2 class="px" id="t-slate" data-fs="2" data-i18n="taverne.slate-h">Bon à savoir</h2>
+        <p data-i18n="taverne.slate-p1">Les Braises n'ont aucune valeur réelle : elles ne sont ni remboursables, ni échangeables contre de l'argent,
           ni transférables vers un autre compte ou un autre serveur. Tarifs indicatifs.</p>
-        <p>L'historique de tes achats te sera fourni avec le paiement. Tu pourras aussi le retrouver sur ton profil, ici
+        <p data-i18n="taverne.slate-p2">L'historique de tes achats te sera fourni avec le paiement. Tu pourras aussi le retrouver sur ton profil, ici
           sur le site : <a href="/compte/achats">Historique d'achat</a>.</p>
       </aside>
       <button class="btn cb-open" id="cb-open" type="button" aria-haspopup="dialog" aria-controls="cb">
-        <span class="cb-scale" aria-hidden="true"></span><span>Voir tout ce qu'on obtient en jeu</span>
+        <span class="cb-scale" aria-hidden="true"></span><span data-i18n="taverne.cb-open">Voir tout ce qu'on obtient en jeu</span>
       </button>
     </div>
   </main>
@@ -83,18 +91,18 @@
   <!-- la liste d'objets : tout ce qu'on obtient en jeu, et son prix (assets/catalogue.js) -->
   <dialog class="cb" id="cb" aria-labelledby="cb-t">
     <header class="cb-head">
-      <h2 class="cb-t" id="cb-t" tabindex="-1">Liste d'objets</h2>
+      <h2 class="cb-t" id="cb-t" tabindex="-1" data-i18n="taverne.cb-title">Liste d'objets</h2>
       <div class="cb-search">
-        <label for="cb-q">Rechercher</label>
-        <input id="cb-q" type="search" placeholder="ex : Titre personnalisé" autocomplete="off" spellcheck="false" enterkeyhint="search">
+        <label for="cb-q" data-i18n="taverne.cb-search">Rechercher</label>
+        <input id="cb-q" type="search" placeholder="ex : Titre personnalisé" data-i18n-attr="placeholder:taverne.cb-ph" autocomplete="off" spellcheck="false" enterkeyhint="search">
       </div>
       <div class="cb-tools">
-        <button class="cb-sw" id="cb-sw" type="button" role="switch" aria-checked="false"><span class="cb-sw-t" aria-hidden="true"><i></i></span>Détail en paquets</button>
-        <button class="cb-sw" id="cb-bsw" type="button" role="switch" aria-checked="false" aria-controls="cb-plate"><span class="cb-sw-t" aria-hidden="true"><i></i></span>Calculer ton budget</button>
+        <button class="cb-sw" id="cb-sw" type="button" role="switch" aria-checked="false"><span class="cb-sw-t" aria-hidden="true"><i></i></span><span data-i18n="taverne.cb-sw">Détail en paquets</span></button>
+        <button class="cb-sw" id="cb-bsw" type="button" role="switch" aria-checked="false" aria-controls="cb-plate"><span class="cb-sw-t" aria-hidden="true"><i></i></span><span data-i18n="taverne.cb-bsw">Calculer ton budget</span></button>
       </div>
-      <button class="cb-x" id="cb-x" type="button" aria-label="Fermer"><span aria-hidden="true"></span></button>
+      <button class="cb-x" id="cb-x" type="button" aria-label="Fermer" data-i18n-attr="aria-label:taverne.close"><span aria-hidden="true"></span></button>
     </header>
-    <section class="cb-plate" id="cb-plate" aria-label="Plateau : calcul en paquets" hidden></section>
+    <section class="cb-plate" id="cb-plate" aria-label="Plateau : calcul en paquets" data-i18n-attr="aria-label:taverne.plate-aria" hidden></section>
     <div class="cb-main" id="cb-main"></div>
     <div class="cb-scrim" id="cb-scrim" hidden></div>
     <section class="cb-fiche" id="cb-fiche" aria-labelledby="cb-f-n" hidden></section>
@@ -103,12 +111,12 @@
   </dialog>
 
   <footer class="foot">
-    <p class="disc">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+    <p class="disc" data-i18n="foot.unofficial">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
     <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
-    <nav aria-label="Liens légaux">
-      <a href="/confidentialite">Confidentialité</a>
-      <a href="/cgu">Conditions d'utilisation</a>
-      <a href="/mentions-legales">Mentions légales</a>
+    <nav aria-label="Liens légaux" data-i18n-attr="aria-label:foot.legal-aria">
+      <a href="/confidentialite" data-i18n="foot.privacy">Confidentialité</a>
+      <a href="/cgu" data-i18n="foot.terms">Conditions d'utilisation</a>
+      <a href="/mentions-legales" data-i18n="foot.legal">Mentions légales</a>
     </nav>
   </footer>
 </body>

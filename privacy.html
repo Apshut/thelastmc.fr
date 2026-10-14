@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en" data-i18n-static>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Last</title>
+  <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
+  <meta name="description" content="What data The Last's launcher, server and website process, why, for how long, and how to exercise your rights.">
+  <link rel="canonical" href="https://thelastmc.fr/privacy">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/privacy">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/confidentialite">
+  <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/confidentialite">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/i18n.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/?lang=en"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="/?lang=en">Home</a>
+        <a href="/?lang=en#launcher">The launcher</a>
+        <a href="/privacy" aria-current="page">Privacy</a>
+        <span class="lang-sw" role="group" aria-label="Language"><a href="/confidentialite" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français">FR</a><a href="/privacy" data-lang="en" lang="en" hreflang="en" aria-label="English" aria-current="true">EN</a></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="doc">
+    <div class="wrap">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: October 14, 2026</p>
+      <p class="tr-note">This English version is a translation provided for information only. Only the
+        <a href="/confidentialite" lang="fr" hreflang="fr">French version</a> is legally binding.</p>
+
+      <p>This page explains what personal data is processed when you use
+        <strong>The Last Launcher</strong>, <strong>The Last Minecraft server</strong> and this
+        <strong>website</strong>, why, for how long, and how to exercise your rights. We
+        collect as little as possible: apart from your IP address, which any server you contact can see, the launcher
+        sends no data about you to The Last, unless you ask it to sign you in to the website (see
+        <a href="#compte">Your account on the website</a>).</p>
+
+      <h2>1. Who is responsible?</h2>
+      <p>The Last is an independent project run by a private individual in France. The data
+        controller is the person in charge of The Last project, who can be reached at
+        <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>.</p>
+
+      <h2>2. The launcher</h2>
+      <h3>Signing in with your Microsoft account</h3>
+      <p>You sign in through your browser, on Microsoft's official page. <strong>The launcher
+        never sees your password.</strong> Microsoft sends back an authorization, which the launcher exchanges
+        with Microsoft, Xbox Live and Minecraft to check that you own Minecraft: Java
+        Edition and to retrieve your profile (username, unique identifier and skin).</p>
+
+      <h3>What is kept, and where</h3>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Data</th><th>Where</th><th>Why</th><th>How long</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Minecraft username, unique identifier (UUID) and skin</td>
+              <td>On your computer only</td>
+              <td>Show your accounts and launch the game</td>
+              <td>Until you remove the account or uninstall the launcher</td>
+            </tr>
+            <tr>
+              <td>Microsoft refresh token (to keep you signed in)</td>
+              <td>On your computer, <strong>encrypted</strong>; the key is protected by your
+                system's secure vault (Windows Credential Manager, macOS Keychain, Secret Service on Linux)</td>
+              <td>Sign you back in without retyping your password</td>
+              <td>Until the account is removed, or until the token expires on Microsoft's side</td>
+            </tr>
+            <tr>
+              <td>Xbox and Minecraft access tokens</td>
+              <td>In the launcher's memory, then passed to the game; never written to a file or to
+                a log</td>
+              <td>Launch the game with your account</td>
+              <td>For the duration of the session</td>
+            </tr>
+            <tr>
+              <td>Settings (memory, language, channel…)</td>
+              <td>On your computer</td>
+              <td>Remember your preferences</td>
+              <td>Until uninstallation</td>
+            </tr>
+            <tr>
+              <td>Launcher and game logs</td>
+              <td>On your computer; tokens are masked in them</td>
+              <td>Troubleshoot a problem</td>
+              <td>7 days for the launcher; game logs are managed by Minecraft</td>
+            </tr>
+            <tr>
+              <td>Player certificate issued by Mojang (the key that signs your chat messages)</td>
+              <td>In the launcher's memory; never written to a file or to a log</td>
+              <td>Prove to the website that you really are the player, when you click “My account on the website”</td>
+              <td>As long as the launcher is open (Mojang renews it about every two days)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The launcher has <strong>no telemetry, no usage statistics, no advertising and no
+        hardware fingerprinting</strong>. It does not send your logs to anyone: the
+        “Export logs” feature creates a file on your computer, which you remain free to share
+        (for example with support).</p>
+
+      <h3>The services the launcher contacts</h3>
+      <p>As with any Internet connection, each of these services receives your IP address.</p>
+      <ul>
+        <li><strong>Microsoft, Xbox Live and Mojang</strong>: sign-in, verification that you own the
+          game, profile and skin, downloading Minecraft and Java and, when you sign in to the website, your
+          player certificate and your signed profile. Their processing is governed by
+          <a href="https://privacy.microsoft.com/en-us/privacystatement" rel="noopener">Microsoft's privacy
+          statement</a>.</li>
+        <li><strong>Our file server</strong>: server content (mods, configuration),
+          news and launcher updates. The host keeps technical logs (IP address,
+          date, file requested) for security purposes. Its name will be given here before launch.</li>
+        <li><strong>Modrinth</strong> and the official <strong>NeoForge</strong> repository: downloading
+          some mods and the mod loader.</li>
+        <li><strong>The Last game server</strong>: the launcher queries it to show its status
+          (players online).</li>
+        <li><strong>Our website</strong> (<code>api.thelastmc.fr</code>), only when you click
+          “My account on the website”: the launcher proves your identity to the website (see
+          <a href="#compte">Your account on the website</a>).</li>
+        <li><strong>Discord (optional)</strong>: if the option is enabled and the Discord app
+          is open on your computer, the launcher tells it that you are playing on The Last, so that
+          it shows on your Discord profile. Can be turned off in the settings.</li>
+      </ul>
+
+      <h2>3. The game server</h2>
+      <p>When you play, the server receives, like any Minecraft server, your <strong>username</strong>,
+        your <strong>unique identifier</strong>, your <strong>IP address</strong>, as well as your messages
+        and your in-game actions. This information is used to run the game, secure it and
+        moderate it (fighting cheating and abuse). Server logs are kept for at most
+        <strong>12 months</strong>. Your in-game progress is kept for as long as the server exists, unless
+        you ask for it to be deleted.</p>
+
+      <h2>4. This website</h2>
+      <p>This website uses <strong>no audience measurement tools and no advertising</strong>, and loads
+        no third-party services (even the fonts are hosted here), unless you use
+        the Volkar assistant (see <a href="#volkar">section 5</a>) or you have signed in to your account
+        (see <a href="#compte">Your account on the website</a>). As long as you do not sign in to
+        an account, it sets <strong>no cookies</strong>. It is hosted by GitHub Pages;
+        GitHub receives visitors' IP addresses and keeps them in its security logs (see
+        <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub's
+        privacy statement</a>).</p>
+      <p>If you write to us, we keep the exchange for as long as it takes to handle your request, then for at most one year.</p>
+
+      <h3 id="compte">Your account on the website</h3>
+      <p>Your account is created the first time you sign in from the launcher, with the “My account on
+        the website” button. It is used to show your player head on the website and, once the shop opens, your
+        purchase history. For now, sign-in is limited to a few testers.</p>
+      <p><strong>How you sign in.</strong> The launcher proves that you really are the player using the
+        certificate and the profile that Mojang signed for your account. It sends no password and no
+        Microsoft, Xbox or Minecraft token. Our server checks Mojang's signatures without contacting Mojang;
+        it only downloads your skin image from <code>textures.minecraft.net</code> to cut out
+        the head. Before opening the session, the website shows you your username and your head and asks you
+        “Is this you?”.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Data</th><th>Why</th><th>How long</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Your Minecraft unique identifier (UUID), your username, your skin model (wide or
+                slim arms), your skin reference and the image of your head</td>
+              <td>Recognize you, and show your head and your username</td>
+              <td>As long as the account exists. It is deleted as soon as you ask, and automatically
+                3 years after your last sign-in from the launcher, if it no longer has an open session or
+                any purchase</td>
+            </tr>
+            <tr>
+              <td>Dates of account creation, last sign-in and last visit</td>
+              <td>Security, and deletion of inactive accounts</td>
+              <td>Same as the account</td>
+            </tr>
+            <tr>
+              <td>For each signed-in device: a session identifier (we keep only a
+                hash of it), the device type (for example “Firefox · Windows”, taken from your browser;
+                we do not keep the details), the approximate country (inferred from your IP address by Cloudflare)
+                and the dates</td>
+              <td>Keep you signed in, and show you your devices so you can sign them out</td>
+              <td>7 days without a visit, 30 days at most, or until you sign out</td>
+            </tr>
+            <tr>
+              <td>A hash of your IP address, computed with a secret value (we never keep
+                the address itself). For export and deletion, we also count requests per
+                account, using a hash of your identifier</td>
+              <td>Limit abuse (number of attempts) and, during sign-in, check that the launcher
+                and the browser are on the same network (protection against malicious links)</td>
+              <td>The duration of the sign-in for the network check (the code lives for 2 minutes); 3 days
+                at most for counting attempts; then erased within the day</td>
+            </tr>
+            <tr>
+              <td>The one-time code that goes from the launcher to your browser</td>
+              <td>Open your session</td>
+              <td>2 minutes, usable only once, then erased within the day</td>
+            </tr>
+            <tr>
+              <td>Your purchases, once the shop opens</td>
+              <td>Your purchase history</td>
+              <td>This page will be updated before payments open</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Data that has reached the end of its retention period is erased automatically every day. To be able to
+        repair the database in case of failure, Cloudflare also keeps a history that erases itself after
+        30 days at most; we use it only for a repair, never to recover a
+        deleted account. Our technical logs contain no IP address, no identifier and no username;
+        Cloudflare may keep technical logs under its own rules.</p>
+      <p>Your username and your head update automatically each time you sign in from the launcher. We
+        make no automated decisions about you and do no profiling: the automatic
+        refusals (too many attempts, different network, access limited to testers) serve only to
+        protect your account.</p>
+      <p><strong>What the website keeps in your browser.</strong> Once you are signed in, a sign-in
+        cookie (<code>__Host-session</code>, restricted to <code>api.thelastmc.fr</code>, unreadable by
+        scripts, valid for 7 days, extended when you come back, 30 days at most) and a marker in local storage (<code>thelast:compte</code>, which is set to
+        “1” and contains no identifier: it keeps the website from querying the server if you have
+        never signed in). They are strictly necessary for the service you request, signing in: they
+        therefore do not require your consent (Article 82 of the French Data Protection Act, “loi Informatique et Libertés”). They
+        disappear when you sign out; if your session expires on its own, the marker is erased on your
+        next visit.</p>
+      <p>Whether you are signed in or not, the website also remembers the language you chose, in local storage
+        (<code>thelast:lang</code>, which is set to “fr” or “en” and nothing else). It stays in your browser
+        until you erase it and is never sent anywhere. When you switch languages, the website also keeps where you were
+        on the page while it reloads (<code>thelast:lang-y</code>, in session storage): it is erased as soon as the page
+        has reloaded.</p>
+      <p><strong>Who receives them.</strong> Cloudflare, Inc. (United States) hosts the account server and its
+        database; we have asked for the database to be located in Western Europe. It acts on
+        our behalf (processor). No one
+        else receives this data.</p>
+      <p><strong>Your rights, in one click.</strong> In <em>My account → Settings</em>, you can
+        download your account data (a JSON file: identifier, username, skin, dates,
+        devices, purchases), sign out all your devices and delete your
+        account. To delete the account, you are asked to have signed in from the launcher within the
+        last 10 minutes, to make sure it really is you. Your Minecraft account is never affected.
+        If you no longer have access to the website, open a private ticket on the Discord or write to us.</p>
+
+      <h2 id="volkar">5. Volkar, the website's AI assistant</h2>
+      <p>On the <a href="/?lang=en#volkar">home page</a>, the bubble at the bottom right lets you put questions to <strong>Volkar</strong>, an
+        assistant powered by <strong>artificial intelligence</strong> (the Claude Haiku model,
+        by Anthropic). So you are talking to an AI, not to a person. It answers solely from the
+        information the team has given it about the server, and it can make mistakes: the
+        <a href="/terms">terms of use</a> prevail.</p>
+      <ul>
+        <li><strong>Why:</strong> to answer you, and to protect the service against abuse and excessive
+          costs (the number of questions is limited). We make no automated decisions about
+          you and we do no profiling.</li>
+        <li><strong>Legal basis:</strong> our legitimate interest in helping players and protecting the
+          service (Article 6(1)(f) GDPR). You are never required to use the assistant: the rest of the website
+          works without it.</li>
+        <li><strong>What data:</strong> the text of your question and the beginning of the current conversation,
+          sent with each question; your IP address, which Cloudflare technically sees to route your
+          request; a <em>hash</em> of your IP address, computed with a secret value (we do not keep
+          the IP itself), used only to count your questions. This hash is still personal
+          data, because it makes it possible to recognize the same visitor. <strong>Do not write any personal
+          information</strong> (name, address, password, age…) in the chat.</li>
+        <li><strong>Who receives it:</strong> <em>Cloudflare, Inc.</em> (United States) hosts the program that
+          receives your question; <em>Anthropic PBC</em> (United States) generates the answer from your question and
+          the conversation. They act on our behalf (processors). We do not pass your
+          IP address on to Anthropic.</li>
+        <li><strong>How long:</strong> we keep neither your questions nor the answers, and nothing
+          is stored in your browser: the conversation disappears when you close or reload the
+          page. The IP hash is deleted after 2 days at most. According to the rules it publishes as of the
+          date of this page (they may change, and they are what counts), Anthropic states that it deletes
+          messages from its systems within 30 days at most, except content flagged by its safety systems
+          (up to 2 years) or where required by law, and that it does not train its models on content sent through
+          its interface for businesses. Cloudflare may keep technical logs under its own
+          rules.</li>
+        <li><strong>Transfers outside the European Union:</strong> Cloudflare and Anthropic are
+          American companies, and the answers are not generated in the European Union. These transfers
+          rely on the European Commission's standard contractual clauses, included in their
+          data processing agreements.</li>
+        <li><strong>Your rights:</strong> those in <a href="#droits">section 8</a>. Since we do not keep
+          your questions, we cannot retrieve a specific conversation; write to us at
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> if you have a problem.</li>
+        <li><strong>If you are a minor:</strong> never give personal information to Volkar, and ask
+          a parent for advice if you are unsure. For an account problem or a report, open a
+          private ticket on the Discord instead.</li>
+      </ul>
+
+      <h2>6. On what legal basis?</h2>
+      <ul>
+        <li><strong>Providing the service you request</strong> (installing and launching the game, signing you in,
+          letting you play): performance of the terms of use (Article 6(1)(b) GDPR).</li>
+        <li><strong>Your account on the website</strong> (recognizing you, showing your head, your devices and,
+          later, your purchases): performance of the terms of use (Article 6(1)(b) GDPR).</li>
+        <li><strong>Security and moderation</strong> (technical logs, server logs, attempt
+          limits and same-network check when signing in to the website, list of your devices): our
+          legitimate interest in protecting the service and its players (Article 6(1)(f) GDPR).</li>
+        <li><strong>Answering your questions through the Volkar assistant and protecting it from abuse</strong>:
+          our legitimate interest (Article 6(1)(f) GDPR).</li>
+      </ul>
+      <p>We do not sell, rent or share your data with anyone for commercial purposes.</p>
+
+      <h2 id="transferts">7. Transfers outside the European Union</h2>
+      <p>Microsoft and GitHub are American companies. Their data transfers to the
+        United States rely on the EU–U.S. Data Privacy
+        Framework and on their own safeguards. For Cloudflare and Anthropic (Volkar assistant),
+        see <a href="#volkar">section 5</a>. We have asked for the account database to be
+        located in Western Europe; since Cloudflare is an American company, a transfer to the United States remains possible,
+        governed by the European Commission's standard contractual clauses.</p>
+
+      <h2 id="droits">8. Your rights</h2>
+      <p>You can request access to your data, its rectification, its erasure, the restriction of
+        processing, object to it, and request its portability, by writing to
+        <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>. We reply within
+        one month. If you believe your rights are not being respected, you can lodge a complaint with the
+        <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>.</p>
+      <p><strong>Your right to object.</strong> You can object at any time to processing based
+        on our legitimate interest (section 6): write to us, and we will stop, unless there is a compelling reason, for
+        example the safety of other players.</p>
+      <p>For your account on the website, export and deletion can also be done directly in
+        <em>My account → Settings</em> (see <a href="#compte">Your account on the website</a>).</p>
+      <p>To erase what the launcher keeps on your computer:</p>
+      <ul>
+        <li>remove the account in the launcher (<em>Comptes → Retirer</em>, or <em>Accounts → Remove</em> in English): its token is deleted;</li>
+        <li>uninstall the launcher, then delete its data folder
+          (<code>%LOCALAPPDATA%\fr.thelast.launcher</code> on Windows);</li>
+        <li>you can also revoke access for “The Last Launcher” from your Microsoft account:
+          <a href="https://account.live.com/consent/Manage" rel="noopener">account.live.com/consent/Manage</a>.</li>
+      </ul>
+
+      <h2>9. Minors</h2>
+      <p>Minecraft is played by many young people. Children's Microsoft accounts are managed by their
+        parents (Microsoft Family). A parent can write to us with any question or to have
+        the data linked to their child's account deleted.</p>
+      <p>If you are under 15, ask a parent for permission before signing in to the website. A parent
+        can delete the account on the website from <em>My account → Settings</em>, or write to us. If
+        online play is blocked by parental controls, signing in to the website does not work: this is
+        normal.</p>
+
+      <h2>10. Changes</h2>
+      <p>We will update this page if our practices change; the date at the top of the page shows when.
+        In the event of a significant change, we will announce it in the launcher's news.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="cols">
+        <div>© 2026 The Last — contact: <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
+        <nav aria-label="Legal links">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms of use</a>
+          <a href="/legal-notice">Legal notice</a>
+        </nav>
+      </div>
+      <div class="disclaimer">
+        <p>Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

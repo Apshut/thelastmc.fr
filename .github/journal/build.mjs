@@ -5,6 +5,14 @@
      Journal(site): Le magma devient une croûte de lave refroidie
      Journal(launcher): Connexion Microsoft prête, en attente de validation par Mojang
      Journal(jeu): Correctif du bug de duplication des Braises
+   Chaque ligne française peut avoir sa jumelle anglaise (américain, même ton, pour les joueurs) : « Journal-en(site|launcher|jeu): … ».
+   La i-ème ligne anglaise d'un projet va avec la i-ème ligne française du même projet dans le même commit ; l'entrée reçoit un
+   champ « en » (160 caractères au plus). Exemple :
+     Journal(site): Le magma devient une croûte de lave refroidie
+     Journal-en(site): The magma is now a cooled lava crust
+   Les entrées d'avant cette convention (ou sans ligne anglaise) reçoivent leur texte anglais de en.json (« projet|phrase » → anglais),
+   qui l'emporte sur tout autre en (pour pouvoir corriger une traduction déjà publiée).
+   Le Discord (discord.mjs) ne lit que le français (t) : le champ « en » ne le concerne pas.
    Les commits sans cette ligne n'apparaissent pas : rien d'autre ne sort des dépôts (ni code, ni message technique).
 
    Sources : les dépôts de SOURCES, lus par l'API GitHub avec le jeton JOURNAL_TOKEN (lecture seule du contenu), ou un dépôt
@@ -19,12 +27,17 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SOURCES = ['Apshut/the-last-launcher'];                 // ajouter ici le dépôt du serveur quand il existera
 const KEEP = 5000, PAGES = 5;                                  // tout l'historique (la page Chantier l'affiche) ; pages de 100 commits lues à chaque passage
 const LINE = /^Journal\((site|launcher|jeu)\)\s*:\s*(.+?)\s*$/gim;
+const LINE_EN = /^Journal-en\((site|launcher|jeu)\)\s*:\s*(.+?)\s*$/gim;
 
 const args = process.argv.slice(2), opt = k => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
 const out = opt('--out') || join(HERE, '..', '..', 'assets', 'journal.json');
 
 function parse(message, date, into) {
-  for (const m of message.matchAll(LINE)) into.push({ p: m[1].toLowerCase(), t: m[2].slice(0, 160), d: new Date(date).toISOString() });
+  const d = new Date(date).toISOString(), fr = [], en = { site: [], launcher: [], jeu: [] };
+  for (const m of message.matchAll(LINE)) fr.push({ p: m[1].toLowerCase(), t: m[2].slice(0, 160), d });
+  for (const m of message.matchAll(LINE_EN)) en[m[1].toLowerCase()].push(m[2].slice(0, 160));
+  const rang = { site: 0, launcher: 0, jeu: 0 };                // la i-ème ligne anglaise d'un projet ↔ sa i-ème ligne française
+  for (const e of fr) { const t = en[e.p][rang[e.p]++]; if (t) e.en = t; into.push(e); }
 }
 async function fromGitHub(repo, token, into) {
   for (let page = 1; page <= PAGES; page++) {
@@ -50,8 +63,17 @@ else {
   if (!token) { console.log('JOURNAL_TOKEN absent : journal inchangé (secret à ajouter dans Settings > Secrets and variables > Actions).'); process.exit(0); }
   for (const repo of SOURCES) await fromGitHub(repo, token, entries);
 }
-// une même phrase n'apparaît qu'une fois (la plus récente) ; les plus récentes d'abord
-const seen = new Set(), list = entries.sort((a, b) => b.d.localeCompare(a.d)).filter(e => { const k = e.p + '|' + e.t; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, KEEP);
+// une même phrase n'apparaît qu'une fois (la plus récente) ; les plus récentes d'abord. Le champ en d'un doublon n'est pas perdu.
+const tri = entries.sort((a, b) => b.d.localeCompare(a.d)), gardees = new Map();
+for (const e of tri) {
+  const k = e.p + '|' + e.t, deja = gardees.get(k);
+  if (!deja) gardees.set(k, e); else if (!deja.en && e.en) deja.en = e.en;
+}
+// les entrées d'avant la convention Journal-en prennent leur anglais dans en.json, qui l'emporte : une correction de en.json
+// s'applique aussi aux entrées déjà publiées (elles portent déjà un en)
+let ENJ = {}; try { ENJ = JSON.parse(readFileSync(join(HERE, 'en.json'), 'utf8')); } catch { /* pas de fichier : le français seul */ }
+for (const [k, e] of gardees) if (typeof ENJ[k] === 'string') e.en = ENJ[k];
+const list = [...gardees.values()].map(({ p, t, en, d }) => en ? { p, t, en, d } : { p, t, d }).slice(0, KEEP);
 const json = JSON.stringify({ entries: list }, null, 1) + '\n';
 let old = ''; try { old = readFileSync(out, 'utf8'); } catch { /* premier passage */ }
 if (old === json) console.log('Journal à jour (' + list.length + ' entrées).');

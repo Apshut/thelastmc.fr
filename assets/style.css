@@ -76,6 +76,12 @@ img { max-width: 100%; display: block; }
   border-radius: 10px;
 }
 .nav a:hover, .nav a[aria-current="page"] { color: var(--fg); background: var(--surface-2); }
+/* l'interrupteur de langue FR | EN (assets/i18n.js) : la langue active en or */
+.lang-sw { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.nav .lang-sw a { border-radius: 0; padding: 8px 10px; }
+.nav .lang-sw a[aria-current] { color: var(--accent-2); background: var(--surface-2); }
+/* pages légales en anglais : la traduction est donnée à titre d'information */
+.tr-note { margin: 0 0 28px; padding: 12px 16px; border: 1px solid var(--border); border-left: 3px solid var(--accent-2); border-radius: 10px; background: var(--surface); color: var(--fg-2); font-size: 14px; }
 
 /* ---------- Héros ---------- */
 .hero { padding: 96px 0 72px; }

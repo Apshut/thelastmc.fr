@@ -9,6 +9,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const CFG = window.THE_LAST || {}, D = document, root = D.documentElement;
 const $ = (s, r) => (r || D).querySelector(s), $$ = (s, r) => Array.from((r || D).querySelectorAll(s));
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -23,12 +24,13 @@ const titre = $('#t-gm'), fil = $('#vk-fil'), fermer = $('#vk-close');
 const log = $('#gm-log'), form = $('#gm-form'), q = $('#gm-q'), send = $('#gm-send'), stop = $('#gm-stop');
 const sugg = $('#gm-sugg'), btnNew = $('#gm-new'), compte = $('#gm-compte'), etat = $('#gm-etat'), mention = $('#gm-mention'), pill = $('#gm-pill');
 const DISCORD = (CFG.community && CFG.community.url ? String(CFG.community.url).replace(/^\//, '') : '') || 'discord/';
+// [libellé affiché, question envoyée] : en anglais le libellé change, la question part toujours en français (sa base de connaissances l'est)
 const SUGGESTIONS = [
-  'Les Braises, ça sert à quoi ?',
-  'Il me faut quoi pour jouer ?',
-  'Le launcher est-il sûr ?',
-  'Comment demander de l\'aide sur le Discord ?',
-  'Tu es une IA ?'
+  [T.t('volkar.s1', 'Les Braises, ça sert à quoi ?'), 'Les Braises, ça sert à quoi ?'],
+  [T.t('volkar.s2', 'Il me faut quoi pour jouer ?'), 'Il me faut quoi pour jouer ?'],
+  [T.t('volkar.s3', 'Le launcher est-il sûr ?'), 'Le launcher est-il sûr ?'],
+  [T.t('volkar.s4', 'Comment demander de l\'aide sur le Discord ?'), 'Comment demander de l\'aide sur le Discord ?'],
+  [T.t('volkar.s5', 'Tu es une IA ?'), 'Tu es une IA ?']
 ];
 
 function h(tag, attrs, ...kids) {
@@ -110,16 +112,16 @@ function rendreTexte(el, txt) {
 function bulle(role, extra) {
   const bot = role !== 'user';
   const m = h('div', { class: 'gm-msg ' + (bot ? 'gm-bot' : 'gm-user') + (extra ? ' ' + extra : '') },
-    h('p', { class: 'gm-de' }, h('span', { class: 'sr', text: bot ? 'Volkar, IA :' : 'Toi :' }), h('span', { 'aria-hidden': 'true', text: bot ? 'Volkar · IA' : 'Toi' })),
+    h('p', { class: 'gm-de' }, h('span', { class: 'sr', text: bot ? T.t('volkar.de-bot-sr', 'Volkar, IA :') : T.t('volkar.de-user-sr', 'Toi :') }), h('span', { 'aria-hidden': 'true', text: bot ? T.t('volkar.de-bot', 'Volkar · IA') : T.t('volkar.de-user', 'Toi') })),
     h('div', { class: 'gm-txt' }));
   log.appendChild(m); descendre(true);
   return m;
 }
 function escalade(parent) {
   parent.appendChild(h('div', { class: 'gm-esc' },
-    h('p', { text: 'Besoin d\'un humain ?' }),
-    h('p', null, 'Une question générale : le forum #aide du ', h('a', { href: DISCORD, target: '_blank', rel: 'noopener', text: 'Discord' }),
-      '. Un souci de compte, de paiement, un signalement : un ticket privé (#ticket-privé). Sinon : ',
+    h('p', { text: T.t('volkar.esc-titre', 'Besoin d\'un humain ?') }),
+    h('p', null, T.t('volkar.esc-1', 'Une question générale : le forum #aide du '), h('a', { href: DISCORD, target: '_blank', rel: 'noopener', text: 'Discord' }),
+      T.t('volkar.esc-2', '. Un souci de compte, de paiement, un signalement : un ticket privé (#ticket-privé). Sinon : '),
       h('a', { href: 'mailto:contact@thelastmc.fr', text: 'contact@thelastmc.fr' }), '.')));
 }
 function erreur(texte, question) {
@@ -127,13 +129,13 @@ function erreur(texte, question) {
   rendreTexte($('.gm-txt', m), texte);
   const act = h('div', { class: 'gm-actions' });
   if (question) {
-    const re = h('button', { class: 'btn btn-sm', type: 'button', text: 'Réessayer' });
+    const re = h('button', { class: 'btn btn-sm', type: 'button', text: T.t('volkar.retry', 'Réessayer') });
     re.addEventListener('click', () => { if (!ctrl) { q.value = question; majCompte(); envoyer(); } });
     act.appendChild(re);
   }
-  act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, target: '_blank', rel: 'noopener', text: 'Aller sur le Discord' }));
+  act.appendChild(h('a', { class: 'btn btn-sm', href: DISCORD, target: '_blank', rel: 'noopener', text: T.t('volkar.to-discord', 'Aller sur le Discord') }));
   m.appendChild(act); descendre(true);
-  annonce('Volkar n\'a pas pu répondre.');
+  annonce(T.t('volkar.a-erreur', 'Volkar n\'a pas pu répondre.'));
 }
 
 /* ---------- l'état « bientôt » : pas de Worker, Worker injoignable ou clé absente ---------- */
@@ -144,10 +146,10 @@ function passerBientot() {
   const avaitFocus = form.contains(D.activeElement);
   if (ctrl) ctrl.abort();
   const m = bulle('bot');
-  rendreTexte($('.gm-txt', m), 'Volkar arrive bientôt. En attendant, le panneau « Questions » de cette page et le Discord sont là pour t\'aider.');
+  rendreTexte($('.gm-txt', m), T.t('volkar.bientot', 'Volkar arrive bientôt. En attendant, le panneau « Questions » de cette page et le Discord sont là pour t\'aider.'));
   // le champ qui avait le focus vient d'être caché : on le pose sur le message, pour ne pas perdre le visiteur au clavier
   if (avaitFocus) { m.tabIndex = -1; m.focus({ preventScroll: true }); }
-  annonce('Volkar arrive bientôt.');
+  annonce(T.t('volkar.a-bientot', 'Volkar arrive bientôt.'));
 }
 function verifier() {
   if (!sante) sante = (async () => {
@@ -168,7 +170,7 @@ function majCompte() {
   compte.textContent = n + ' / ' + MAX_Q;
   compte.classList.toggle('proche', reste <= 50 && reste > 0); compte.classList.toggle('plein', reste <= 0);
   const s = reste <= 0 ? '0' : reste <= 50 ? '50' : '';
-  if (s && s !== seuil) annonce(s === '0' ? 'Limite de 500 caractères atteinte.' : 'Plus que 50 caractères.');
+  if (s && s !== seuil) annonce(s === '0' ? T.t('volkar.a-limite', 'Limite de 500 caractères atteinte.') : T.t('volkar.a-reste', 'Plus que 50 caractères.'));
   seuil = s;
 }
 function occupe(on) {
@@ -178,13 +180,13 @@ function occupe(on) {
 }
 
 /* ---------- un échange : POST /question, puis lecture du flux SSE ---------- */
-async function envoyer() {
+async function envoyer(affiche) {               // affiche : le libellé d'une suggestion, montré à la place de la question (anglais)
   const texte = q.value.trim().slice(0, MAX_Q);
   if (!texte || ctrl || bientot) return;
   if (!(await verifier())) return;
   q.value = ''; majCompte(); if (ouvert) q.focus({ preventScroll: true });
   sugg.hidden = true;
-  rendreTexte($('.gm-txt', bulle('user')), texte);
+  rendreTexte($('.gm-txt', bulle('user')), affiche || texte);
   hist.push({ role: 'user', content: texte });
   let envoi = hist.slice(-MAX_HIST); if (envoi[0].role !== 'user') envoi = envoi.slice(1);
   // une réponse précédente part avec sa signature (sans elle, le Worker ne la transmet pas au modèle)
@@ -192,8 +194,8 @@ async function envoyer() {
 
   const m = bulle('bot'), txt = $('.gm-txt', m);
   m.setAttribute('aria-busy', 'true');
-  txt.appendChild(h('p', { class: 'gm-pense' }, 'Volkar réfléchit', h('i', { 'aria-hidden': 'true' }, h('b'))));
-  annonce('Volkar écrit…');
+  txt.appendChild(h('p', { class: 'gm-pense' }, T.t('volkar.pense', 'Volkar réfléchit'), h('i', { 'aria-hidden': 'true' }, h('b'))));
+  annonce(T.t('volkar.a-ecrit', 'Volkar écrit…'));
   ctrl = new AbortController(); occupe(true);
 
   let ecrit = '', sources = [], cites = [], fin = null, err = null, coupe = false, delai = false, minuteur = 0;
@@ -212,11 +214,11 @@ async function envoyer() {
       const ra = parseInt(r.headers.get('Retry-After') || '', 10);
       let msg = j && typeof j.message === 'string' && j.message ? j.message : '';
       if (r.status === 429) {
-        msg = msg || 'Trop de questions d\'un coup : reviens dans quelques instants.';
-        if (ra > 0) msg += ' (Tu pourras réessayer dans ' + (ra < 90 ? ra + ' secondes' : Math.ceil(ra / 60) + ' minutes') + '.)';
+        msg = msg || T.t('volkar.e-429', 'Trop de questions d\'un coup : reviens dans quelques instants.');
+        if (ra > 0) msg += T.t('volkar.e-429-delai', ' (Tu pourras réessayer dans {delai}.)', { delai: ra < 90 ? T.t('volkar.secondes', '{n} secondes', { n: ra }) : T.t('volkar.minutes', '{n} minutes', { n: Math.ceil(ra / 60) }) });
       }
-      if (r.status === 503 && !msg) msg = 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.';
-      throw { visible: msg || 'Volkar n\'a pas compris la demande. Réessaie avec une question plus courte.', code: j && j.code, status: r.status };
+      if (r.status === 503 && !msg) msg = T.t('volkar.e-cave', 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.');
+      throw { visible: msg || T.t('volkar.e-400', 'Volkar n\'a pas compris la demande. Réessaie avec une question plus courte.'), code: j && j.code, status: r.status };
     }
     const lecteur = r.body.getReader(), dec = new TextDecoder();
     let tampon = '';
@@ -239,11 +241,11 @@ async function envoyer() {
       while ((k = tampon.search(/\r?\n\r?\n/)) >= 0) { const bloc = tampon.slice(0, k); tampon = tampon.slice(k).replace(/^\r?\n\r?\n/, ''); evenement(bloc); }
       if (done || fin || err) { if (done && tampon.trim()) evenement(tampon); break; }
     }
-    if (!fin && !err) err = { message: 'La réponse s\'est coupée en route. Réessaie dans un instant.' };
+    if (!fin && !err) err = { message: T.t('volkar.e-coupe-retry', 'La réponse s\'est coupée en route. Réessaie dans un instant.') };
   } catch (e) {
-    if (delai) err = { message: 'Volkar ne répond plus. Réessaie dans un instant, ou passe par le Discord.', avant: !ecrit.trim() };
+    if (delai) err = { message: T.t('volkar.e-delai', 'Volkar ne répond plus. Réessaie dans un instant, ou passe par le Discord.'), avant: !ecrit.trim() };
     else if (ctrl && ctrl.signal.aborted) coupe = true;
-    else err = { message: e && e.visible ? e.visible : 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.', avant: true, status: e && e.status };
+    else err = { message: e && e.visible ? e.visible : T.t('volkar.e-cave', 'Volkar est parti à la cave. Réessaie plus tard, ou passe par le Discord.'), avant: true, status: e && e.status };
   }
 
   /* fin de l'échange */
@@ -258,14 +260,14 @@ async function envoyer() {
     if (err.status === 503) sante = null;
   } else if (!ecrit.trim()) {
     m.remove(); hist.pop();
-    if (coupe) annonce('Réponse arrêtée.');
-    else erreur(err && typeof err.message === 'string' && err.message ? err.message : 'Volkar n\'a rien trouvé à dire. Réessaie autrement.', texte);
+    if (coupe) annonce(T.t('volkar.a-arret', 'Réponse arrêtée.'));
+    else erreur(err && typeof err.message === 'string' && err.message ? err.message : T.t('volkar.e-vide', 'Volkar n\'a rien trouvé à dire. Réessaie autrement.'), texte);
   } else {
     // forme signée par le Worker : les MAX_A premiers caractères (points de code), sans autre retouche
     hist.push({ role: 'assistant', content: Array.from(ecrit).slice(0, MAX_A).join(''), sig: !coupe && !err && fin && /^[0-9a-f]{64}$/.test(fin.sig || '') ? fin.sig : undefined });
-    if (coupe) m.appendChild(h('p', { class: 'gm-coupe', text: 'Réponse arrêtée.' }));
-    else if (err) m.appendChild(h('p', { class: 'gm-coupe', text: typeof err.message === 'string' && err.message ? err.message : 'La réponse s\'est coupée en route.' }));
-    else if (fin && fin.raison === 'longueur') m.appendChild(h('p', { class: 'gm-coupe', text: 'Volkar s\'est arrêté en chemin : la réponse était trop longue. Demande-lui la suite.' }));
+    if (coupe) m.appendChild(h('p', { class: 'gm-coupe', text: T.t('volkar.a-arret', 'Réponse arrêtée.') }));
+    else if (err) m.appendChild(h('p', { class: 'gm-coupe', text: typeof err.message === 'string' && err.message ? err.message : T.t('volkar.e-coupe', 'La réponse s\'est coupée en route.') }));
+    else if (fin && fin.raison === 'longueur') m.appendChild(h('p', { class: 'gm-coupe', text: T.t('volkar.trop-long', 'Volkar s\'est arrêté en chemin : la réponse était trop longue. Demande-lui la suite.') }));
     // sources : les documents cités ; à défaut, les pages retrouvées (dédoublonnées)
     ((fin && Array.isArray(fin.cites)) ? fin.cites : []).forEach(n => { if (Number.isInteger(n) && !cites.includes(n)) cites.push(n); });
     const cits = sources.filter(s => cites.includes(s.n)), liste = cits.length ? cits : sources, vus = new Set(), liens = [];
@@ -276,11 +278,11 @@ async function envoyer() {
     if (liens.length) {
       const ul = h('ul');
       liens.slice(0, 5).forEach(l => ul.appendChild(h('li', null, h('a', { href: l.href }, h('b', { 'aria-hidden': 'true', text: String(l.n) }), l.titre))));
-      m.appendChild(h('div', { class: 'gm-src' }, h('p', { text: cits.length ? 'Sources' : 'Pages liées' }), ul));
+      m.appendChild(h('div', { class: 'gm-src' }, h('p', { text: cits.length ? T.t('volkar.sources', 'Sources') : T.t('volkar.pages', 'Pages liées') }), ul));
     }
     if (!coupe && (!cits.length || err || (fin && fin.raison === 'refus'))) escalade(m);
-    m.appendChild(h('p', { class: 'gm-note', text: 'Généré par une IA, peut contenir des erreurs.' }));
-    annonce(coupe ? 'Réponse arrêtée.' : err ? 'Réponse interrompue : ' + (typeof err.message === 'string' && err.message ? err.message : 'la réponse s\'est coupée en route.') : 'Réponse de Volkar prête.');
+    m.appendChild(h('p', { class: 'gm-note', text: T.t('volkar.note', 'Généré par une IA, peut contenir des erreurs.') }));
+    annonce(coupe ? T.t('volkar.a-arret', 'Réponse arrêtée.') : err ? T.t('volkar.a-interrompue', 'Réponse interrompue : {msg}', { msg: typeof err.message === 'string' && err.message ? err.message : T.t('volkar.e-coupe-bas', 'la réponse s\'est coupée en route.') }) : T.t('volkar.a-prete', 'Réponse de Volkar prête.'));
   }
   occupe(false); descendre(suivre);
   if (!ouvert) btn.classList.add('vk-neuf');   // fermé pendant la réponse : un point d'or sur le bouton
@@ -292,7 +294,7 @@ function nouvelle() {
   $$('.gm-msg', log).forEach(m => { if (!m.classList.contains('gm-accueil')) m.remove(); });
   sugg.hidden = false; btnNew.hidden = true; fil.scrollTop = 0;
   q.value = ''; majCompte(); q.focus();
-  annonce('Nouvelle conversation. Rien n\'a été gardé.');
+  annonce(T.t('volkar.a-nouvelle', 'Nouvelle conversation. Rien n\'a été gardé.'));
 }
 
 /* ---------- ouvrir, fermer ---------- */
@@ -315,7 +317,7 @@ function ouvrir(focus = true) {
   if (ouvert) { if (focus) poserFocus(); return; }
   ouvert = true;
   box.classList.remove('vk-ferme'); box.hidden = false;
-  btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Fermer la conversation avec Volkar');
+  btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', T.t('volkar.btn-ferme', 'Fermer la conversation avec Volkar'));
   plein(PLEIN.matches);
   if (log.querySelector('.gm-user')) descendre(true);   // une conversation en cours : on reprend au dernier message
   if (focus) poserFocus();
@@ -330,7 +332,7 @@ function fermerPanneau(focus = 'bouton') {
   if (!ouvert) return;
   ouvert = false;
   const dedans = box.contains(D.activeElement);
-  btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Demande à Volkar, l\'assistant IA');
+  btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', T.t('volkar.btn-ouvre', 'Demande à Volkar, l\'assistant IA'));
   if (ctrl) btn.classList.add('vk-ecrit');
   plein(false);
   if (location.hash === '#volkar') history.replaceState(null, '', location.pathname + location.search);
@@ -347,8 +349,8 @@ fermer.addEventListener('click', () => fermerPanneau());
 const taille = $('#vk-taille');
 taille.addEventListener('click', () => {
   const bas = !!log.querySelector('.gm-user') && enBas(), grand = box.classList.toggle('vk-grand');
-  taille.setAttribute('aria-label', grand ? 'Réduire la conversation' : 'Agrandir la conversation');
-  taille.title = grand ? 'Réduire' : 'Agrandir';
+  taille.setAttribute('aria-label', grand ? T.t('volkar.reduire-aria', 'Réduire la conversation') : T.t('volkar.agrandir-aria', 'Agrandir la conversation'));
+  taille.title = grand ? T.t('volkar.reduire', 'Réduire') : T.t('volkar.agrandir', 'Agrandir');
   if (bas) setTimeout(() => descendre(true), REDUCE ? 0 : 240);   // on suivait la fin de la conversation : on la garde en vue
 });
 box.addEventListener('keydown', e => { if (e.key === 'Escape' && !e.isComposing) { e.preventDefault(); fermerPanneau(); } });
@@ -378,9 +380,9 @@ if (window.visualViewport) { visualViewport.addEventListener('resize', caler); v
 if (!API) passerBientot();
 else {
   form.hidden = false; sugg.hidden = false;
-  SUGGESTIONS.forEach(s => {
-    const b = h('button', { class: 'gm-s', type: 'button', text: s });
-    b.addEventListener('click', () => { q.value = s; majCompte(); envoyer(); });
+  SUGGESTIONS.forEach(([libelle, question]) => {
+    const b = h('button', { class: 'gm-s', type: 'button', text: libelle });
+    b.addEventListener('click', () => { q.value = question; majCompte(); envoyer(libelle); });
     sugg.appendChild(b);
   });
   // premier geste dans le chat : on vérifie que Volkar est là (pas avant, pour ne contacter personne pour rien)

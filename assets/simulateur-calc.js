@@ -10,6 +10,7 @@
 (function (root) {
 'use strict';
 
+const T = root.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };   // sous Node : le repli français
 const MAX_CENTS = 100000;          // 1 000 € : au-delà, le simulateur plafonne (et le dit)
 const MAX_BRAISES = 100000;
 
@@ -20,7 +21,7 @@ function paquets(cfg) {
   const shop = (cfg && cfg.shop) || {};
   return (shop.products || [])
     .filter(p => p && p.kind === 'pack' && p.braises > 0 && p.price > 0)
-    .map(p => ({ id: p.id, name: p.name, short: p.short || p.name, braises: Math.round(p.braises), cents: Math.round(p.price * 100) }))
+    .map(p => ({ id: p.id, name: T.pick(p, 'name'), short: T.pick(p, 'short') || T.pick(p, 'name'), braises: Math.round(p.braises), cents: Math.round(p.price * 100) }))
     .sort((a, b) => b.braises - a.braises);
 }
 /* ce qu'on obtient en jeu, du moins cher au plus cher */
@@ -32,13 +33,16 @@ function objets(cfg) {
 /* saisies : « 12,50 € », « 12.5 », « 1 000 » → centimes ; « 1 300 » → Braises. null si illisible, négatif ou vide */
 function lireEuros(s) {
   if (typeof s === 'number') return isFinite(s) && s >= 0 ? Math.round(s * 100) : null;
-  s = String(s == null ? '' : s).replace(/[\s  €]/g, '').replace(',', '.');
+  s = String(s == null ? '' : s).replace(/[\s  €]/g, '');
+  if (T.lang === 'en' && /^\d{1,3}(,\d{3})+(\.\d*)?$/.test(s)) s = s.replace(/,/g, '');   // anglais : « 1,250.50 », la virgule sépare les milliers
+  s = s.replace(',', '.');
   if (!/^(\d+(\.\d*)?|\.\d+)$/.test(s)) return null;
   return Math.round(parseFloat(s) * 100);
 }
 function lireBraises(s) {
   if (typeof s === 'number') return isFinite(s) && s >= 0 ? Math.floor(s) : null;
   s = String(s == null ? '' : s).replace(/[\s  ]/g, '');
+  if (T.lang === 'en' && /^\d{1,3}(,\d{3})+$/.test(s)) s = s.replace(/,/g, '');   // anglais : « 1,300 »
   if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');  // « 1.300 », point des milliers
   if (!/^\d+$/.test(s)) return null;
   return parseInt(s, 10);
@@ -102,7 +106,7 @@ function aPortee(objs, braises) {
   return objs.map(o => ({ objet: o, ok: o.braises <= braises, manque: Math.max(0, o.braises - braises) }));
 }
 
-const nbFmt = new Intl.NumberFormat('fr-FR'), eurFmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+const nbFmt = new Intl.NumberFormat(T.locale), eurFmt = new Intl.NumberFormat(T.locale, { style: 'currency', currency: 'EUR' });
 const fmtBraises = n => nbFmt.format(n);
 const fmtEuros = cents => eurFmt.format(cents / 100);
 

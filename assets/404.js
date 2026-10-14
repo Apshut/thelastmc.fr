@@ -12,6 +12,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const D = document, W = window, root = D.documentElement;
 const MC = W.MC || { blocks: {}, font: {} };
 const $ = (s, r) => (r || D).querySelector(s), $$ = (s, r) => Array.from((r || D).querySelectorAll(s));
@@ -55,7 +56,7 @@ function pxLabel(el, text) {
   el.append(h('span', { class: 'sr', text }), box); el.classList.add('pxl-host');
 }
 if (MC.font && MC.font.A) {
-  $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
+  $$('.top .tbtn').forEach(b => { if (b.classList.contains('lang-sw')) $$('a', b).forEach(a => pxLabel(a, a.textContent)); else pxLabel(b, b.textContent); });   // FR | EN : chaque moitié
   $$('.v-sorties .btn').forEach(b => pxLabel(b, b.textContent));
   $$('h1.px').forEach(pxText);
 }
@@ -63,18 +64,19 @@ if (MC.font && MC.font.A) {
 /* ---------- « Tu cherchais peut-être » : seulement si l'adresse ressemble à une vraie page ---------- */
 let chemin = location.pathname;
 try { chemin = decodeURIComponent(chemin); } catch (e) { /* adresse mal encodée : on la compare telle quelle */ }
+const kw = (fr, en) => T.lang === 'en' ? en.concat(fr) : fr;   // en anglais, les mots-clés anglais d'abord, puis les français
 const PAGES = [
-  ['/', 'Accueil', ['accueil', 'index', 'home']],
-  ['/boutique', 'Boutique', ['boutique', 'shop', 'taverne']],
-  ['/chantier', 'Chantier', ['chantier', 'journal']],
-  ['/#volkar', 'Demande à Volkar', ['faq', 'aide', 'volkar']],
-  ['/en', 'English', ['en', 'english']],
-  ['/confidentialite', 'Confidentialité', ['confidentialite', 'vie-privee']],
-  ['/cgu', "Conditions d'utilisation", ['cgu', 'cgv', 'conditions']],
-  ['/mentions-legales', 'Mentions légales', ['mentions-legales', 'mentions']],
-  ['/compte/achats', "Historique d'achat", ['achats', 'historique']],
-  ['/compte/parametres', 'Paramètres du compte', ['parametres', 'reglages']],
-  ['/discord/', 'Discord', ['discord']]
+  ['/', T.t('pages.404.p-accueil', 'Accueil'), kw(['accueil', 'index', 'home'], ['home', 'index', 'homepage'])],
+  ['/boutique', T.t('pages.404.p-boutique', 'Boutique'), kw(['boutique', 'shop', 'taverne'], ['shop', 'store', 'tavern'])],
+  ['/chantier', T.t('pages.404.p-chantier', 'Chantier'), kw(['chantier', 'journal'], ['devlog', 'changelog', 'news', 'journal'])],
+  ['/#volkar', T.t('pages.404.p-volkar', 'Demande à Volkar'), kw(['faq', 'aide', 'volkar'], ['faq', 'help', 'volkar', 'support'])],
+  ['/en', T.t('pages.404.p-en', 'English'), kw(['en', 'english'], ['en', 'english', 'launcher', 'technical'])],
+  ['/confidentialite', T.t('pages.404.p-confidentialite', 'Confidentialité'), kw(['confidentialite', 'vie-privee'], ['privacy', 'confidentiality'])],
+  ['/cgu', T.t('pages.404.p-cgu', "Conditions d'utilisation"), kw(['cgu', 'cgv', 'conditions'], ['terms', 'tos', 'conditions'])],
+  ['/mentions-legales', T.t('pages.404.p-mentions', 'Mentions légales'), kw(['mentions-legales', 'mentions'], ['legal', 'legal-notice', 'imprint'])],
+  ['/compte/achats', T.t('pages.404.p-achats', "Historique d'achat"), kw(['achats', 'historique'], ['purchases', 'orders', 'history'])],
+  ['/compte/parametres', T.t('pages.404.p-parametres', 'Paramètres du compte'), kw(['parametres', 'reglages'], ['settings', 'account', 'preferences'])],
+  ['/discord/', T.t('pages.404.p-discord', 'Discord'), kw(['discord'], ['discord'])]
 ];
 function lev(a, b) {
   const m = a.length, n = b.length; let p = Array.from({ length: n + 1 }, (_, j) => j);

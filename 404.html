@@ -5,49 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
   <meta name="robots" content="noindex">
-  <meta name="description" content="Cette page n'existe pas, ou plus. Remonte à l'accueil du serveur Minecraft The Last.">
+  <meta name="description" data-i18n-attr="content:pages.404.desc" content="Cette page n'existe pas, ou plus. Remonte à l'accueil du serveur Minecraft The Last.">
   <meta name="theme-color" content="#0a0608">
   <!-- Page servie par GitHub Pages pour toute adresse inconnue, à n'importe quelle profondeur : chemins absolus partout. -->
   <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <script>document.documentElement.classList.add("js");</script>
+  <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="/assets/fonts.css">
   <link rel="stylesheet" href="/assets/nether.css">
   <link rel="stylesheet" href="/assets/compte.css">
   <link rel="stylesheet" href="/assets/404.css">
+  <script src="/assets/i18n.js" defer></script>
+  <script src="/assets/lang/en-commun.js" defer></script>
+  <script src="/assets/lang/en-compte.js" defer></script>
+  <script src="/assets/lang/en-pages.js" defer></script>
   <script src="/assets/config.js" defer></script>
   <script src="/assets/mc/mc.js" defer></script>
   <script src="/assets/404.js" defer></script>
   <script src="/assets/compte.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#contenu">Aller au contenu</a>
+  <a class="skip" href="#contenu" data-i18n="pages.404.skip">Aller au contenu</a>
 
   <header class="top solid" id="top">
     <a class="brand" href="/"><img src="/assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale">
-      <a class="tbtn" href="/">Accueil</a>
-      <a class="tbtn" href="/boutique">Boutique</a>
-      <a class="tbtn" href="/chantier">Chantier</a>
-      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+      <a class="tbtn" href="/" data-i18n="nav.home">Accueil</a>
+      <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
+      <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
     </nav>
   </header>
 
   <div class="v-ciel" aria-hidden="true"></div>
 
   <main class="v-main" id="contenu">
-    <p class="v-sur">Erreur 404</p>
-    <h1 class="px v-titre" data-fs="5">Tu as creusé trop&nbsp;loin.</h1>
-    <p class="v-dit">Cette page n'existe pas, ou plus. Sous la bedrock, il n'y a que le vide.</p>
-    <p class="v-peut" hidden>Tu cherchais peut-être : <a class="v-lien" href="/"></a></p>
+    <p class="v-sur" data-i18n="pages.404.sur">Erreur 404</p>
+    <h1 class="px v-titre" data-fs="5" data-i18n="pages.404.titre">Tu as creusé trop&nbsp;loin.</h1>
+    <p class="v-dit" data-i18n="pages.404.dit">Cette page n'existe pas, ou plus. Sous la bedrock, il n'y a que le vide.</p>
+    <p class="v-peut" hidden data-i18n="pages.404.peut">Tu cherchais peut-être : <a class="v-lien" href="/"></a></p>
     <p class="v-sorties">
-      <a class="btn btn-main btn-big v-up" href="/">Remonter à l'accueil</a>
+      <a class="btn btn-main btn-big v-up" href="/" data-i18n="pages.404.up">Remonter à l'accueil</a>
     </p>
   </main>
 
   <footer class="v-fond">
-    <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+    <p data-i18n="foot.unofficial">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
   </footer>
 </body>
 </html>

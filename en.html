@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-i18n-static>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,19 +7,19 @@
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
   <meta name="description" content="The Last is a French Minecraft: Java Edition server with custom NeoForge content. This page describes The Last Launcher: how it signs players in with Microsoft, what it downloads and what data it handles.">
   <link rel="canonical" href="https://thelastmc.fr/en">
-  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/i18n.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="wrap">
-      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
+      <a class="brand" href="/?lang=en"><img src="assets/logo.svg" alt="" width="30" height="30">THE LAST</a>
       <nav class="nav" aria-label="Main navigation">
-        <a href="./" lang="fr">Accueil (FR)</a>
-        <a href="/en" aria-current="page">English</a>
-        <a href="/confidentialite" lang="fr">Privacy (FR)</a>
+        <a href="/?lang=en">Home</a>
+        <a href="/privacy">Privacy</a>
+        <span class="lang-sw" role="group" aria-label="Language"><a href="/?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français">FR</a><a href="/en" data-lang="en" lang="en" hreflang="en" aria-label="English" aria-current="true">EN</a></span>
       </nav>
     </div>
   </header>
@@ -27,7 +27,7 @@
   <main class="doc">
     <div class="wrap">
       <h1>The Last Launcher</h1>
-      <p class="updated">English overview — last updated October 5, 2026</p>
+      <p class="updated">English overview — last updated October 14, 2026</p>
 
       <p><strong>The Last</strong> is an independent French Minecraft: Java Edition server with custom
         content built on NeoForge, currently in development. <strong>The Last Launcher</strong> is its
@@ -69,7 +69,7 @@
           personal data to The Last, except when the player asks it to sign them in to our website: it then
           sends only public proof signed by Mojang (the player certificate and the signed profile), never a
           token.</li>
-        <li>Full privacy policy (French): <a href="/confidentialite">thelastmc.fr/confidentialite</a>.</li>
+        <li>Full privacy policy: <a href="/privacy">thelastmc.fr/privacy</a>.</li>
       </ul>
 
       <h2>Contact</h2>
@@ -82,14 +82,13 @@
       <div class="cols">
         <div>© 2026 The Last — <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a></div>
         <nav aria-label="Legal links">
-          <a href="/confidentialite" lang="fr">Confidentialité</a>
-          <a href="/cgu" lang="fr">Conditions d'utilisation</a>
-          <a href="/mentions-legales" lang="fr">Mentions légales</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms of use</a>
+          <a href="/legal-notice">Legal notice</a>
         </nav>
       </div>
       <div class="disclaimer">
         <p>Not an official Minecraft service. Not approved by or associated with Mojang or Microsoft.</p>
-        <p lang="fr">Service Minecraft non officiel. Non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
       </div>
     </div>
   </footer>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-i18n-static>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,9 +7,13 @@
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
   <meta name="description" content="Quelles données le launcher, le serveur et le site The Last traitent, pourquoi, combien de temps, et comment exercer tes droits.">
   <link rel="canonical" href="https://thelastmc.fr/confidentialite">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/confidentialite">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/privacy">
+  <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/confidentialite">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/i18n.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -19,7 +23,7 @@
         <a href="./">Accueil</a>
         <a href="./#launcher">Le launcher</a>
         <a href="/confidentialite" aria-current="page">Confidentialité</a>
-        <a href="/en" lang="en">English</a>
+        <span class="lang-sw" role="group" aria-label="Langue"><a href="/confidentialite" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><a href="/privacy" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
       </nav>
     </div>
   </header>
@@ -27,7 +31,7 @@
   <main class="doc">
     <div class="wrap">
       <h1>Politique de confidentialité</h1>
-      <p class="updated">Dernière mise à jour : 12 octobre 2026</p>
+      <p class="updated">Dernière mise à jour : 14 octobre 2026</p>
 
       <p>Cette page explique quelles données personnelles sont traitées quand tu utilises
         <strong>The Last Launcher</strong>, le <strong>serveur Minecraft The Last</strong> et ce
@@ -219,6 +223,11 @@
         ne demandent donc pas ton consentement (article 82 de la loi Informatique et Libertés). Ils
         disparaissent quand tu te déconnectes ; si ta session expire toute seule, la marque s'efface à ta
         visite suivante.</p>
+      <p>Que tu sois connecté ou non, le site retient aussi la langue que tu as choisie, dans le stockage local
+        (<code>thelast:lang</code>, qui vaut « fr » ou « en » et rien d'autre). Elle reste dans ton navigateur
+        jusqu'à ce que tu l'effaces et n'est jamais envoyée. Quand tu changes de langue, le site garde aussi, le temps de
+        recharger la page, l'endroit où tu étais (<code>thelast:lang-y</code>, dans le stockage de session) : il est
+        effacé dès que la page est rechargée.</p>
       <p><strong>Qui les reçoit.</strong> Cloudflare, Inc. (États-Unis) héberge le serveur du compte et sa
         base de données ; nous avons demandé que la base soit placée en Europe de l'Ouest. Il agit pour
         notre compte (sous-traitant). Personne
@@ -338,7 +347,6 @@
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">Conditions d'utilisation</a>
           <a href="/mentions-legales">Mentions légales</a>
-          <a href="/en" lang="en">English</a>
         </nav>
       </div>
       <div class="disclaimer">

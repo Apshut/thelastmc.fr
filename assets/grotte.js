@@ -11,6 +11,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };          // les langues (assets/i18n.js)
 const MC = window.MC || { blocks: {}, items: {}, font: {} }, G = window.GROTTE, CFG = window.THE_LAST || {};
 if (!G) return;
 const D = document, root = D.documentElement;
@@ -790,12 +791,12 @@ let eng = null, tried = false, overlay = null, panel = null, lastTag = null, hov
 
 /* ---------- la feuille de route ---------- */
 const parseDay = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
-const longDate = d => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const longDate = d => d.toLocaleDateString(T.locale, { day: 'numeric', month: 'long', year: 'numeric' });
 const STATE = {
-  fait: { c: 'green', ic: 'obsidian', t: s => { const d = parseDay(s.date); return d ? 'Posé le ' + longDate(d) : 'Posé'; } },
-  attente: { c: 'purple', ic: 'crying_obsidian', t: s => { const d = parseDay(s.date); return d ? 'En attente · demandé le ' + longDate(d) : 'En attente'; } },
-  encours: { c: 'yellow', t: () => 'En cours' },
-  avenir: { c: 'gray', t: () => 'À venir' }
+  fait: { c: 'green', ic: 'obsidian', t: s => { const d = parseDay(s.date); return d ? T.t('accueil.state.placed-on', 'Posé le {date}', { date: longDate(d) }) : T.t('accueil.state.placed', 'Posé'); } },
+  attente: { c: 'purple', ic: 'crying_obsidian', t: s => { const d = parseDay(s.date); return d ? T.t('accueil.state.pending-on', 'En attente · demandé le {date}', { date: longDate(d) }) : T.t('accueil.state.pending', 'En attente'); } },
+  encours: { c: 'yellow', t: () => T.t('accueil.state.doing', 'En cours') },
+  avenir: { c: 'gray', t: () => T.t('accueil.state.soon', 'À venir') }
 };
 const stOf = s => STATE[s.state] || STATE.avenir;
 const faces = {};
@@ -811,24 +812,25 @@ function route() {
   STEPS.forEach((s, i) => {
     const st = stOf(s), ic = h('span', { class: 'r-ic', 'aria-hidden': 'true' }), f = st.ic && face16(st.ic);
     if (f) ic.style.backgroundImage = 'url(' + f + ')';
-    const b = h('button', { class: 'r-b', type: 'button' }, ic, h('span', { class: 'r-n', text: s.name }), h('span', { class: 'r-s', text: st.t(s) }));
+    const b = h('button', { class: 'r-b', type: 'button' }, ic, h('span', { class: 'r-n', text: T.pick(s, 'name') }), h('span', { class: 'r-s', text: st.t(s) }));
     b.addEventListener('focus', () => { focusId = i; });
     b.addEventListener('blur', () => { if (focusId === i) focusId = null; });
-    routeOl.appendChild(h('li', { class: 'r-step', 'data-state': STATE[s.state] ? s.state : 'avenir' }, b, s.text ? h('p', { class: 'r-t', text: s.text }) : null));
+    routeOl.appendChild(h('li', { class: 'r-step', 'data-state': STATE[s.state] ? s.state : 'avenir' }, b, T.pick(s, 'text') ? h('p', { class: 'r-t', text: T.pick(s, 'text') }) : null));
   });
 }
 
 /* ---------- l'ouverture : le panneau du squelette ---------- */
 function opening() {
   const L = CFG.launcher || {}, d = L.opening ? new Date(L.opening) : null;
-  if (!d || isNaN(d)) return { sign: ['OUVERTURE', 'pas encore', 'de date'], text: 'Pas encore de date. Elle sera annoncée ici, sur ce panneau, et dans le salon #annonces de notre Discord, nulle part ailleurs.' };
+  const OUV = T.t('accueil.sign.opening', 'OUVERTURE');
+  if (!d || isNaN(d)) return { sign: [OUV, T.t('accueil.sign.nodate-1', 'pas encore'), T.t('accueil.sign.nodate-2', 'de date')], text: T.t('accueil.ouv.nodate', 'Pas encore de date. Elle sera annoncée ici, sur ce panneau, et dans le salon #annonces de notre Discord, nulle part ailleurs.') };
   const day = new Date(d.getFullYear(), d.getMonth(), d.getDate()), today = new Date(), t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const days = Math.round((day - t0) / 864e5), ds = longDate(d), short = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
-  if (days > 1) return { sign: ['OUVERTURE', short, 'dans ' + days + ' jours'], text: 'Ouverture prévue le ' + ds + ', dans ' + days + ' jours.' };
-  if (days === 1) return { sign: ['OUVERTURE', 'demain !'], text: 'Ouverture prévue demain, le ' + ds + '.' };
-  if (days === 0) return { sign: ['OUVERTURE', 'aujourd’hui !'], text: 'Ouverture prévue aujourd’hui, le ' + ds + '.' };
-  if (L.url) return { sign: ['C’EST', 'OUVERT !'], text: 'Le serveur est ouvert depuis le ' + ds + '. Le launcher se télécharge plus haut.' };
-  return { sign: ['OUVERTURE', 'imminente'], text: 'L’ouverture était prévue le ' + ds + ' : elle arrive.' };
+  const days = Math.round((day - t0) / 864e5), ds = longDate(d), short = d.toLocaleDateString(T.locale, { day: 'numeric', month: 'short', year: 'numeric' });
+  if (days > 1) return { sign: [OUV, short, T.t('accueil.sign.in-days', 'dans {n} jours', { n: days })], text: T.t('accueil.ouv.in-days', 'Ouverture prévue le {date}, dans {n} jours.', { date: ds, n: days }) };
+  if (days === 1) return { sign: [OUV, T.t('accueil.sign.tomorrow', 'demain !')], text: T.t('accueil.ouv.tomorrow', 'Ouverture prévue demain, le {date}.', { date: ds }) };
+  if (days === 0) return { sign: [OUV, T.t('accueil.sign.today', 'aujourd’hui !')], text: T.t('accueil.ouv.today', 'Ouverture prévue aujourd’hui, le {date}.', { date: ds }) };
+  if (L.url) return { sign: [T.t('accueil.sign.its', 'C’EST'), T.t('accueil.sign.open', 'OUVERT !')], text: T.t('accueil.ouv.open', 'Le serveur est ouvert depuis le {date}. Le launcher se télécharge plus haut.', { date: ds }) };
+  return { sign: [OUV, T.t('accueil.sign.soon', 'imminente')], text: T.t('accueil.ouv.late', 'L’ouverture était prévue le {date} : elle arrive.', { date: ds }) };
 }
 const OP = opening();
 if (ouvEl) ouvEl.textContent = OP.text;
@@ -836,22 +838,22 @@ if (ouvEl) ouvEl.textContent = OP.text;
 /* ---------- ce qui est posé sur la 3D : le texte du panneau, les étiquettes, l'infobulle ---------- */
 const signEl = h('div', { class: 'g-sign', 'aria-hidden': 'true' });
 OP.sign.forEach(t => { const l = pxLine(t); l.classList.add('glow'); signEl.appendChild(l); });
-const tagNews = pxLabel(h('button', { class: 'g-tag', type: 'button', 'aria-controls': 'g-news' }), 'Le chantier · quoi de neuf ?');
-const tagFaq = pxLabel(h('button', { class: 'g-tag', type: 'button', 'aria-controls': 'g-faq' }), 'Questions');
-const tagUp = pxLabel(h('a', { class: 'g-tag under', href: '#launcher' }), 'Remonter au launcher ↑');
+const tagNews = pxLabel(h('button', { class: 'g-tag', type: 'button', 'aria-controls': 'g-news' }), T.t('accueil.tag.news', 'Le chantier · quoi de neuf ?'));
+const tagFaq = pxLabel(h('button', { class: 'g-tag', type: 'button', 'aria-controls': 'g-faq' }), T.t('accueil.faq.title', 'Questions'));
+const tagUp = pxLabel(h('a', { class: 'g-tag under', href: '#launcher' }), T.t('accueil.tag.up', 'Remonter au launcher ↑'));
 const tip = h('div', { class: 'g-tip', 'aria-hidden': 'true' });
-const cap = h('p', { class: 'g-cap', 'aria-hidden': 'true' }, pxLine('Chaque bloc du portail est une étape du projet. ' + (matchMedia('(hover: hover)').matches ? 'Survole-les.' : 'Touche-les.')));
+const cap = h('p', { class: 'g-cap', 'aria-hidden': 'true' }, pxLine(matchMedia('(hover: hover)').matches ? T.t('accueil.cap.hover', 'Chaque bloc du portail est une étape du projet. Survole-les.') : T.t('accueil.cap.touch', 'Chaque bloc du portail est une étape du projet. Touche-les.')));
 function fillTip(i) {
   const s = STEPS[i]; tip.textContent = ''; if (!s) return;
   const st = stOf(s), add = (t, c, wrap) => { const p = pxLine(t); p.classList.add('tl', c); if (wrap) p.classList.add('wrap'); tip.appendChild(p); };
-  add(s.name, 'white'); add(st.t(s), st.c); if (s.text) add(s.text, 'lore', true);
+  add(T.pick(s, 'name'), 'white'); add(st.t(s), st.c); if (T.pick(s, 'text')) add(T.pick(s, 'text'), 'lore', true);
 }
 
 /* ---------- les panneaux : nouvelles et questions ---------- */
 const docHome = D.createComment('g-doc');
 const panels = [news, faq].filter(Boolean);
 panels.forEach(p => {
-  const x = h('button', { class: 'g-x', type: 'button', 'aria-label': 'Fermer' }, '×');
+  const x = h('button', { class: 'g-x', type: 'button', 'aria-label': T.t('accueil.close', 'Fermer') }, '×');
   x.addEventListener('click', () => toggle(null));
   p.prepend(x);
   const hd = $('h3', p); if (hd) hd.tabIndex = -1;

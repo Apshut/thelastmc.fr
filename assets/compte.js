@@ -20,6 +20,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const D = document, W = window;
 const CFG = (W.THE_LAST && W.THE_LAST.compte) || {};
 const MC = W.MC || null;
@@ -52,22 +53,22 @@ if (LOCAL && Q.get('signal') === '1') poserSignal();
 
 /* ---------- erreurs ---------- */
 const MESSAGES = {
-  reseau: 'Impossible de joindre le serveur des comptes. Vérifie ta connexion, puis réessaie.',
-  delai: 'Le serveur des comptes met trop de temps à répondre. Réessaie dans un moment.',
-  hors_ligne: "La connexion au site n'est pas encore en ligne. Elle ouvrira avec le launcher.",
-  invalide: "Ce lien n'est pas valide. Relance « Mon compte sur le site » depuis le launcher.",
-  confirmation: 'Recopie exactement ton pseudo pour confirmer.',
-  non_connecte: "Tu n'es pas connecté.",
-  origine: "Cette page n'a pas le droit d'utiliser ton compte.",
-  acces_ferme: "La connexion au site n'est pas encore ouverte. Elle le sera à l'ouverture du serveur.",
-  autre_reseau: 'Ce lien a été ouvert sur un autre réseau que ton launcher. Ouvre-le sur le même ordinateur. Si ton navigateur passe par un VPN, coupe-le le temps de la connexion.',
-  reconnexion_requise: 'Pour supprimer ton compte, relance « Mon compte sur le site » depuis le launcher, puis recommence dans les 10 minutes.',
-  code_invalide: 'Ce lien a expiré ou a déjà servi. Relance « Mon compte sur le site » depuis le launcher.',
-  introuvable: "Cet appareil n'est plus connecté à ton compte.",
-  limite: 'Trop de tentatives. Réessaie dans un moment.',
-  maintenance: 'La connexion au site est en pause. Réessaie plus tard.',
-  indisponible: 'Le service est momentanément indisponible. Réessaie dans un moment.',
-  inconnu: "Quelque chose n'a pas marché. Réessaie dans un moment."
+  reseau: T.t('compte.err.reseau', 'Impossible de joindre le serveur des comptes. Vérifie ta connexion, puis réessaie.'),
+  delai: T.t('compte.err.delai', 'Le serveur des comptes met trop de temps à répondre. Réessaie dans un moment.'),
+  hors_ligne: T.t('compte.err.hors-ligne', "La connexion au site n'est pas encore en ligne. Elle ouvrira avec le launcher."),
+  invalide: T.t('compte.err.invalide', "Ce lien n'est pas valide. Relance « Mon compte sur le site » depuis le launcher."),
+  confirmation: T.t('compte.err.confirmation', 'Recopie exactement ton pseudo pour confirmer.'),
+  non_connecte: T.t('compte.err.non-connecte', "Tu n'es pas connecté."),
+  origine: T.t('compte.err.origine', "Cette page n'a pas le droit d'utiliser ton compte."),
+  acces_ferme: T.t('compte.err.acces-ferme', "La connexion au site n'est pas encore ouverte. Elle le sera à l'ouverture du serveur."),
+  autre_reseau: T.t('compte.err.autre-reseau', 'Ce lien a été ouvert sur un autre réseau que ton launcher. Ouvre-le sur le même ordinateur. Si ton navigateur passe par un VPN, coupe-le le temps de la connexion.'),
+  reconnexion_requise: T.t('compte.err.reconnexion-requise', 'Pour supprimer ton compte, relance « Mon compte sur le site » depuis le launcher, puis recommence dans les 10 minutes.'),
+  code_invalide: T.t('compte.err.code-invalide', 'Ce lien a expiré ou a déjà servi. Relance « Mon compte sur le site » depuis le launcher.'),
+  introuvable: T.t('compte.err.introuvable', "Cet appareil n'est plus connecté à ton compte."),
+  limite: T.t('compte.err.limite', 'Trop de tentatives. Réessaie dans un moment.'),
+  maintenance: T.t('compte.err.maintenance', 'La connexion au site est en pause. Réessaie plus tard.'),
+  indisponible: T.t('compte.err.indisponible', 'Le service est momentanément indisponible. Réessaie dans un moment.'),
+  inconnu: T.t('compte.err.inconnu', "Quelque chose n'a pas marché. Réessaie dans un moment.")
 };
 class ErreurCompte extends Error {
   constructor(code, message, statut, retryAfter) {
@@ -201,6 +202,7 @@ function h(tag, attrs, ...kids) {
     if (k === 'class') e.className = v;
     else if (k === 'text') e.textContent = v;
     else if (k === 'style') e.style.cssText = v;
+    else if (k === 'html') e.innerHTML = v;   // seulement des textes écrits ici (traductions), jamais ce qui vient de l'API
     else e.setAttribute(k, v);
   }
   kids.forEach(c => { if (c) e.appendChild(typeof c === 'string' ? D.createTextNode(c) : c); });
@@ -409,21 +411,21 @@ function enseigne(contenu, cls) {
 }
 /* « Compte Minecraft vérifié », en vert du jeu, police du jeu */
 function verifie() {
-  return h('p', { class: 'cpt-verif' }, h('img', { class: 'cpt-coche', src: COCHE, alt: '', width: '14', height: '12' }), pxLabel(h('span'), 'Compte Minecraft vérifié'));
+  return h('p', { class: 'cpt-verif' }, h('img', { class: 'cpt-coche', src: COCHE, alt: '', width: '14', height: '12' }), pxLabel(h('span'), T.t('compte.verifie', 'Compte Minecraft vérifié')));
 }
 /* Le texte d'invitation, le même dans le panneau et sur les pages du compte */
 function invitation(titreTag) {
   const action = OUVERT && API
     ? h('div', { class: 'cpt-go' },
-        h('p', { class: 'cpt-how' }, 'Dans le launcher, clique sur ', h('b', { text: 'Mon compte sur le site' }), '. Ta première connexion crée ton compte.'),
-        h('p', { class: 'cpt-dl' }, 'Pas encore le launcher ? ', h('a', { href: '/#launcher', text: 'Télécharger' })))
-    : h('p', { class: 'cpt-wait' }, h('span', { class: 'cpt-wait-i', 'aria-hidden': 'true' }), 'La connexion ouvrira avec le launcher.');
+        h('p', { class: 'cpt-how', html: T.t('compte.how', 'Dans le launcher, clique sur <b>Mon compte sur le site</b>. Ta première connexion crée ton compte.') }),
+        h('p', { class: 'cpt-dl', html: T.t('compte.dl', 'Pas encore le launcher ? <a href="/#launcher">Télécharger</a>') }))
+    : h('p', { class: 'cpt-wait' }, h('span', { class: 'cpt-wait-i', 'aria-hidden': 'true' }), T.t('compte.ouvrira', 'La connexion ouvrira avec le launcher.'));
   return [
-    pxLabel(h(titreTag || 'h2', { class: 'cpt-titre' }), 'Ton compte The Last'),
-    h('p', { class: 'cpt-plus', text: 'Retrouve tes achats, ta tête de joueur sur le site et, à l’ouverture, tes Braises.' }),
+    pxLabel(h(titreTag || 'h2', { class: 'cpt-titre' }), T.t('compte.titre', 'Ton compte The Last')),
+    h('p', { class: 'cpt-plus', text: T.t('compte.plus', 'Retrouve tes achats, ta tête de joueur sur le site et, à l’ouverture, tes Braises.') }),
     action,
-    h('p', { class: 'cpt-trust' }, picto(P_CADENAS), 'On ne te demandera jamais ton mot de passe.'),
-    h('a', { class: 'cpt-why', href: '/#volkar', text: 'Pourquoi un compte ?' })
+    h('p', { class: 'cpt-trust' }, picto(P_CADENAS), T.t('compte.trust', 'On ne te demandera jamais ton mot de passe.')),
+    h('a', { class: 'cpt-why', href: '/#volkar', text: T.t('compte.pourquoi', 'Pourquoi un compte ?') })
   ];
 }
 TheLastCompte.ui = { h, pxLabel, tete3d, verifierImage, signe, enseigne, verifie, invitation, icone };
@@ -453,8 +455,8 @@ const ICI = location.pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
 
 function nomBouton() {
   const e = courant.etat;
-  if (e === 'connecte') return 'Compte de ' + courant.moi.pseudo;
-  return e === 'chargement' ? 'Mon compte (chargement)' : e === 'injoignable' ? 'Mon compte (injoignable)' : 'Mon compte (non connecté)';
+  if (e === 'connecte') return T.t('compte.btn.compte', 'Compte de {pseudo}', { pseudo: courant.moi.pseudo });
+  return e === 'chargement' ? T.t('compte.btn.chargement', 'Mon compte (chargement)') : e === 'injoignable' ? T.t('compte.btn.injoignable', 'Mon compte (injoignable)') : T.t('compte.btn.deconnecte', 'Mon compte (non connecté)');
 }
 function monterBouton() {
   const e = courant.etat;
@@ -475,27 +477,27 @@ function monterPanneau() {
   let corps;
   if (e === 'connecte') {
     const face = h('img', { class: 'cpt-face', src: teteOk || facesGrille('neutre').flat, alt: '', width: '48', height: '48' });
-    const sortie = h('button', { class: 'cpt-ent cpt-sortie', type: 'button' }, icone('porte'), h('span', { text: 'Se déconnecter' }));
+    const sortie = h('button', { class: 'cpt-ent cpt-sortie', type: 'button' }, icone('porte'), h('span', { text: T.t('compte.sortie', 'Se déconnecter') }));
     sortie.addEventListener('click', () => deconnecter(sortie));
     corps = h('div', { class: 'cpt-in' },
       h('div', { class: 'cpt-id' }, h('span', { class: 'cpt-slot' }, face),
         h('div', { class: 'cpt-qui' }, pxLabel(h('p', { class: 'cpt-pseudo' }), courant.moi.pseudo), verifie())),
       h('ul', { class: 'cpt-liste' },
-        entree('/compte/achats', 'written_book', "Historique d'achat"),
-        entree('/compte/parametres', 'name_tag', 'Paramètres'),
-        entree('/#volkar', 'soul_lantern', 'Aide')),
+        entree('/compte/achats', 'written_book', T.t('compte.achats', "Historique d'achat")),
+        entree('/compte/parametres', 'name_tag', T.t('compte.parametres', 'Paramètres')),
+        entree('/#volkar', 'soul_lantern', T.t('compte.aide', 'Aide'))),
       h('hr', { class: 'cpt-sep' }),
       h('div', { class: 'cpt-bas' }, sortie),
       h('p', { class: 'cpt-err', role: 'alert', hidden: '' }));
   } else if (e === 'injoignable' || e === 'chargement') {
-    const retry = pxLabel(h('button', { class: 'btn cpt-main', type: 'button' }), 'Réessayer');
+    const retry = pxLabel(h('button', { class: 'btn cpt-main', type: 'button' }), T.t('compte.reessayer', 'Réessayer'));
     retry.addEventListener('click', () => { TheLastCompte.etat(); });
     corps = h('div', { class: 'cpt-in' },
-      pxLabel(h('h2', { class: 'cpt-titre' }), 'Ton compte The Last'),
+      pxLabel(h('h2', { class: 'cpt-titre' }), T.t('compte.titre', 'Ton compte The Last')),
       h('p', { class: 'cpt-wait' }, h('span', { class: 'cpt-wait-i', 'aria-hidden': 'true' }),
-        e === 'chargement' ? 'Chargement de ton compte…' : 'Ton compte est momentanément injoignable.'),
+        e === 'chargement' ? T.t('compte.chargement', 'Chargement de ton compte…') : T.t('compte.injoignable', 'Ton compte est momentanément injoignable.')),
       e === 'injoignable' ? h('div', { class: 'cpt-go' }, retry) : null,
-      h('a', { class: 'cpt-why', href: '/#volkar', text: 'Aide' }));
+      h('a', { class: 'cpt-why', href: '/#volkar', text: T.t('compte.aide', 'Aide') }));
   } else {
     corps = h('div', { class: 'cpt-in' }, ...invitation('h2'));
   }
@@ -534,10 +536,10 @@ async function deconnecter(sortie) {
   try { await TheLastCompte.deconnecter(); }
   catch (e) {
     sortie.disabled = false;
-    const err = panel.querySelector('.cpt-err'); if (err) { err.textContent = 'La déconnexion n’a pas abouti. ' + e.message; err.hidden = false; }
+    const err = panel.querySelector('.cpt-err'); if (err) { err.textContent = T.t('compte.deco.echec', 'La déconnexion n’a pas abouti. {msg}', { msg: e.message }); err.hidden = false; }
     return;
   }
-  fermer(false); btn.focus(); annoncer('Tu es déconnecté.');
+  fermer(false); btn.focus(); annoncer(T.t('compte.deconnecte', 'Tu es déconnecté.'));
 }
 
 /* chaque changement d'état redessine le bouton (et le panneau s'il est ouvert) */

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="Le journal du chantier du serveur Minecraft The Last : toutes les nouveautés et corrections du site, du launcher et du jeu, mois par mois.">
-  <meta property="og:title" content="Le chantier — The Last">
-  <meta property="og:description" content="Tout ce qui avance sur le site, le launcher et le jeu, au fil des corrections.">
+  <meta name="description" data-i18n-attr="content:pages.chantier.desc" content="Le journal du chantier du serveur Minecraft The Last : toutes les nouveautés et corrections du site, du launcher et du jeu, mois par mois.">
+  <meta property="og:title" data-i18n-attr="content:pages.chantier.og-title" content="Le chantier — The Last">
+  <meta property="og:description" data-i18n-attr="content:pages.chantier.og-desc" content="Tout ce qui avance sur le site, le launcher et le jeu, au fil des corrections.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://thelastmc.fr/chantier">
   <meta property="og:image" content="https://thelastmc.fr/assets/og.jpg">
@@ -16,56 +16,64 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0a0608">
   <link rel="canonical" href="https://thelastmc.fr/chantier">
+  <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/chantier">
+  <link rel="alternate" hreflang="en" href="https://thelastmc.fr/chantier?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://thelastmc.fr/chantier">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <script>document.documentElement.classList.add("js");</script>
+  <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="assets/fonts.css">
   <link rel="stylesheet" href="assets/nether.css">
   <link rel="stylesheet" href="assets/chantier.css">
   <link rel="stylesheet" href="assets/compte.css">
+  <script src="assets/i18n.js" defer></script>
+  <script src="assets/lang/en-commun.js" defer></script>
+  <script src="assets/lang/en-compte.js" defer></script>
+  <script src="assets/lang/en-pages.js" defer></script>
   <script src="assets/config.js" defer></script>
   <script src="assets/mc/mc.js" defer></script>
   <script src="assets/chantier.js" defer></script>
   <script src="assets/compte.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#histoire">Aller au journal</a>
+  <a class="skip" href="#histoire" data-i18n="pages.chantier.skip">Aller au journal</a>
 
   <header class="top solid" id="top">
     <a class="brand" href="/"><img src="assets/logo.svg" alt="" width="28" height="28"><span>THE LAST</span></a>
-    <nav aria-label="Navigation principale">
-      <a class="tbtn" href="/">Accueil</a>
-      <a class="tbtn" href="/boutique">Boutique</a>
-      <a class="tbtn tbtn-main" href="/chantier" aria-current="page">Chantier</a>
-      <a class="tbtn" href="/en" lang="en" hreflang="en">EN</a>
+    <nav aria-label="Navigation principale" data-i18n-attr="aria-label:nav.aria">
+      <a class="tbtn" href="/" data-i18n="nav.home">Accueil</a>
+      <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
+      <a class="tbtn tbtn-main" href="/chantier" aria-current="page" data-i18n="nav.devlog">Chantier</a>
+      <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
     </nav>
   </header>
 
   <main class="ch-main">
-    <h1 class="px" data-fs="5">Le chantier</h1>
-    <p class="sub">Tout ce qui avance sur le site, le launcher et le jeu, au fil des corrections, mois par mois.
+    <h1 class="px" data-fs="5" data-i18n="pages.chantier.h1">Le chantier</h1>
+    <p class="sub" data-i18n="pages.chantier.sub">Tout ce qui avance sur le site, le launcher et le jeu, au fil des corrections, mois par mois.
       Le journal se met à jour tout seul, à chaque nouveauté.</p>
 
-    <div class="ch-filtres" role="group" aria-label="Projets affichés">
-      <button class="ch-f" type="button" data-p="site" aria-pressed="true">Site</button>
-      <button class="ch-f" type="button" data-p="launcher" aria-pressed="true">Launcher</button>
-      <button class="ch-f" type="button" data-p="jeu" aria-pressed="true">Jeu</button>
+    <div class="ch-filtres" role="group" aria-label="Projets affichés" data-i18n-attr="aria-label:pages.chantier.filtres">
+      <button class="ch-f" type="button" data-p="site" aria-pressed="true" data-i18n="pages.chantier.p-site">Site</button>
+      <button class="ch-f" type="button" data-p="launcher" aria-pressed="true" data-i18n="pages.chantier.p-launcher">Launcher</button>
+      <button class="ch-f" type="button" data-p="jeu" aria-pressed="true" data-i18n="pages.chantier.p-jeu">Jeu</button>
     </div>
 
     <div class="ch-histoire" id="histoire" aria-live="polite">
-      <p class="ch-vide">Le journal du chantier s'affiche ici.</p>
+      <p class="ch-vide" data-i18n="pages.chantier.ici">Le journal du chantier s'affiche ici.</p>
     </div>
     <noscript><p class="ch-vide">Le journal du chantier a besoin de JavaScript pour s'afficher.</p></noscript>
   </main>
 
   <footer class="ch-foot">
-    <p>Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
-    <nav aria-label="Liens légaux">
+    <p data-i18n="foot.unofficial">Service Minecraft non officiel, non approuvé par Mojang ou Microsoft, ni associé à eux.</p>
+    <nav aria-label="Liens légaux" data-i18n-attr="aria-label:foot.legal-aria">
       <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>
-      <a href="/confidentialite">Confidentialité</a>
-      <a href="/cgu">Conditions d'utilisation</a>
-      <a href="/mentions-legales">Mentions légales</a>
+      <a href="/confidentialite" data-i18n="foot.privacy">Confidentialité</a>
+      <a href="/cgu" data-i18n="foot.terms">Conditions d'utilisation</a>
+      <a href="/mentions-legales" data-i18n="foot.legal">Mentions légales</a>
     </nav>
   </footer>
 </body>

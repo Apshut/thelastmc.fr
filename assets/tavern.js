@@ -9,6 +9,7 @@
 (() => {
 'use strict';
 
+const T = window.I18N || { lang: 'fr', locale: 'fr-FR', t: (k, s, v) => v ? s.replace(/\{(\w+)\}/g, (m, x) => x in v ? v[x] : m) : s, pick: (o, f) => o && o[f] };
 const CFG = window.THE_LAST || {}, MC = window.MC || { blocks: {}, items: {}, font: {} };
 const KEEPER = window.TAVERN_KEEPER && Array.isArray(window.TAVERN_KEEPER.parts) && typeof window.TAVERN_KEEPER.pose === 'function' ? window.TAVERN_KEEPER : null;
 const D = document, root = D.documentElement;
@@ -960,8 +961,8 @@ const copy = c => { const o = mk(c.width, c.height); o.getContext('2d').drawImag
 
 /* ================= La page ================= */
 const S = CFG.shop || {}, LIST = (S.products || []).filter(p => p && p.id);
-const eur = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
-const nb = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const eur = new Intl.NumberFormat(T.locale, { style: 'currency', currency: 'EUR' });
+const nb = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, T.lang === 'en' ? ',' : ' ');
 const stage = $('#stage'), canvas = $('#tavern'), etal = $('#etal'), dealBox = $('#deal'), say = $('#say'), topBar = $('#top');
 const IMG = {};
 const loadImg = src => new Promise((ok, ko) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ko(new Error('image ' + src)); i.src = src; });
@@ -970,12 +971,15 @@ let eng = null, desk = deskMQ.matches, tall = false;
 const items = LIST.map(p => ({ id: p.id, prop: PROPS[p.prop] ? p.prop : p.kind === 'don' ? 'jar' : 'heap', p, pos: [0, 1.0625, 2], ry: 0, hl: 0, btn: null }));
 
 /* ---------- l'étal : un bouton par article, posé sur l'objet 3D ---------- */
-function priceLine(p) { return p.kind === 'don' ? h('span', null, 'Don · ' + eur.format(p.price)) : h('span', null, nb(p.braises), h('span', { class: 'tag-b', text: ' Braises' }), ' · ' + eur.format(p.price)); }
-function ariaOf(p) { return p.kind === 'don' ? p.name + ' : don sans contrepartie, ' + eur.format(p.price) + ' ou plus' : p.name + ' : ' + nb(p.braises) + ' Braises, ' + eur.format(p.price); }
+function priceLine(p) { return p.kind === 'don' ? h('span', null, T.t('taverne.tag-don', 'Don · {price}', { price: eur.format(p.price) })) : h('span', null, nb(p.braises), h('span', { class: 'tag-b', text: ' Braises' }), ' · ' + eur.format(p.price)); }
+function ariaOf(p) {
+  const name = T.pick(p, 'name'), price = eur.format(p.price);
+  return p.kind === 'don' ? T.t('taverne.aria-don', '{name} : don sans contrepartie, {price} ou plus', { name, price }) : T.t('taverne.aria-pack', '{name} : {n} Braises, {price}', { name, n: nb(p.braises), price });
+}
 function buildEtal() {
   etal.textContent = '';
   items.forEach(it => {
-    const tag = h('span', { class: 'tag', 'aria-hidden': 'true' }, pxLabel(h('span', { class: 'tag-n' }), it.p.short || it.p.name, 2, true), h('span', { class: 'tag-p' }, priceLine(it.p)));
+    const tag = h('span', { class: 'tag', 'aria-hidden': 'true' }, pxLabel(h('span', { class: 'tag-n' }), T.pick(it.p, 'short') || T.pick(it.p, 'name'), 2, true), h('span', { class: 'tag-p' }, priceLine(it.p)));
     const b = h('button', { class: 'loot', type: 'button', 'aria-label': ariaOf(it.p), 'aria-pressed': 'false', 'aria-controls': 'deal', 'data-id': it.id, 'data-prop': it.prop }, h('span', { class: 'loot-ic', 'aria-hidden': 'true' }, copy(coinIcon())), tag);
     b.addEventListener('pointerenter', () => hover(it.id, true));
     b.addEventListener('pointerleave', () => hover(it.id, false));
@@ -1048,10 +1052,19 @@ function stagger() {
   // le prix reste affiché : d'abord sans le mot « Braises » (comme sur mobile), puis en quinconce ; il ne disparaît
   // qu'en dernier recours (il reste dans le panneau de l'article et dans le nom du bouton). Il disparaissait dès que
   // deux étiquettes se touchaient, soit dans toutes les fenêtres de moins de 1100 px de large environ
-  if (!clash(false)) return;
-  etal.classList.add('short'); if (!clash(false)) return;
-  etal.classList.add('stagger'); if (!clash(true)) return;
-  etal.classList.add('compact');
+  if (!clash(false)) return borner();
+  etal.classList.add('short'); if (!clash(false)) return borner();
+  etal.classList.add('stagger'); if (!clash(true)) return borner();
+  etal.classList.add('compact'); borner();
+}
+// sur téléphone, une étiquette au bord de l'écran se décale pour rester entière (calculé sans la transformation en cours)
+function borner() {
+  items.forEach(it => {
+    const t = it.btn && it.btn.querySelector('.tag'); if (!t) return;
+    const b = it.btn.getBoundingClientRect(), c = (b.left + b.right) / 2, w = t.offsetWidth, m = 6;
+    const dx = c - w / 2 < m ? m - (c - w / 2) : c + w / 2 > innerWidth - m ? innerWidth - m - (c + w / 2) : 0;
+    if (dx) t.style.setProperty('--tx', Math.round(dx) + 'px'); else t.style.removeProperty('--tx');
+  });
 }
 function relayout() {
   restag = true;
@@ -1071,25 +1084,25 @@ function deal(id) {
   const it = items.find(x => x.id === id), p = it && it.p;
   dealBox.textContent = '';
   if (!p) {
-    dealBox.append(h('h2', { class: 'deal-t', id: 'deal-name', text: 'Le comptoir' }),
-      h('p', { class: 'deal-lore', text: "Choisis ce qui est posé devant le comptoir. On paie ici en euros, on reçoit des Braises, et on les dépense en jeu, au comptoir du tavernier." }));
+    dealBox.append(h('h2', { class: 'deal-t', id: 'deal-name', text: T.t('taverne.counter', 'Le comptoir') }),
+      h('p', { class: 'deal-lore', text: T.t('taverne.counter-lore', "Choisis ce qui est posé devant le comptoir. On paie ici en euros, on reçoit des Braises, et on les dépense en jeu, au comptoir du tavernier.") }));
     if (desk) tighten();
     return;
   }
   const url = checkout(p);
-  const buy = url ? pxLabel(h('a', { class: 'btn btn-main', href: url, rel: 'noopener' }), p.kind === 'don' ? 'Donner' : 'Acheter')
-    : pxLabel(h('button', { class: 'btn btn-locked', type: 'button', disabled: '' }), 'Bientôt');
+  const buy = url ? pxLabel(h('a', { class: 'btn btn-main', href: url, rel: 'noopener' }), p.kind === 'don' ? T.t('taverne.give', 'Donner') : T.t('taverne.buy', 'Acheter'))
+    : pxLabel(h('button', { class: 'btn btn-locked', type: 'button', disabled: '' }), T.t('taverne.soon', 'Bientôt'));
   dealBox.append(
-    h('div', { class: 'deal-head' }, h('span', { class: 'deal-ic', 'aria-hidden': 'true' }, copy(coinIcon())), h('h2', { class: 'deal-t', id: 'deal-name', text: p.name })),
-    h('p', { class: 'deal-q' }, p.kind === 'don' ? h('b', { text: 'Sans contrepartie' }) : h('b', { text: nb(p.braises) + ' Braises' }), h('span', { class: 'deal-p', text: eur.format(p.price) + (p.kind === 'don' ? ' ou plus' : '') })),
-    h('p', { class: 'deal-lore', text: p.lore || '' }),
-    h('div', { class: 'deal-buy' }, buy, h('span', { class: 'deal-note', text: url ? 'Paiement chez notre partenaire.' : "Paiement à l'ouverture du serveur." })));
+    h('div', { class: 'deal-head' }, h('span', { class: 'deal-ic', 'aria-hidden': 'true' }, copy(coinIcon())), h('h2', { class: 'deal-t', id: 'deal-name', text: T.pick(p, 'name') })),
+    h('p', { class: 'deal-q' }, p.kind === 'don' ? h('b', { text: T.t('taverne.no-return', 'Sans contrepartie') }) : h('b', { text: nb(p.braises) + ' Braises' }), h('span', { class: 'deal-p', text: eur.format(p.price) + (p.kind === 'don' ? ' ' + T.t('taverne.or-more', 'ou plus') : '') })),
+    h('p', { class: 'deal-lore', text: T.pick(p, 'lore') || '' }),
+    h('div', { class: 'deal-buy' }, buy, h('span', { class: 'deal-note', text: url ? T.t('taverne.pay-partner', 'Paiement chez notre partenaire.') : T.t('taverne.pay-later', "Paiement à l'ouverture du serveur.") })));
   if (desk) tighten();
 }
 
 /* ---------- humeur du tavernier ---------- */
 const MOODS = ['idle', 'angry', 'threat'], FORCED = MOODS.indexOf(QS.get('mood')) >= 0 ? QS.get('mood') : null;
-const LINES = Object.assign({ idle: ['Tu prends quoi ?'], threat: ['On touche avec les yeux.'], angry: ['Pas touche !'], don: ['Un don ? Merci.'] }, KEEPER && KEEPER.lines || {});
+const LINES = Object.assign({ idle: [T.t('taverne.fb-idle', 'Tu prends quoi ?')], threat: [T.t('taverne.fb-threat', 'On touche avec les yeux.')], angry: [T.t('taverne.fb-angry', 'Pas touche !')], don: [T.t('taverne.fb-don', 'Un don ? Merci.')] }, KEEPER && KEEPER.lines || {});
 let hoverId = null, selId = null, angryUntil = -1, nextBurst = 0, mood = 'idle', moodT0 = 0, now0 = 0, sayUntil = 0, sayN = { idle: 0, threat: 0, angry: 0, don: 0 }, nextIdleSay = 6;
 /* le tronc de soutien ne fâche pas le tavernier : il le regarde, et remercie */
 const isDon = id => { const it = id && items.find(x => x.id === id); return !!(it && it.p.kind === 'don'); };
@@ -1170,10 +1183,10 @@ function step(t, dt, since) {
 }
 
 function start() {
-  $$('.top .tbtn').forEach(b => pxLabel(b, b.textContent));
+  $$('.top .tbtn').forEach(b => { if (b.classList.contains('lang-sw')) $$('a', b).forEach(a => pxLabel(a, a.textContent)); else pxLabel(b, b.textContent); });   // FR | EN : chaque moitié
   $$('.px').forEach(pxText);
   root.style.setProperty('--lock', 'url(' + art(['..kkkk..', '.k....k.', '.k....k.', 'kkkkkkkk', 'kyyyyyyk', 'kyyddyyk', 'kyyddyyk', 'kyyyyyyk', 'kkkkkkkk'], { k: '#1c1410', y: '#d9a521', d: '#4a3210' }).toDataURL() + ')');
-  if (S.checkoutUrl) { const st = $('#shop-state'); if (st) st.textContent = 'Taverne ouverte. Paiement sécurisé chez notre partenaire.'; }
+  if (S.checkoutUrl) { const st = $('#shop-state'); if (st) st.textContent = T.t('taverne.state-open', 'Taverne ouverte. Paiement sécurisé chez notre partenaire.'); }
   buildEtal(); deal(null);
   if (!QS.has('nogl') && IMG.blocks) {
     try { eng = Engine(canvas, IMG, { still: SHOT }); } catch (e) { eng = null; if (window.console) console.error(e); }

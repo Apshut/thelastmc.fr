@@ -51,6 +51,9 @@
 .cpt-panel { position: absolute; right: 0; top: 100%; width: 368px; z-index: 2; }
 .cpt-sign { position: relative; padding-top: 16px; transform-origin: 50% 0; filter: drop-shadow(0 14px 18px rgb(0 0 0 / .55)); }
 .cpt-panel.balance .cpt-sign { animation: cpt-balance .9s cubic-bezier(.3, .7, .3, 1) both; }
+/* à la fermeture, la même à l'envers ; compte.js cache le panneau quand elle finit */
+.cpt-panel.retour { pointer-events: none; }
+.cpt-panel.retour .cpt-sign { animation: cpt-balance .9s cubic-bezier(.3, .7, .3, 1) reverse both; }
 @keyframes cpt-balance {
   0%   { transform: translateY(-10px) rotate(-3.5deg); opacity: 0; }
   22%  { opacity: 1; }

@@ -502,9 +502,12 @@ function monterPanneau() {
   panel.appendChild(enseigne(corps));
 }
 
-const ouvert = () => !panel.hidden;
+let repli = 0;                              // la fermeture en cours : l'enseigne remonte, puis le panneau se cache
+const ouvert = () => !panel.hidden && !repli;
+function cacher() { clearTimeout(repli); repli = 0; panel.hidden = true; panel.inert = false; panel.classList.remove('balance', 'retour'); }
 function ouvrir(sansGeste) {
   if (ouvert()) return;
+  if (repli) cacher();                      // rouvert pendant qu'il remontait : il repart de zéro
   monterPanneau();
   panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); wrap.classList.add('ouvert');
   if (!REDUIT.matches && !sansGeste) { panel.classList.remove('balance'); void panel.offsetWidth; panel.classList.add('balance'); }
@@ -513,7 +516,11 @@ function ouvrir(sansGeste) {
 }
 function fermer(rendreFocus) {
   if (!ouvert()) return;
-  panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); wrap.classList.remove('ouvert'); panel.classList.remove('balance');
+  btn.setAttribute('aria-expanded', 'false'); wrap.classList.remove('ouvert');
+  // l'animation de l'ouverture, à l'envers : l'enseigne se balance, remonte et s'efface (0,9 s, comme dans compte.css) ;
+  // pendant ce temps, elle ne prend plus ni clic ni focus
+  if (REDUIT.matches) cacher();
+  else { panel.inert = true; panel.classList.remove('balance'); void panel.offsetWidth; panel.classList.add('retour'); repli = setTimeout(cacher, 900); }
   if (teteBtn) teteBtn.querySelectorAll('.cpt-eye').forEach(x => x.classList.remove('vif'));
   if (rendreFocus) btn.focus();
 }

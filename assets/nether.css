@@ -432,12 +432,13 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 @media (max-width: 700px) { .toasts { top: auto; bottom: 70px; right: 8px; } }
 
 /* ---------- Écran de débogage F3 ---------- */
-.f3 { position: fixed; z-index: 24; left: 8px; top: 66px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; pointer-events: none; color: #e0e0e0; transition: opacity .3s; }
+.f3 { position: fixed; z-index: 24; left: 8px; top: 66px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; pointer-events: none; color: #e0e0e0; opacity: 0; transition: opacity .3s; }
 .f3 > span { padding: 1px 2px 0; background: rgb(80 80 80 / .55); }
 .f3 .pxl svg { filter: drop-shadow(2px 2px 0 #383838); }
 .f3 .hi { color: #ffff55; }
 @media (max-width: 999px), (pointer: coarse) { .f3 { display: none; } }
-.ready:not(.scrolled) .f3, .ready:not(.in-scene) .f3 { opacity: 0; }
+/* caché par défaut : il n'apparaît que dans la scène, une fois descendu (il ne s'allume pas puis s'éteint à la fin du chargement) */
+.ready.scrolled.in-scene .f3 { opacity: 1; }
 
 /* ---------- La prise : une vraie présence sur la lave ---------- */
 .js .catch.hooked { filter: drop-shadow(0 16px 0 rgb(0 0 0 / .32)) drop-shadow(0 0 36px rgb(255 120 30 / .45)); }

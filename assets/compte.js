@@ -519,10 +519,10 @@ function ouvrir(sansGeste) {
 function fermer(rendreFocus) {
   if (!ouvert()) return;
   btn.setAttribute('aria-expanded', 'false'); wrap.classList.remove('ouvert');
-  // l'animation de l'ouverture, à l'envers : l'enseigne se balance, remonte et s'efface (0,9 s, comme dans compte.css) ;
+  // le miroir de l'arrivée, sans le balancement : l'enseigne remonte et s'efface (0,25 s, comme dans compte.css) ;
   // pendant ce temps, elle ne prend plus ni clic ni focus
   if (REDUIT.matches) cacher();
-  else { panel.inert = true; panel.classList.remove('balance'); void panel.offsetWidth; panel.classList.add('retour'); repli = setTimeout(cacher, 900); }
+  else { panel.inert = true; panel.classList.remove('balance'); void panel.offsetWidth; panel.classList.add('retour'); repli = setTimeout(cacher, 250); }
   if (teteBtn) teteBtn.querySelectorAll('.cpt-eye').forEach(x => x.classList.remove('vif'));
   if (rendreFocus) btn.focus();
 }

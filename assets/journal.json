@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "À l'arrivée sur l'accueil, seul « Ouverture du Nether... » s'affiche pendant le chargement : tout le reste apparaît d'un coup, une fois la scène prête.",
+   "en": "When the home page loads, only “Opening the Nether...” shows; everything else appears at once when the scene is ready.",
+   "d": "2026-10-14T16:33:18.000Z"
+  },
+  {
+   "p": "site",
    "t": "Le panneau de ton compte se referme maintenant aussi vite qu'il s'ouvre.",
    "en": "Your account panel now closes as quickly as it opens.",
    "d": "2026-10-14T16:08:23.000Z"

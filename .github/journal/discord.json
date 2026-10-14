@@ -45,7 +45,8 @@
   "site|Le site existe maintenant en anglais : l'interrupteur FR | EN en haut à droite change la langue de tout le site.",
   "site|Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s",
   "site|Les pages de confidentialité, de conditions d'utilisation et de mentions légales prennent le style du reste du site, et la mention de Mojang en bas de page ne s'affiche plus que dans ta langue.",
-  "site|Le panneau de ton compte se referme maintenant aussi vite qu'il s'ouvre."
+  "site|Le panneau de ton compte se referme maintenant aussi vite qu'il s'ouvre.",
+  "site|À l'arrivée sur l'accueil, seul « Ouverture du Nether... » s'affiche pendant le chargement : tout le reste apparaît d'un coup, une fois la scène prête."
  ],
  "semaine": "2026-10-12"
 }

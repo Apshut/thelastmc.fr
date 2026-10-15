@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "Sur ordinateur, le menu du haut grandit : liens plus gros au centre, et la langue (Français · English) avec ton compte dans un îlot à droite.",
+   "en": "On desktop, the top menu is bigger: larger links in the middle, and the language (Français · English) with your account on the right.",
+   "d": "2026-10-15T20:35:31.000Z"
+  },
+  {
+   "p": "site",
    "t": "En haut de chaque page, les crochets dorés qui entourent un lien au survol ne restent plus collés à l'écran quand la souris s'en va.",
    "en": "At the top of every page, the gold brackets around a hovered link no longer stay stuck on screen after the mouse moves away.",
    "d": "2026-10-15T18:44:03.000Z"

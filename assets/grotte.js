@@ -921,6 +921,13 @@ stage.addEventListener('click', e => {
   const p = local(e), id = eng.pickAt(p[0], p[1]);
   pinned = id === pinned ? null : id;
 });
+// faire défiler la page efface l'infobulle, comme elle referme les panneaux (au-delà de 40 px depuis son apparition) ;
+// elle revient au prochain survol, au prochain clic ou à la prochaine étape atteinte au clavier
+let tipA = 0;
+addEventListener('scroll', () => {
+  if (hlShown === null || Math.abs(scrollY - tipA) <= 40) return;
+  hover = pinned = focusId = hlShown = null; stage.classList.remove('aim');
+}, { passive: true });
 
 /* ---------- la caméra : la vitre, puis le portail ----------
    La lave de l'accueil est vue de face, à travers une vitre d'aquarium, à 16 texels par bloc (48 px, 32 sur téléphone), et
@@ -993,7 +1000,7 @@ function step(t, dt) {
   const tk = REDUCE ? 0 : sstep(.7, .92, view.u), tagsOn = tk > .01;
   [tagNews, tagFaq, tagUp, cap].forEach(el => { el.style.opacity = tk.toFixed(3); el.style.visibility = tagsOn ? '' : 'hidden'; el.inert = !tagsOn; });
   const hr = hl !== null ? eng.rectOf(hl) : null;
-  if (hl !== hlShown) { hlShown = hl; if (hl !== null) fillTip(hl); }
+  if (hl !== hlShown) { hlShown = hl; tipA = scrollY; if (hl !== null) fillTip(hl); }
   tip.classList.toggle('on', !!hr);
   // le panneau : la taille du texte suit celle du bois
   const ps = place(signEl, 'panneau'), A = eng.anchors.panneau;

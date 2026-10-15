@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "En haut de chaque page, les crochets dorés qui entourent un lien au survol ne restent plus collés à l'écran quand la souris s'en va.",
+   "en": "At the top of every page, the gold brackets around a hovered link no longer stay stuck on screen after the mouse moves away.",
+   "d": "2026-10-15T18:44:03.000Z"
+  },
+  {
+   "p": "site",
    "t": "Dans la grotte, la bulle d'un bloc du portail disparaît maintenant quand tu fais défiler la page, comme le panneau des questions.",
    "en": "In the cave, a portal block's tooltip now disappears when you scroll the page, just like the Questions panel.",
    "d": "2026-10-15T18:20:33.000Z"

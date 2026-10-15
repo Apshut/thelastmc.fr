@@ -66,6 +66,11 @@ img { max-width: 100%; }
   /* écart minimal entre deux boutons voisins : les crochets débordent de 6 px (8 au survol et au focus), l'anneau du
      lingot de 4 px ; à 14 px, deux voisins ne se touchent jamais */
   --bt-ecart: 14px;
+  /* une image vide : le repos des crochets qui n'apparaissent qu'au survol (liens de la barre, bouton de compte). Constaté
+     dans Chrome : avec « none » au repos, le débord des crochets (border-image-outset) n'entre pas dans la zone repeinte ;
+     au survol, ils arrivent 4 px dehors, hors de cette zone, et des bouts restaient collés à l'écran après le départ de
+     la souris. Avec une image, même vide, le débord compte dès le repos (.btn et .btn-main en ont déjà une). */
+  --bt-vide: linear-gradient(#0000 0 0);
   /* encoche d'un pixel de 2 px ; avec les pixels de coin noirs de --bt-coins, un coin arrondi « pixel » net */
   --bt-encoche: polygon(2px 0, calc(100% - 2px) 0, calc(100% - 2px) 2px, 100% 2px, 100% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px),
     calc(100% - 2px) 100%, 2px 100%, 2px calc(100% - 2px), 0 calc(100% - 2px), 0 2px, 2px 2px);
@@ -325,7 +330,7 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 .top nav { display: flex; align-items: center; gap: var(--g); }
 .top .tbtn {
   padding: 6px 10px; min-height: 36px; font-size: 12px; color: #d8c8be;
-  border-image-source: none; border-image-outset: 4px;
+  border-image-source: var(--bt-vide); border-image-outset: 4px;
 }
 .top .tbtn .pxl { --fs: var(--tf); }
 .top .tbtn .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .8)); }

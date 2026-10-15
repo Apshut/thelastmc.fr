@@ -11,7 +11,7 @@
 .cpt-btn {
   position: relative; display: grid; place-items: center; flex: none; width: var(--cpt-w); height: var(--cpt-b); padding: 0; margin: 0;
   background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent;
-  border: 0 solid transparent; border-image: none 6 / 6px / 4px stretch; transition: border-image-outset 80ms steps(2);
+  border: 0 solid transparent; border-image: var(--bt-vide) 6 / 6px / 4px stretch; transition: border-image-outset 80ms steps(2);
 }
 .cpt-frame { position: relative; display: grid; place-items: center; width: var(--cpt-w); height: var(--cpt-b); pointer-events: none; }
 .cpt-btn:hover { border-image-source: var(--svg-crochets-or); border-image-outset: 0px; }

@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "Dans la grotte, la bulle d'un bloc du portail disparaît maintenant quand tu fais défiler la page, comme le panneau des questions.",
+   "en": "In the cave, a portal block's tooltip now disappears when you scroll the page, just like the Questions panel.",
+   "d": "2026-10-15T18:20:33.000Z"
+  },
+  {
+   "p": "site",
    "t": "Nouveaux boutons sur tout le site : l'en-tête devient une barre à losanges, les boutons principaux brillent comme des lingots et le focus clavier se voit.",
    "en": "New buttons across the whole site: the header is now a single bar with diamonds, main buttons glow like ingots, and keyboard focus is finally visible.",
    "d": "2026-10-14T22:12:08.000Z"

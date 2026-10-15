@@ -1,4 +1,4 @@
-/* The Last — le bouton de compte et son panneau (assets/compte.js), au bout de la barre de l'en-tête (.top-barre) de
+/* The Last — le bouton de compte et son panneau (assets/compte.js), au bout de la barre de l'en-tête (.top-outils) de
    chaque page. S'appuie sur nether.css (--u, --notch, .btn, .pxl, .sr, les crochets --svg-crochets-*). Le bouton se
    comporte comme un lien de la barre sans en porter la classe (les scripts de page réécrivent chaque « .top .tbtn » en
    police du jeu, et videraient la tête) : la tête posée dans la barre, sans boîte, et des crochets-viseurs au survol. */
@@ -173,6 +173,14 @@
 }
 @media (pointer: coarse) and (max-width: 480px) { .cpt-panel { top: 54px; } }
 @media (pointer: coarse) and (max-width: 345px) { .cpt { --cpt-w: 36px; } }      /* 36 × 44 : la barre tient à 320 px */
+/* ordinateur : le compte est au bout de l'îlot (.top-outils, nether.css), après « Français · English » ; le panneau
+   (368 px) est plus large que l'îlot (~300 px) : sa chaîne de gauche s'accroche sous l'îlot, pas dans le vide */
+@media (min-width: 1024px) and (pointer: fine) {
+  .top-outils .cpt { --cpt-b: 44px; --cpt-s: 24px; }
+  .top-outils .cpt-chain.l { left: 108px; }
+}
+@media (min-width: 1360px) and (pointer: fine) { .top-outils .cpt { --cpt-s: 26px; } }
+@media (min-width: 2200px) and (pointer: fine) { .top-outils .cpt { --cpt-b: 48px; --cpt-s: 30px; } }
 
 @media (prefers-reduced-motion: reduce) {
   .cpt-panel.balance .cpt-sign, .cpt-panel.retour .cpt-sign, .cpt-lueur, .cpt-wait-i { animation: none; }

@@ -14,8 +14,8 @@
   <script>document.documentElement.classList.add("js");</script>
   <script>/* langue : l'anglais est appliqué avant le premier affichage (assets/i18n.js) */try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("thelast:lang");if(l==="en"){document.documentElement.classList.add("lang-wait");setTimeout(function(){document.documentElement.classList.remove("lang-wait")},3000)}}catch(e){}</script>
   <link rel="stylesheet" href="/assets/fonts.css?v=6f64086d">
-  <link rel="stylesheet" href="/assets/nether.css?v=fc59cbf7">
-  <link rel="stylesheet" href="/assets/compte.css?v=cb4a96e1">
+  <link rel="stylesheet" href="/assets/nether.css?v=9d54cba3">
+  <link rel="stylesheet" href="/assets/compte.css?v=77dc449f">
   <link rel="stylesheet" href="/assets/404.css?v=3b1d4db7">
   <script src="/assets/i18n.js?v=b5d8b9e4" defer></script>
   <script src="/assets/lang/en-commun.js?v=c6219999" defer></script>
@@ -25,7 +25,7 @@
   <script src="/assets/mc/mc.js?v=b24b6f44" defer></script>
   <script src="/assets/404.js?v=c1a42e49" defer></script>
   <script src="/assets/boutons.js?v=8939f1ba" defer></script>
-  <script src="/assets/compte.js?v=b5aee10c" defer></script>
+  <script src="/assets/compte.js?v=effd5ff2" defer></script>
 </head>
 <body>
   <a class="skip" href="#contenu" data-i18n="pages.404.skip">Aller au contenu</a>
@@ -37,8 +37,11 @@
         <a class="tbtn" href="/" data-i18n="nav.home">Accueil</a>
         <a class="tbtn" href="/boutique" data-i18n="nav.shop">Boutique</a>
         <a class="tbtn" href="/chantier" data-i18n="nav.devlog">Chantier</a>
-        <span class="tbtn lang-sw" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
       </nav>
+      <div class="top-outils">
+        <span class="tbtn lang-sw lang-court" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-label="Français" aria-current="true">FR</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en" aria-label="English">EN</a></span>
+        <span class="tbtn lang-sw lang-long" role="group" aria-label="Langue" data-i18n-attr="aria-label:lang.aria"><a href="?lang=fr" data-lang="fr" lang="fr" hreflang="fr" aria-current="true">Français</a><i aria-hidden="true"></i><a href="?lang=en" data-lang="en" lang="en" hreflang="en">English</a></span>
+      </div>
     </div>
   </header>
 

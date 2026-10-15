@@ -100,10 +100,10 @@ html:not(.ready) .loot, html:not(.gl):not(.no-gl) .loot { visibility: hidden; }
   .stage { position: fixed; inset: 0; height: auto; z-index: 0; }
   .say { z-index: 40; }                                       /* par-dessus l'en-tête (30) et les panneaux */
   .intro, .deal, .tv-side { position: fixed; z-index: 5; width: var(--side); margin: 0; }
-  .intro { left: 24px; top: 70px; padding: 0; }
+  .intro { left: 24px; top: calc(var(--top-h, 60px) + 10px); padding: 0; }          /* 10 px sous l'en-tête (nether.css : --top-h) */
   .deal { left: 24px; bottom: 58px; }
   /* à droite : « Bon à savoir », et dessous le bouton de la liste d'objets (catalogue.css) */
-  .tv-side { right: 24px; top: 70px; display: flex; flex-direction: column; gap: 10px; }
+  .tv-side { right: 24px; top: calc(var(--top-h, 60px) + 10px); display: flex; flex-direction: column; gap: 10px; }
   .tv-side .slate { margin: 0; }
   /* pied de page sur une ligne : il laisse la place aux étiquettes des articles posés au bas de la scène */
   .foot {

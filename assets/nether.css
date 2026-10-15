@@ -316,9 +316,12 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 }
 .brand:hover { color: #fff; }
 .top.solid .brand, html:not(.js) .brand { opacity: 1; transform: none; }
-/* la barre : une seule barre pixel (.top-barre) porte le menu et, quand compte.js est là, le bouton de compte. Ses deux
-   bouts sont en escalier aux marches dorées, son liseré haut en or terni (border-image en 9 tranches). Les liens sont du
-   texte du jeu, séparés par des losanges de braise ; quatre crochets-viseurs se referment sur le lien visé. */
+/* la barre : une seule barre pixel (.top-barre) porte le menu (<nav>, les pages) et .top-outils : le sélecteur de langue
+   et, quand compte.js est là, le bouton de compte. Ses deux bouts sont en escalier aux marches dorées, son liseré haut en
+   or terni (border-image en 9 tranches). Les liens sont du texte du jeu, séparés par des losanges de braise ; quatre
+   crochets-viseurs se referment sur le lien visé. Sur téléphone, .top-outils s'efface (display: contents) : langue et
+   compte suivent les pages dans la même barre. Sur ordinateur, c'est l'inverse (plus bas, « ordinateur »). */
+.top-outils { display: contents; }
 .top-barre {
   position: relative; isolation: isolate; flex: none; display: flex; align-items: center; gap: var(--g);
   margin: 0 calc(-1 * var(--bpr)) 0 auto; padding: 0 var(--bpr) 0 var(--bpl);
@@ -336,7 +339,7 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 .top .tbtn .pxl svg { filter: drop-shadow(var(--fs) var(--fs) 0 rgb(0 0 0 / .8)); }
 .top .tbtn:hover { color: #fff4e6; border-image-source: var(--svg-crochets-or); border-image-outset: 0px; }
 /* le losange de braise entre deux éléments : 1-3-5-3-1 pixels de 2 px (10 × 10), éclairé en haut à gauche */
-.top nav > .tbtn + .tbtn::before, .top-barre > nav ~ .cpt::after {
+.top nav > .tbtn + .tbtn::before, .top-outils > .lang-sw::before, .top-barre > nav ~ .cpt::after, .top-outils > .cpt::after {
   content: ""; position: absolute; top: calc(50% - 5px); left: calc(var(--g) / -2 - 5px); width: 10px; height: 10px;
   background: var(--svg-losange) 0 0 / 10px 10px no-repeat; pointer-events: none;
 }
@@ -361,21 +364,24 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 .top .tbtn-main .pxl svg { filter: none; }
 .top .tbtn-main:hover { color: #1c0a03; border-image-source: none; --fill: linear-gradient(#ffe09a 0 10px, #ffad48 10px calc(100% - 10px), #ff7a3a calc(100% - 10px)); }
 
-/* FR | EN : la langue active en or, soulignée d'un trait d'or */
+/* la langue : FR | EN (.lang-court) ; sur ordinateur, « Français · English » (.lang-long), une seule des deux affichée.
+   L'active : braise claire, soulignée de braise (deux indices), sans crochets (elle ne fait rien) ; elle ne prend plus
+   l'or de la page courante. L'autre : plus claire que les liens du menu, crochets d'or au survol. Le séparateur se voit. */
+.top .tbtn.lang-long { display: none; }
 .top .tbtn.lang-sw, .top .tbtn.lang-sw:hover { padding: 0; gap: 0; border-image-source: none; }
 .lang-sw a {
   position: relative; display: inline-flex; align-items: center; align-self: stretch; padding: 0 var(--lp, 8px);
-  color: #c4b5ad; text-decoration: none;
+  color: #e8dcd4; text-decoration: none;
   border: 0 solid transparent; border-image: none 6 / 6px / 0 stretch; transition: color 80ms steps(1);
 }
 .lang-sw a:hover { color: #fff4e6; border-image-source: var(--svg-crochets-or); }
 .lang-sw a:focus-visible { outline-offset: 0px; box-shadow: none; }
-.lang-sw a[aria-current] { color: #ffd27a; }
+.lang-sw a[aria-current], .lang-sw a[aria-current]:hover { color: #ff9f66; border-image-source: var(--bt-vide); cursor: default; }
 .lang-sw a[aria-current]::after {
-  content: ""; position: absolute; left: var(--lp, 8px); right: var(--lp, 8px); height: 2px; background: #ffb547; pointer-events: none;
+  content: ""; position: absolute; left: var(--lp, 8px); right: var(--lp, 8px); height: 2px; background: #ff6b2c; pointer-events: none;
   top: calc(50% + 5 * var(--tf, 2px)); top: round(calc(50% + 5 * var(--tf, 2px)), 1px);   /* une rangée sous les lettres */
 }
-.lang-sw i { flex: none; width: 2px; height: 12px; align-self: center; background: #4a3631; }
+.lang-sw i { flex: none; width: 2px; height: 12px; align-self: center; background: #7a645b; }
 
 /* au doigt : la barre et ses cibles font 44 px de haut au moins */
 @media (pointer: coarse) {
@@ -390,7 +396,7 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 @media (max-width: 640px) {
   .top { --tp: 10px; --g: 10px; --bpr: 8px; --tf: 1.5px; --lp: 6px; }
   .top .tbtn { padding-left: 6px; padding-right: 6px; }
-  .top nav > .tbtn + .tbtn::before, .top-barre > nav ~ .cpt::after {
+  .top nav > .tbtn + .tbtn::before, .top-outils > .lang-sw::before, .top-barre > nav ~ .cpt::after, .top-outils > .cpt::after {
     width: 5px; height: 5px; top: calc(50% - 2.5px); left: calc(var(--g) / -2 - 2.5px); background-size: 5px 5px;
   }
 }
@@ -403,6 +409,91 @@ a.btn-sm:not(.gm-actions > a):focus-visible { border-image-source: none; }
 @media (max-width: 345px) {
   .top { --tp: 6px; --bpl: 4px; }
   .top .tbtn { padding-left: 2px; padding-right: 2px; }
+}
+/* ordinateur (souris, 1024 px et plus) : la barre de téléphone paraissait rabougrie sur grand écran (même taille de 641 à
+   2560 px). Les trois pages deviennent des liens libres en police du jeu, centrés sur une bande sombre, et un îlot en
+   escalier, à droite, ne porte que les deux fonctions utilitaires : la langue, écrite en entier, et le compte. La barre
+   s'efface (display: contents) : le menu et l'îlot (.top-outils) se placent dans la grille de l'en-tête, le logo à
+   gauche. --top-h : la hauteur de l'en-tête, pour ce qui se cale dessous (écran F3, succès, ancres, taverne, Volkar). */
+@media (min-width: 1024px) and (pointer: fine) {
+  :root { --top-h: 64px; }
+  .top {
+    height: var(--top-h); display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+    align-items: center; column-gap: 24px;
+    --tp: 24px;
+    --tf: 2px;           /* la police des liens du menu */
+    --menu-ecart: 40px;  /* entre deux liens */
+    --menu-cro: 6px;     /* les crochets : trois pixels de police */
+    --menu-h: 44px;      /* hauteur des cibles */
+  }
+  /* la bande : plus dense en haut, pour un contraste sûr des liens libres sur toutes les scènes */
+  .top::before {
+    inset: 0 0 -56px;
+    background: linear-gradient(rgb(8 4 6 / .94), rgb(8 4 6 / .86) 40%, rgb(8 4 6 / .5) 66%, rgb(8 4 6 / .16) 86%, rgb(8 4 6 / 0));
+  }
+  /* en-tête plein (pages intérieures, accueil défilé) : un fond presque opaque qui s'arrête vite, pour ne rien assombrir dessous */
+  .top.solid::before { inset: 0 0 -28px; background: linear-gradient(rgb(8 4 6 / .97) 70%, rgb(8 4 6 / 0)); }
+  .top > .brand { grid-column: 1; justify-self: start; }
+  .top-barre { display: contents; }
+  .top-barre::before { content: none; }
+
+  /* les liens libres */
+  .top nav { grid-column: 2; gap: var(--menu-ecart); }
+  .top nav > .tbtn {
+    min-height: var(--menu-h); padding: 0 var(--menu-pad, calc(var(--tf) * 6)); color: #e2d4ca;
+    border-image-width: var(--menu-cro); border-image-outset: calc(var(--tf) * 2);
+  }
+  .top nav > .tbtn:hover, .top nav > .tbtn[aria-current="page"] { border-image-outset: 0px; }
+  .top nav > .tbtn[aria-current="page"]:hover { color: #fff4e6; }
+  .top nav > .tbtn + .tbtn::before { content: none; }
+  /* le chevron de braise, en pixels de police */
+  .top nav > .tbtn[aria-current="page"]::after {
+    left: calc(50% - var(--tf) * 1.5); bottom: calc(var(--tf) * -1); width: calc(var(--tf) * 3); height: calc(var(--tf) * 2);
+    background: linear-gradient(#ff6b2c 0 0) var(--tf) 0 / var(--tf) var(--tf) no-repeat, linear-gradient(#ff6b2c 0 0) 0 var(--tf) / var(--tf) var(--tf) no-repeat,
+      linear-gradient(#ff6b2c 0 0) calc(var(--tf) * 2) var(--tf) / var(--tf) var(--tf) no-repeat;
+  }
+  .top nav > .tbtn-main { padding: 0 16px; }
+
+  /* l'îlot : la barre en escalier, réduite à la langue et au compte (le compte : compte.css) */
+  .top-outils {
+    grid-column: 3; justify-self: end; position: relative; isolation: isolate; display: flex; align-items: center;
+    gap: var(--g); padding: 0 12px 0 14px; --g: 20px; --bh: 56px; --tf: 2px; --lp: 10px;
+  }
+  .top-outils::before {
+    content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: calc(50% - var(--bh) / 2); height: var(--bh); pointer-events: none;
+    box-sizing: border-box; border: 10px solid transparent; border-image: var(--svg-barre) 10 fill / 10px / 0 stretch;
+  }
+  .top .tbtn.lang-court { display: none; }
+  .top .tbtn.lang-long { display: inline-flex; min-height: 44px; align-self: center; }
+  .top-outils > .lang-sw::before { content: none; }
+  /* le trait sous la langue active passe sous les jambages (ç, g) : deux rangées plus bas qu'au téléphone */
+  .top-outils .lang-sw a[aria-current]::after { height: var(--tf); top: calc(50% + 7 * var(--tf)); top: round(calc(50% + 7 * var(--tf)), 1px); }
+  /* le point médian : un pixel de police, à mi-hauteur des minuscules */
+  .top-outils .lang-sw i { width: var(--tf); height: var(--tf); margin: 0 2px; transform: translateY(var(--tf)); background: #8f7a70; }
+}
+/* 1024 à 1199 px : le menu se resserre un peu, pour garder 40 px d'air de chaque côté */
+@media (min-width: 1024px) and (max-width: 1199px) and (pointer: fine) {
+  .top { column-gap: 40px; --menu-ecart: 32px; --menu-pad: 10px; }
+  .top-outils { --lp: 8px; }
+}
+/* à partir de 1360 px (les portables 1366 × 768 compris, où Minecraft affiche déjà sa police à l'échelle 3) : la police
+   du menu passe à 3 px, les crochets suivent (trois pixels de 3 px) ; l'îlot reste à 2 px */
+@media (min-width: 1360px) and (pointer: fine) {
+  :root { --top-h: 76px; }
+  .top { --tf: 3px; --menu-ecart: 40px; --menu-pad: 15px; --menu-cro: 9px; --menu-h: 52px; --tp: 32px; }
+  .top-outils { --tf: 2px; padding: 0 14px 0 16px; }
+}
+/* à partir de 1600 px, plus d'air entre les liens */
+@media (min-width: 1600px) and (pointer: fine) {
+  .top { --menu-ecart: 48px; --menu-pad: 18px; }
+}
+/* très grands écrans (2200 px et plus, 2560 × 1440) : l'îlot passe lui aussi à 3 px, et le menu respire davantage */
+@media (min-width: 2200px) and (pointer: fine) {
+  :root { --top-h: 84px; }
+  .top { --menu-ecart: 64px; --menu-pad: 18px; --menu-h: 56px; --tp: 40px; }
+  .top-outils { --tf: 3px; --bh: 60px; --g: 24px; --lp: 12px; padding: 0 16px 0 18px; }
+  .top-outils .lang-sw a { border-image-width: 9px; }
+  .top .tbtn.lang-long { min-height: 48px; }
 }
 /* le temps de traduire la page en anglais (le script de <head>), rien ne s'affiche */
 .lang-wait body { visibility: hidden; }
@@ -469,7 +560,7 @@ html:not(.js) #rig, .no-gl #rig { display: none; }
 
 /* ---------- Strates ---------- */
 .stratum { position: relative; isolation: isolate; padding: calc(var(--b) * 3) 16px calc(var(--b) * 4.5); }
-[id] { scroll-margin-top: 64px; }
+[id] { scroll-margin-top: calc(var(--top-h, 52px) + 12px); }        /* sous l'en-tête fixe (--top-h : sa hauteur sur ordinateur) */
 .stratum::before {
   content: ""; position: absolute; inset: 0; z-index: -3;
   background: var(--col, #201012) var(--tile, none) 0 0 / var(--ts, var(--b)) auto;
@@ -703,7 +794,7 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 .community { margin-top: 12px; }
 
 /* ---------- Notifications de progrès, comme en jeu ---------- */
-.toasts { position: fixed; z-index: 70; top: 68px; right: 12px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toasts { position: fixed; z-index: 70; top: calc(var(--top-h, 60px) + 8px); right: 12px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 .toast {
   display: grid; grid-template-columns: 32px 1fr; align-items: center; gap: 2px 14px; width: 320px; height: 64px; padding: 0 16px;
   background: url("mc/toast.png") 0 0 / 320px 64px no-repeat; image-rendering: pixelated;
@@ -717,7 +808,7 @@ html:not(.js) #g-cv, .g-off #g-cv, html:not(.js) .g-layer, .g-off .g-layer { dis
 @media (max-width: 700px) { .toasts { top: auto; bottom: 70px; right: 8px; } }
 
 /* ---------- Écran de débogage F3 ---------- */
-.f3 { position: fixed; z-index: 24; left: 8px; top: 66px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; pointer-events: none; color: #e0e0e0; opacity: 0; transition: opacity .3s; }
+.f3 { position: fixed; z-index: 24; left: 8px; top: calc(var(--top-h, 56px) + 10px); display: flex; flex-direction: column; align-items: flex-start; gap: 2px; pointer-events: none; color: #e0e0e0; opacity: 0; transition: opacity .3s; }
 .f3 > span { padding: 1px 2px 0; background: rgb(80 80 80 / .55); }
 .f3 .pxl svg { filter: drop-shadow(2px 2px 0 #383838); }
 .f3 .hi { color: #ffff55; }

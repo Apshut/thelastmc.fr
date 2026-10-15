@@ -75,8 +75,8 @@
   position: fixed; z-index: 61; right: var(--vk-m); bottom: calc(var(--vk-m) + var(--vk-b) + 14px);
   display: flex; flex-direction: column;
   width: min(410px, calc(100vw - 2 * var(--vk-m)));
-  height: min(660px, calc(100vh - var(--vk-m) - var(--vk-b) - 14px - 76px));
-  height: min(660px, calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - 76px));   /* 76 px : sous l'en-tête du site */
+  height: min(660px, calc(100vh - var(--vk-m) - var(--vk-b) - 14px - var(--top-h, 60px) - 16px));
+  height: min(660px, calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - var(--top-h, 60px) - 16px));   /* sous l'en-tête du site (16 px sous --top-h, nether.css) */
   min-height: 300px;
   color: var(--vk-ink); font: 15px/1.55 "Inter", system-ui, sans-serif;
   filter: drop-shadow(0 14px 28px rgb(0 0 0 / .6)) drop-shadow(0 0 30px rgb(255 100 30 / .14));
@@ -87,8 +87,8 @@
 /* agrandi (bouton de l'en-tête) : plus large, et toute la hauteur entre l'en-tête du site et le bouton */
 .vk.vk-grand {
   width: min(780px, calc(100vw - 2 * var(--vk-m)));
-  height: calc(100vh - var(--vk-m) - var(--vk-b) - 14px - 76px);
-  height: calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - 76px);
+  height: calc(100vh - var(--vk-m) - var(--vk-b) - 14px - var(--top-h, 60px) - 16px);
+  height: calc(100dvh - var(--vk-m) - var(--vk-b) - 14px - var(--top-h, 60px) - 16px);
 }
 .vk-moins { display: none !important; }
 .vk-grand .vk-plus { display: none !important; }

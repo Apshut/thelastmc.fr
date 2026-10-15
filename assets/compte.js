@@ -446,8 +446,9 @@ const cadre = h('span', { class: 'cpt-frame', 'aria-hidden': 'true' });   // le 
 btn.appendChild(cadre);
 const panel = h('div', { class: 'cpt-panel', id: 'cpt-panneau', hidden: '' });
 wrap.append(btn, panel);
-// au bout de la barre de l'en-tête, après le menu (nether.css : .top-barre) ; une page sans barre : juste après le menu
-const barre = header.querySelector('.top-barre'), nav = header.querySelector('nav');
+// au bout de l'en-tête, après la langue (nether.css : .top-outils, dans .top-barre) ; sinon au bout de la barre ; une page
+// sans barre : juste après le menu
+const barre = header.querySelector('.top-outils') || header.querySelector('.top-barre'), nav = header.querySelector('nav');
 if (barre) barre.appendChild(wrap);
 else if (nav && nav.nextSibling) header.insertBefore(wrap, nav.nextSibling); else header.appendChild(wrap);
 header.classList.add('a-compte');

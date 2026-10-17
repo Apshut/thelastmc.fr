@@ -50,7 +50,8 @@
   "site|Nouveaux boutons sur tout le site : l'en-tête devient une barre à losanges, les boutons principaux brillent comme des lingots et le focus clavier se voit.",
   "site|Dans la grotte, la bulle d'un bloc du portail disparaît maintenant quand tu fais défiler la page, comme le panneau des questions.",
   "site|En haut de chaque page, les crochets dorés qui entourent un lien au survol ne restent plus collés à l'écran quand la souris s'en va.",
-  "site|Sur ordinateur, le menu du haut grandit : liens plus gros au centre, et la langue (Français · English) avec ton compte dans un îlot à droite."
+  "site|Sur ordinateur, le menu du haut grandit : liens plus gros au centre, et la langue (Français · English) avec ton compte dans un îlot à droite.",
+  "site|Confidentialité : le bot Volkar va lire en direct les messages du serveur Discord, sans les garder, pour repérer arnaques, spam et raids. Tout est expliqué."
  ],
  "semaine": "2026-10-12"
 }

@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "site",
+   "t": "Volkar peut expulser ou bannir seul dans quelques cas précis (raid, arnaque, spam) ; une personne relit chaque ban. La page « Contester » t'explique comment.",
+   "en": "Volkar can kick or ban on its own in a few specific cases (raid, scam, spam); a person reviews every ban. The Appeal page tells you how.",
+   "d": "2026-10-17T20:32:50.000Z"
+  },
+  {
+   "p": "site",
    "t": "Confidentialité : le bot Volkar va lire en direct les messages du serveur Discord, sans les garder, pour repérer arnaques, spam et raids. Tout est expliqué.",
    "en": "Privacy: our Discord bot Volkar will read the server's messages live, without keeping them, to spot scams, spam and raids. It is all explained.",
    "d": "2026-10-17T12:55:12.000Z"

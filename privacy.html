@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Last</title>
   <script>/* adresses sans « .html » : un ancien lien boutique.html s'affiche /boutique */if(/\.html$/.test(location.pathname))history.replaceState(null,"",location.pathname.replace(/(index)?\.html$/,"")+location.search+location.hash);</script>
-  <meta name="description" content="What data The Last's launcher, server and website process, why, for how long, and how to exercise your rights.">
+  <meta name="description" content="What data The Last's launcher, server, Discord and website process, why, for how long, and how to exercise your rights.">
   <link rel="canonical" href="https://thelastmc.fr/privacy">
   <link rel="alternate" hreflang="en" href="https://thelastmc.fr/privacy">
   <link rel="alternate" hreflang="fr" href="https://thelastmc.fr/confidentialite">
@@ -44,15 +44,15 @@
   <main class="lg-main lg">
     <div class="lg-tete">
       <h1 class="px" data-fs="5">Privacy Policy</h1>
-      <p class="updated">Last updated: October 14, 2026</p>
+      <p class="updated">Last updated: October 17, 2026</p>
     </div>
     <div class="lg-texte">
       <p class="tr-note">This English version is a translation provided for information only. Only the
         <a href="/confidentialite" lang="fr" hreflang="fr">French version</a> is legally binding.</p>
 
       <p>This page explains what personal data is processed when you use
-        <strong>The Last Launcher</strong>, <strong>The Last Minecraft server</strong> and this
-        <strong>website</strong>, why, for how long, and how to exercise your rights. We
+        <strong>The Last Launcher</strong>, <strong>The Last Minecraft server</strong>, our
+        <strong>Discord server</strong> and this <strong>website</strong>, why, for how long, and how to exercise your rights. We
         collect as little as possible: apart from your IP address, which any server you contact can see, the launcher
         sends no data about you to The Last, unless you ask it to sign you in to the website (see
         <a href="#compte">Your account on the website</a>).</p>
@@ -228,8 +228,8 @@
         30 days at most; we use it only for a repair, never to recover a
         deleted account. Our technical logs contain no IP address, no identifier and no username;
         Cloudflare may keep technical logs under its own rules.</p>
-      <p>Your username and your head update automatically each time you sign in from the launcher. We
-        make no automated decisions about you and do no profiling: the automatic
+      <p>Your username and your head update automatically each time you sign in from the launcher. On
+        the website, we make no automated decisions about you and do no profiling: the automatic
         refusals (too many attempts, different network, access limited to testers) serve only to
         protect your account.</p>
       <p><strong>What the website keeps in your browser.</strong> Once you are signed in, a sign-in
@@ -291,7 +291,7 @@
           American companies, and the answers are not generated in the European Union. These transfers
           rely on the European Commission's standard contractual clauses, included in their
           data processing agreements.</li>
-        <li><strong>Your rights:</strong> those in <a href="#droits">section 8</a>. Since we do not keep
+        <li><strong>Your rights:</strong> those in <a href="#droits">section 9</a>. Since we do not keep
           your questions, we cannot retrieve a specific conversation; write to us at
           <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> if you have a problem.</li>
         <li><strong>If you are a minor:</strong> never give personal information to Volkar, and ask
@@ -299,36 +299,137 @@
           private ticket on the Discord instead.</li>
       </ul>
 
-      <h2>6. On what legal basis?</h2>
+      <h2 id="discord">6. The Last's Discord</h2>
+      <p>Our Discord server is hosted by Discord, which also processes your data under its own
+        policy. Our bot there, <strong>Volkar</strong>, is hosted by Cloudflare. This section says what
+        we keep in addition, for support tickets and for moderation. On Discord, Volkar
+        uses no artificial intelligence.</p>
+
+      <h3 id="tickets">Support tickets</h3>
+      <p>When you open a ticket on our Discord server, a private thread is created, visible only to
+        you and The Last's team. It contains what you write in the form and in the thread, and the
+        files you attach to it (except for a “Danger pour un mineur” (danger to a minor) report: images are
+        never copied). Our bot Volkar, hosted by Cloudflare, keeps only technical
+        information about the ticket (your Discord identifier and username, the subject, the dates and
+        the status), never its content. The only exception: when you report a message, its copy (with
+        its author's identifier and name) is kept while the form is being sent, then erased
+        within the following hour. Tickets are deleted 12 months after they are closed, unless a payment
+        dispute is ongoing. To view your data or have it deleted, open a “Mon compte” (My account) ticket
+        or write to <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>. Banned or timed
+        out? Write to <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>.</p>
+
+      <h3 id="moderation">Discord moderation</h3>
+      <p>To protect the community, many of whose members are young, The Last's team and our
+        bot Volkar enforce the Discord server's rules.</p>
+      <ul>
+        <li><strong>What is automatic:</strong> Discord's filter (AutoMod) can block a
+          message, or put you in a 10-minute timeout for a scam or, once the filter has been fine-tuned, for serious remarks. If three of
+          your messages are blocked within an hour, Volkar can put you in a one-hour timeout; a
+          team member then checks, and no point is counted without them. Everything
+          else (warning, longer timeout, deletion) is decided by a team member;
+          during a bot attack, the team can put recent accounts in a 24-hour timeout, recording it
+          as a protective measure, with no fault and no point. Mass mentions can lead to a 10-minute timeout. Volkar
+          counts, per member, blocked messages, flagged expressions and reports, in order to
+          spot persistence, repeat offenses and risky situations. Only the founder kicks
+          or bans.</li>
+        <li><strong>Reading messages:</strong> our bot Volkar reads, live, the messages in the server's
+          channels. Messages in <strong>tickets, private threads and staff channels</strong> also reach it,
+          but it never analyses them and keeps nothing from them. The others, it compares to fixed rules:
+          scams, dangerous links and files, spam, mass arrival of fake accounts. It does not keep the text.
+          To spot spam, it keeps for <strong>15 minutes, in its memory only</strong>, who wrote, when and
+          where, and an unreadable fingerprint of the text (it shows that a message is repeated without
+          letting anyone read it again); then everything is erased, and a message you delete leaves that
+          memory at once. When a rule fires, it can delete the message or put you in timeout, and then
+          keeps a short excerpt of the message in question in your record (500 characters at most; never
+          when the reason concerns a minor or illegal content). It never downloads any file or image. No
+          artificial intelligence decides. For a message about distress or danger to a minor, Volkar never
+          sanctions anyone: it alerts a team member.</li>
+        <li><strong>What we keep:</strong> your Discord identifier and name, the sanction, its
+          reason, its date, who decided it, and sometimes a short excerpt of the message in question (text only;
+          masked when it contains someone else's personal data; never when the reason concerns
+          a minor or illegal content). When the filter blocks
+          a message, or flags certain expressions to be checked (for example an email address, a
+          request for someone's age or social media, an offer to sell, a phrase of distress), the text of the message is shown to
+          the team in a restricted channel, then erased after 30 days; a message that is only flagged
+          stays online. Some phrases (distress, grooming of a minor) block nothing but
+          also alert the founder in a restricted channel, with your name: this alert is erased after
+          30 days. A phrase of distress never leads to a sanction. When the team issues a sanction
+          based on a message, Volkar keeps a working copy of it while the form is being filled in,
+          erased within the hour. If the team then opens a “Un mot de l'équipe” (A word from the team) thread with you,
+          it is deleted after 30 days and is not linked to your name in our database. The team can also record internally a short note about a member (300 characters
+          at most, which you do not see, but which you can request by exercising your right of access). Volkar also
+          sees the server's activity log (who was blocked or flagged by the filter, by
+          which rule, without the text) and what the team reports to it. It also keeps a log of its
+          incidents (who, what, where, when, never the text of a message), kept for <strong>90 days</strong>,
+          and, per member, a few counters (numbers only, never text) over 24 hours at most, to spot repeat
+          offenses. Discord accounts created
+          less than 7 days ago that join the server are recorded for one week (identifier, name, dates),
+          to spot bots. For a banned member, we also monitor their normalized name for as long
+          as the ban lasts, to spot a return under another account. We do not ask for your age, your identity or your address.</li>
+        <li><strong>How long:</strong> the excerpt is erased 30 days after the sanction ends
+          (90 days at most if you appeal it); the record, 12 months after it ends, unless proceedings are ongoing
+          (illegal content, threat). The filter's technical traces (rule triggered, channel, time, without
+          text) are kept for 30 days, and member reports for 90 days. The log of Volkar's incidents is kept
+          for 90 days, its repeat-offense counters 24 hours at most. The private thread where you receive the notice is deleted 30 days
+          after the sanction ends.</li>
+        <li><strong>Who sees it:</strong> the moderation team and the founder. You receive the reason in
+          a private thread on the server, never in a direct message, and you can see your records with the
+          <code>/mon-casier</code> (my record) command. The data is hosted by Discord and by Cloudflare (hosting
+          of the bot): see <a href="#transferts">section 8</a>.</li>
+        <li><strong>Why:</strong> our legitimate interest in protecting players, many of whom are young,
+          from scams, fake accounts and harassment (Article 6(1)(f) GDPR). We have weighed this interest
+          against your rights, in particular those of the youngest: reading messages without keeping the
+          text, private channels excluded, fixed rules, minimal data, short retention periods, and no
+          serious decision made by a machine. You may object to this reading (Article 21); because it
+          protects the whole server we cannot exempt a member who stays, but we look at every request, and
+          you can leave the server.</li>
+        <li><strong>Your rights:</strong> access, rectification, erasure (unless the record is still
+          needed: a sanction or points still in effect, or evidence for proceedings), objection, and appeal of a sanction (once, within 30 days after it ends,
+          through a “Contester une sanction” (Appeal a sanction) ticket, or at
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> if you are banned, kicked or in timeout). You
+          can also lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>. See
+          also <a href="#droits">section 9</a>.</li>
+      </ul>
+
+      <h2>7. On what legal basis?</h2>
       <ul>
         <li><strong>Providing the service you request</strong> (installing and launching the game, signing you in,
           letting you play): performance of the terms of use (Article 6(1)(b) GDPR).</li>
         <li><strong>Your account on the website</strong> (recognizing you, showing your head, your devices and,
           later, your purchases): performance of the terms of use (Article 6(1)(b) GDPR).</li>
         <li><strong>Security and moderation</strong> (technical logs, server logs, attempt
-          limits and same-network check when signing in to the website, list of your devices): our
+          limits and same-network check when signing in to the website, list of your devices,
+          Discord moderation: sanction records, automatic filter, notices, live reading of the server's
+          messages by the bot, without keeping the text): our
           legitimate interest in protecting the service and its players (Article 6(1)(f) GDPR).</li>
+        <li><strong>Answering your support tickets on Discord</strong>: performance of the terms
+          of use when the ticket concerns your account or a purchase (Article 6(1)(b) GDPR), our
+          legitimate interest in answering players otherwise (Article 6(1)(f) GDPR).</li>
         <li><strong>Answering your questions through the Volkar assistant and protecting it from abuse</strong>:
           our legitimate interest (Article 6(1)(f) GDPR).</li>
       </ul>
       <p>We do not sell, rent or share your data with anyone for commercial purposes.</p>
 
-      <h2 id="transferts">7. Transfers outside the European Union</h2>
+      <h2 id="transferts">8. Transfers outside the European Union</h2>
       <p>Microsoft and GitHub are American companies. Their data transfers to the
         United States rely on the EU–U.S. Data Privacy
         Framework and on their own safeguards. For Cloudflare and Anthropic (Volkar assistant),
-        see <a href="#volkar">section 5</a>. We have asked for the account database to be
+        see <a href="#volkar">section 5</a>. Discord, which hosts our Discord server (<a href="#discord">section 6</a>),
+        is also an American company; its processing is governed by its
+        <a href="https://discord.com/privacy" rel="noopener">privacy policy</a>. We have asked for the account database to be
         located in Western Europe; since Cloudflare is an American company, a transfer to the United States remains possible,
-        governed by the European Commission's standard contractual clauses.</p>
+        governed by the European Commission's standard contractual clauses. Cloudflare also hosts
+        our Discord bot and its database (tickets and moderation), governed by the same standard
+        contractual clauses.</p>
 
-      <h2 id="droits">8. Your rights</h2>
+      <h2 id="droits">9. Your rights</h2>
       <p>You can request access to your data, its rectification, its erasure, the restriction of
         processing, object to it, and request its portability, by writing to
         <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>. We reply within
         one month. If you believe your rights are not being respected, you can lodge a complaint with the
         <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>.</p>
       <p><strong>Your right to object.</strong> You can object at any time to processing based
-        on our legitimate interest (section 6): write to us, and we will stop, unless there is a compelling reason, for
+        on our legitimate interest (section 7): write to us, and we will stop, unless there is a compelling reason, for
         example the safety of other players.</p>
       <p>For your account on the website, export and deletion can also be done directly in
         <em>My account → Settings</em> (see <a href="#compte">Your account on the website</a>).</p>
@@ -341,16 +442,17 @@
           <a href="https://account.live.com/consent/Manage" rel="noopener">account.live.com/consent/Manage</a>.</li>
       </ul>
 
-      <h2>9. Minors</h2>
+      <h2>10. Minors</h2>
       <p>Minecraft is played by many young people. Children's Microsoft accounts are managed by their
         parents (Microsoft Family). A parent can write to us with any question or to have
-        the data linked to their child's account deleted.</p>
+        the data linked to their child's account deleted, including Discord moderation data,
+        except for a sanction or points still in effect, or evidence needed for proceedings (<a href="#discord">section 6</a>).</p>
       <p>If you are under 15, ask a parent for permission before signing in to the website. A parent
         can delete the account on the website from <em>My account → Settings</em>, or write to us. If
         online play is blocked by parental controls, signing in to the website does not work: this is
         normal.</p>
 
-      <h2>10. Changes</h2>
+      <h2>11. Changes</h2>
       <p>We will update this page if our practices change; the date at the top of the page shows when.
         In the event of a significant change, we will announce it in the launcher's news.</p>
     </div>

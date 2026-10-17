@@ -330,8 +330,7 @@
           during a bot attack, the team can put recent accounts in a 24-hour timeout, recording it
           as a protective measure, with no fault and no point. Mass mentions can lead to a 10-minute timeout. Volkar
           counts, per member, blocked messages, flagged expressions and reports, in order to
-          spot persistence, repeat offenses and risky situations. Only the founder kicks
-          or bans.</li>
+          spot persistence, repeat offenses and risky situations.</li>
         <li><strong>Reading messages:</strong> our bot Volkar reads, live, the messages in the server's
           channels. Messages in <strong>tickets, private threads and staff channels</strong> also reach it,
           but it never analyses them and keeps nothing from them. The others, it compares to fixed rules:
@@ -344,6 +343,25 @@
           when the reason concerns a minor or illegal content). It never downloads any file or image. No
           artificial intelligence decides. For a message about distress or danger to a minor, Volkar never
           sanctions anyone: it alerts a team member.</li>
+        <li><strong>Automatic kicks and bans:</strong> in a few specific cases, and only those, Volkar can
+          <strong>kick or ban you automatically</strong>: a mass arrival of fake accounts (a raid), a link
+          to a known scam site or a trapped file posted by a recently joined account, spam that continues
+          after two timeouts, a bot added without permission. These are rules written in advance, not a
+          judgement. An automatic ban lasts <strong>7 days at most</strong>: a team member, who reads the
+          rule and the message, reviews it within 72 hours; <strong>without that review, it is lifted
+          automatically</strong>. They can lift it at any time, and only a person can make it permanent.
+          Volkar never kicks or bans for an insult, a remark or a message about distress: the team
+          decides.</li>
+        <li><strong>If you are banned or kicked:</strong> just before a ban, Volkar sends you a single
+          direct message, with no link, that says why and how to appeal. The
+          <a href="/appeal">thelastmc.fr/appeal</a> page explains it too. Write to
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> within 90 days: we acknowledge
+          receipt within 72 hours, and a person, if possible different from the one who confirmed the
+          decision, answers within 7 days (30 days at most); they can lift the sanction. No ID and no
+          parental consent needed. A Discord ban does not affect your website account, your Tavern purchases
+          or your access to the game. If you are kicked, the explanation waits for you in a private thread
+          on the server when you come back; a kick during a wave of fake accounts is not a sanction and
+          counts no point.</li>
         <li><strong>What we keep:</strong> your Discord identifier and name, the sanction, its
           reason, its date, who decided it, and sometimes a short excerpt of the message in question (text only;
           masked when it contains someone else's personal data; never when the reason concerns
@@ -365,28 +383,35 @@
           offenses. Discord accounts created
           less than 7 days ago that join the server are recorded for one week (identifier, name, dates),
           to spot bots. For a banned member, we also monitor their normalized name for as long
-          as the ban lasts, to spot a return under another account. We do not ask for your age, your identity or your address.</li>
-        <li><strong>How long:</strong> the excerpt is erased 30 days after the sanction ends
-          (90 days at most if you appeal it); the record, 12 months after it ends, unless proceedings are ongoing
+          as the ban lasts, to spot a return under another account. For an automatic ban or kick: the rule that fired, the
+          measured threshold, and who confirmed or lifted the decision. The log of changes made in the
+          team's dashboard is kept for <strong>12 months</strong>. For a banned member, the blacklist keeps
+          their identifier for as long as the ban lasts; it is reviewed every year. We do not ask for your age, your identity or your address.</li>
+        <li><strong>How long:</strong> the excerpt is erased <strong>30 days after the sanction was notified
+          to you</strong> (90 days at most, or 30 days after the decision if you appeal). A ban record stays
+          while the ban lasts, is reviewed yearly, and is erased 12 months after it is lifted; other records,
+          12 months after they end, unless proceedings are ongoing
           (illegal content, threat). The filter's technical traces (rule triggered, channel, time, without
           text) are kept for 30 days, and member reports for 90 days. The log of Volkar's incidents is kept
-          for 90 days, its repeat-offense counters 24 hours at most. The private thread where you receive the notice is deleted 30 days
+          for 90 days, the dashboard change log for 12 months, its repeat-offense counters 24 hours at most. The private thread where you receive the notice is deleted 30 days
           after the sanction ends.</li>
         <li><strong>Who sees it:</strong> the moderation team and the founder. You receive the reason in
-          a private thread on the server, never in a direct message, and you can see your records with the
+          a private thread on the server, except for a ban: a single direct message, with no link, just before it
+          (see above). You can see your records with the
           <code>/mon-casier</code> (my record) command. The data is hosted by Discord and by Cloudflare (hosting
           of the bot): see <a href="#transferts">section 8</a>.</li>
         <li><strong>Why:</strong> our legitimate interest in protecting players, many of whom are young,
           from scams, fake accounts and harassment (Article 6(1)(f) GDPR). We have weighed this interest
-          against your rights, in particular those of the youngest: reading messages without keeping the
-          text, private channels excluded, fixed rules, minimal data, short retention periods, and no
-          serious decision made by a machine. You may object to this reading (Article 21); because it
-          protects the whole server we cannot exempt a member who stays, but we look at every request, and
-          you can leave the server.</li>
+          against your rights, in particular those of the youngest: reading without keeping the text,
+          private channels excluded, fixed rules, a person's review of every ban, short retention periods.
+          You may object to this processing (Article 21); because it protects the whole server we cannot
+          exempt a member who stays, but we look at every request, and you can leave the server.</li>
         <li><strong>Your rights:</strong> access, rectification, erasure (unless the record is still
           needed: a sanction or points still in effect, or evidence for proceedings), objection, and appeal of a sanction (once, within 30 days after it ends,
           through a “Contester une sanction” (Appeal a sanction) ticket, or at
-          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> if you are banned, kicked or in timeout). You
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> if you are in timeout; if you are
+          banned or kicked, within 90 days, by email to
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a>: see above). You
           can also lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>. See
           also <a href="#droits">section 9</a>.</li>
       </ul>
@@ -400,7 +425,8 @@
         <li><strong>Security and moderation</strong> (technical logs, server logs, attempt
           limits and same-network check when signing in to the website, list of your devices,
           Discord moderation: sanction records, automatic filter, notices, live reading of the server's
-          messages by the bot, without keeping the text): our
+          messages by the bot, without keeping the text, automatic kicks and bans in listed cases, reviewed by a
+          person): our
           legitimate interest in protecting the service and its players (Article 6(1)(f) GDPR).</li>
         <li><strong>Answering your support tickets on Discord</strong>: performance of the terms
           of use when the ticket concerns your account or a purchase (Article 6(1)(b) GDPR), our

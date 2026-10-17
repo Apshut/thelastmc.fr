@@ -327,8 +327,7 @@
           lors d'une attaque de robots, l'équipe peut mettre les comptes récents en timeout 24 h, en le notant
           comme une mesure de protection, sans faute ni point. Les mentions en masse peuvent valoir un timeout de 10 minutes. Volkar
           compte, par membre, les messages bloqués, les expressions repérées et les signalements, pour
-          repérer l'insistance, la récidive et les situations à risque. Seul le fondateur expulse
-          ou bannit.</li>
+          repérer l'insistance, la récidive et les situations à risque.</li>
         <li><strong>Lecture des messages :</strong> notre bot Volkar lit en direct les messages des salons
           du serveur. Ceux des <strong>tickets, des fils privés et des salons de l'équipe</strong> lui
           parviennent aussi, mais il ne les analyse jamais et n'en garde rien. Les autres, il les compare à
@@ -342,6 +341,25 @@
           Il ne télécharge jamais de fichier ni d'image. Aucune intelligence artificielle ne décide. Pour un
           message de détresse ou un danger pour un mineur, Volkar ne sanctionne jamais : il prévient une
           personne de l'équipe.</li>
+        <li><strong>Expulsions et bannissements automatiques :</strong> dans quelques cas précis, et
+          seulement ceux-là, Volkar peut <strong>t'expulser ou te bannir automatiquement</strong> : arrivée
+          en masse de faux comptes (raid), lien vers un site d'arnaque connu ou fichier piégé posté par un
+          compte arrivé depuis peu, spam qui continue après deux timeouts, bot ajouté sans autorisation. Ce
+          sont des règles écrites à l'avance, pas un jugement. Un bannissement automatique dure <strong>7
+          jours au plus</strong> : une personne de l'équipe, qui lit la règle et le message, le relit dans
+          les 72 heures ; <strong>sans cette relecture, il est levé automatiquement</strong>. Elle peut le
+          lever à tout moment, et elle seule peut le rendre définitif. Volkar n'expulse ni ne bannit jamais
+          pour une insulte, un propos ou un message de détresse : c'est l'équipe qui décide.</li>
+        <li><strong>Si tu es banni ou expulsé :</strong> juste avant un bannissement, Volkar t'envoie un
+          seul message privé, sans lien, qui dit pourquoi et comment contester. La page
+          <a href="/contester">thelastmc.fr/contester</a> l'explique aussi. Écris à
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> dans les 90 jours : nous accusons
+          réception sous 72 heures, et une personne, si possible différente de celle qui a confirmé la
+          décision, te répond sous 7 jours (30 jours au plus) ; elle peut lever la sanction. Pas besoin de
+          pièce d'identité ni de l'accord de tes parents. Un bannissement du Discord ne touche ni ton compte
+          sur le site, ni tes achats dans la Taverne, ni ton accès au jeu. Si tu es expulsé, l'explication
+          t'attend dans un fil privé du serveur quand tu reviens ; une expulsion pendant une vague de faux
+          comptes n'est pas une sanction, elle ne compte aucun point.</li>
         <li><strong>Ce que nous gardons :</strong> ton identifiant et ton nom Discord, la sanction, son
           motif, sa date, qui l'a décidée, et parfois un court extrait du message en cause (texte seulement ;
           masqué quand il contient les données personnelles de quelqu'un d'autre ; jamais quand le motif touche
@@ -360,31 +378,40 @@
           quelle règle, sans le texte) et ce que l'équipe lui signale. Il tient aussi un journal de ses
           incidents (qui, quoi, où, quand, jamais le texte du message), gardé <strong>90 jours</strong>, et,
           par membre, quelques compteurs (des nombres seulement, jamais de texte) sur 24 heures au plus,
-          pour repérer la récidive. Les comptes Discord créés depuis
+          pour repérer la récidive. Pour un bannissement ou une expulsion automatique, nous gardons aussi la
+          règle déclenchée, le seuil mesuré, et qui a confirmé ou levé la décision. Le journal des réglages
+          du tableau de bord de l'équipe est gardé <strong>12 mois</strong>. Pour un membre banni, la liste
+          noire garde son identifiant tant que le bannissement dure ; elle est relue chaque année. Les comptes Discord créés depuis
           moins de 7 jours qui rejoignent le serveur sont notés une semaine (identifiant, nom, dates),
           pour repérer les robots. Pour un membre banni, nous surveillons aussi son nom normalisé tant
           que le bannissement dure, pour repérer un retour sous un autre compte. Nous ne demandons ni ton âge, ni ton identité, ni ton adresse.</li>
-        <li><strong>Combien de temps :</strong> l'extrait est effacé 30 jours après la fin de la sanction
-          (90 jours au plus si tu la contestes) ; le dossier, 12 mois après la fin, sauf procédure en cours
-          (contenu illégal, menace). Les traces techniques du filtre (règle déclenchée, salon, heure, sans
+        <li><strong>Combien de temps :</strong> l'extrait est effacé <strong>30 jours après que la sanction
+          t'a été notifiée</strong> (90 jours au plus, ou 30 jours après la décision si tu contestes). Le
+          dossier d'un bannissement reste tant que le bannissement dure, relu chaque année, et est effacé 12
+          mois après sa levée ; les autres dossiers, 12 mois après leur fin, sauf procédure en cours (contenu
+          illégal, menace). Les traces techniques du filtre (règle déclenchée, salon, heure, sans
           texte) sont gardées 30 jours, et les signalements de membres 90 jours. Le journal des incidents de
-          Volkar est gardé 90 jours, ses compteurs de récidive 24 heures au plus. Le fil privé où tu reçois l'avis est supprimé 30 jours
+          Volkar est gardé 90 jours, ses compteurs de récidive 24 heures au plus, le journal des réglages du
+          tableau de bord 12 mois. Le fil privé où tu reçois l'avis est supprimé 30 jours
           après la fin de la sanction.</li>
         <li><strong>Qui le voit :</strong> l'équipe de modération et le fondateur. Tu reçois le motif dans
-          un fil privé du serveur, jamais en message privé, et tu peux voir tes dossiers avec la commande
+          un fil privé du serveur, sauf pour un bannissement : un seul message privé, sans lien, juste avant
+          (voir ci-dessus), et tu peux voir tes dossiers avec la commande
           <code>/mon-casier</code>. Les données sont hébergées par Discord et par Cloudflare (hébergement
           du bot) : voir la <a href="#transferts">section 8</a>.</li>
         <li><strong>Pourquoi :</strong> notre intérêt légitime à protéger les joueurs, dont beaucoup sont
           jeunes, contre les arnaques, les faux comptes et le harcèlement (article 6.1.f du RGPD). Nous
-          avons pesé cet intérêt contre tes droits, en particulier ceux des plus jeunes : lecture des
-          messages sans en garder le texte, salons privés exclus, règles fixes, des données minimales, des
-          durées courtes, et aucune décision lourde prise par une machine. Tu peux t'opposer à cette
-          lecture (article 21) ; comme elle protège tout le serveur, nous ne pouvons pas exempter un membre
-          qui reste, mais nous étudions chaque demande, et tu peux quitter le serveur.</li>
+          avons pesé cet intérêt contre tes droits, en particulier ceux des plus jeunes : lecture sans
+          conservation du texte, salons privés exclus, règles fixes, relecture par une personne de chaque
+          bannissement, durées courtes. Tu peux t'opposer à ce traitement (article 21) ; comme il protège
+          tout le serveur, nous ne pouvons pas exempter un membre qui reste, mais nous étudions chaque
+          demande, et tu peux quitter le serveur.</li>
         <li><strong>Tes droits :</strong> accès, rectification, effacement (sauf si le dossier est encore
           nécessaire : sanction ou points en cours, ou preuve pour une procédure), opposition, et contestation d'une sanction (une fois, dans les 30 jours après sa fin,
           par un ticket « Contester une sanction », ou à
-          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> si tu es banni, expulsé ou en timeout). Tu
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> si tu es en timeout ; si tu es banni
+          ou expulsé, dans les 90 jours, par e-mail à
+          <a href="mailto:contact@thelastmc.fr">contact@thelastmc.fr</a> : voir plus haut). Tu
           peux aussi saisir la <a href="https://www.cnil.fr/fr/plaintes" rel="noopener">CNIL</a>. Voir
           aussi la <a href="#droits">section 9</a>.</li>
       </ul>
@@ -398,7 +425,8 @@
         <li><strong>Sécurité et modération</strong> (journaux techniques, journaux du serveur, limites de
           tentatives et contrôle du même réseau à la connexion au site, liste de tes appareils,
           modération du Discord : dossiers de sanction, filtre automatique, avis, lecture en direct des
-          messages du serveur par le bot, sans conservation du texte) : notre
+          messages du serveur par le bot, sans conservation du texte, expulsions et bannissements
+          automatiques dans des cas listés, relus par une personne) : notre
           intérêt légitime à protéger le service et ses joueurs (article 6.1.f du RGPD).</li>
         <li><strong>Répondre à tes tickets de support sur Discord</strong> : exécution des conditions
           d'utilisation lorsque le ticket concerne ton compte ou un achat (article 6.1.b du RGPD), notre

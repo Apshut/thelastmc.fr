@@ -1,6 +1,12 @@
 {
  "entries": [
   {
+   "p": "jeu",
+   "t": "Le jeu démarre plus vite et utilise moins de mémoire grâce à trois nouveaux mods de performance.",
+   "en": "The game starts faster and uses less memory thanks to three new performance mods.",
+   "d": "2026-10-19T15:07:34.000Z"
+  },
+  {
    "p": "site",
    "t": "Volkar peut expulser ou bannir seul dans quelques cas précis (raid, arnaque, spam) ; une personne relit chaque ban. La page « Contester » t'explique comment.",
    "en": "Volkar can kick or ban on its own in a few specific cases (raid, scam, spam); a person reviews every ban. The Appeal page tells you how.",

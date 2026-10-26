@@ -53,7 +53,8 @@
   "site|Sur ordinateur, le menu du haut grandit : liens plus gros au centre, et la langue (Français · English) avec ton compte dans un îlot à droite.",
   "site|Confidentialité : le bot Volkar va lire en direct les messages du serveur Discord, sans les garder, pour repérer arnaques, spam et raids. Tout est expliqué.",
   "site|Volkar peut expulser ou bannir seul dans quelques cas précis (raid, arnaque, spam) ; une personne relit chaque ban. La page « Contester » t'explique comment.",
-  "jeu|Le jeu démarre plus vite et utilise moins de mémoire grâce à trois nouveaux mods de performance."
+  "jeu|Le jeu démarre plus vite et utilise moins de mémoire grâce à trois nouveaux mods de performance.",
+  "jeu|Le mod The Last passe en 0.7.0 : un joueur gelé par l'équipe porte désormais des chaînes, et le launcher installe la nouvelle version tout seul."
  ],
- "semaine": "2026-10-19"
+ "semaine": "2026-10-26"
 }

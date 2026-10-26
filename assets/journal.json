@@ -2,6 +2,12 @@
  "entries": [
   {
    "p": "jeu",
+   "t": "Le mod The Last passe en 0.7.0 : un joueur gelé par l'équipe porte désormais des chaînes, et le launcher installe la nouvelle version tout seul.",
+   "en": "The Last mod moves to 0.7.0: a player frozen by the staff now wears chains, and the launcher installs the new version on its own.",
+   "d": "2026-10-26T16:32:53.000Z"
+  },
+  {
+   "p": "jeu",
    "t": "Le jeu démarre plus vite et utilise moins de mémoire grâce à trois nouveaux mods de performance.",
    "en": "The game starts faster and uses less memory thanks to three new performance mods.",
    "d": "2026-10-19T15:07:34.000Z"
